@@ -1,42 +1,69 @@
-import React, {Component} from 'react';
-import logo from './logo.svg';
-import "./tailwind.css"; //replace with 'import "./tailwind.generated.css"' when ready for production
-import "./main.css"; //this is the css file containing all of the tailwind classes... we're gonna need to modify this for production using postcss; Cam will modify the scripts none of you worry about this :)
-import './App.css';
+import React, { useState, useEffect } from 'react';
 
-class App extends Component {
+function useStickyState(defaultValue, key) {
 
-    state = {};
+    // Checks local storage and sets values
+    const [value, setValue] = useState(() => {
+      const stickyValue = window.localStorage.getItem(key);
+      return stickyValue !== null
+        ? JSON.parse(stickyValue)
+        : defaultValue;
+    });
 
-        componentDidMount() {
-            this.members()
-        }
+    // Used to set the value
+    useEffect(() => {
+      window.localStorage.setItem(key, JSON.stringify(value));
+    }, [key, value]);
+    return [value, setValue];
+}
 
-    members = () => {
-        fetch('/api/members')
-            .then(response => response.text())
-            .then(message => {
-                this.setState({message: message});
+function App() {
+    // This data will be persistent
+    const [
+      user,
+      setUser
+    ] = useStickyState({}, "user");
+
+    // Basically like beforeComponentLoad
+    useEffect(() => {
+        // Update the document title using the browser API
+        console.log("App is starting...")
+    });
+
+    const doLogin = async () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/html' },
+            body: "Billy Bob"
+        };
+        
+        await fetch('/api/login', requestOptions)
+            .then(response => response.json())
+            .then(user => {
+                setUser(user);
             });
     };
 
-    render() {
-        return (
-            <div className="App bg-black h-screen">
-                <header className="App-header justify-center bg-black">
-                    <img src={logo} className="App-logo" alt="logo"/>
-                    <h1>Education System Portal</h1>
-                    <h2>built by</h2>
-                    <h3 className="App-title">{this.state.message}</h3>
-                </header>
-                <div class="h-10 p-5 bg-black">
-                    <p className="App-intro text-white">
-                    To get started, edit <code>src/App.js</code> and save to reload it.
-                    </p>
+    // for user logout
+    const clearStorage = () => {
+        setUser({});
+    }
+  
+    return (
+        <div className="w-full h-full flex">
+            <div className="mt-20 mx-auto">
+                <h1 className="text-2xl text-gray-600">USER LOGIN</h1>
+                <p>USER ID: {user.userID}</p>
+                <div className="p-2">
+                    <button className="p-2 border-2 font-medium text-lg text-green-500" onClick={doLogin}>Login</button>
+                    <div className="pt-2">
+                        <button className="p-2 border-2 font-medium text-lg text-red-500" 
+                        onClick={clearStorage}>Logout / Clear Storage</button>
+                    </div>
                 </div>
             </div>
+        </div>
     );
-    } 
 }
 
 export default App;

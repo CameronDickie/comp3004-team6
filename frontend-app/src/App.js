@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import Splash from "./pages/splash.js"
+import Test from "./pages/test.js"
 
 function useStickyState(defaultValue, key) {
 
@@ -50,19 +53,16 @@ function App() {
     }
   
     return (
-        <div className="w-full h-full flex">
-            <div className="mt-20 mx-auto">
-                <h1 className="text-2xl text-gray-600">USER LOGIN</h1>
-                <p>USER ID: {user.userID}</p>
-                <div className="p-2">
-                    <button className="p-2 border-2 font-medium text-lg text-green-500" onClick={doLogin}>Login</button>
-                    <div className="pt-2">
-                        <button className="p-2 border-2 font-medium text-lg text-red-500" 
-                        onClick={clearStorage}>Logout / Clear Storage</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <BrowserRouter>
+            <Switch>
+                <Route exact path="/" >
+                    <Splash user={user} setUser={setUser} doLogin={doLogin} clearStorage={clearStorage}/>
+                </Route>
+                <Route exact path="/test">
+                    <Test user={user}></Test>
+                </Route>
+            </Switch>
+        </BrowserRouter>
     );
 }
 

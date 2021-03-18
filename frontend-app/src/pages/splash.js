@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from "react-router-dom"
 
 class Splash extends React.Component {
     render() {
@@ -15,6 +16,11 @@ class Splash extends React.Component {
                         </div>
                     </div>
                 </div>
+                <Link to="/test" >
+                    <button className="p-2 bg-blue-500">
+                        Go to test
+                    </button>
+                </Link>
             </div>
         )
     }

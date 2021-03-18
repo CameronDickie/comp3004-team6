@@ -59,7 +59,7 @@ function App() {
                     <Splash user={user} setUser={setUser} doLogin={doLogin} clearStorage={clearStorage}/>
                 </Route>
                 <Route exact path="/test">
-                    <Test user={user}></Test>
+                    <Test user={user} />
                 </Route>
             </Switch>
         </BrowserRouter>

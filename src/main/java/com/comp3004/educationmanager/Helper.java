@@ -3,12 +3,7 @@ package com.comp3004.educationmanager;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonMethod;
 import org.codehaus.jackson.map.ObjectMapper;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-
-
 public class Helper {
     public String objectToJSONString(Object o){
         ObjectMapper mapper = new ObjectMapper();

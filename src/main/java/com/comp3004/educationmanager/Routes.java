@@ -14,7 +14,7 @@ import java.util.HashMap;
 public class Routes {
     // For things like converting Objects to json
     Helper help = new Helper();
-
+    ServerState s = new ServerState();
     @GetMapping("/api/members")
     public String members() {
         return "Cameron, Cameron, Ben, Jaxson";

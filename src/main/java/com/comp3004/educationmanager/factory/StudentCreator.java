@@ -5,10 +5,7 @@ import com.comp3004.educationmanager.accounts.Student;
 
 public class StudentCreator implements UserCreator{
 
-    public User createUser(int userID, String username, String password) {
-
-        Student student = new Student(userID, username, password);
-
-        return student;
+    public User createUser(String username, String password) {
+        return new Student(username, password);
     }
 }

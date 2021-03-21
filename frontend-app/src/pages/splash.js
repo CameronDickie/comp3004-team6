@@ -1,6 +1,9 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
+import LoginForm from "../components/LoginForm.js"
+import SignUp from "../components/SignUp.js"
+
 class Splash extends React.Component {
     render() {
         return (
@@ -15,6 +18,8 @@ class Splash extends React.Component {
                             onClick={this.props.clearStorage}>Logout / Clear Storage</button>
                         </div>
                     </div>
+                    <LoginForm/>
+                    <SignUp />
                 </div>
                 <Link to="/test" >
                     <button className="p-2 bg-blue-500">

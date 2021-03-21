@@ -4,6 +4,11 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonMethod;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+
 public class Helper {
     public String objectToJSONString(Object o){
         ObjectMapper mapper = new ObjectMapper();
@@ -17,5 +22,14 @@ public class Helper {
         }
 
         return jsonString;
+    }
+    public HashMap<String, String> stringToMap(String s) {
+        String[] sets = s.replace("{","").replace("}","").split(",");
+        HashMap<String, String> m = new HashMap<>();
+        for (String set : sets) {
+            String[] spl = set.replace("\"", "").split(":");
+            m.put(spl[0], spl[1]);
+        }
+        return m;
     }
 }

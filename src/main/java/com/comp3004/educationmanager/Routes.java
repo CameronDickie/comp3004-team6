@@ -1,6 +1,7 @@
 package com.comp3004.educationmanager;
 import com.comp3004.educationmanager.accounts.Student;
 import com.comp3004.educationmanager.misc.UserNotification;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,10 @@ public class Routes {
     // For things like converting Objects to json
     Helper help = new Helper();
     ServerState s = new ServerState();
+
+    @Autowired
+    UserRepository ur;
+
     @GetMapping("/api/members")
     public String members() {
         return "Cameron, Cameron, Ben, Jaxson";
@@ -33,6 +38,15 @@ public class Routes {
     public String login(@RequestBody String username) {
         System.out.println("From '/api/login': " + username);
         Student a = new Student(username, "1234");
+
+        //TEST DATABASE
+        try {
+            UserDetails _userDetails = ur.save(new UserDetails("Jaxson", "YOU SUCK"));
+            System.out.println("Worked");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return help.objectToJSONString(a);
     }
 }

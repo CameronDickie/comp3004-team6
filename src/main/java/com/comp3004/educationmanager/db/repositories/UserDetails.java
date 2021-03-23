@@ -1,4 +1,4 @@
-package com.comp3004.educationmanager;
+package com.comp3004.educationmanager.db.repositories;
 
 import javax.persistence.*;
 

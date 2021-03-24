@@ -1,23 +1,32 @@
 package com.comp3004.educationmanager.accounts;
 
+import javax.persistence.*;
+
+@MappedSuperclass
 public abstract class User {
-    protected int userID;
-    protected String username, password;
-    protected static int nextUID = 1;
-    public User(String username, String password) {
-        this.userID = nextUID;
-        this.username = username;
-        this.password = password;
-        this.nextUID +=1;
-    }
+
+    @Id
+    protected long id;
+
+    @Column(name = "username")
+    protected String username;
+
+    @Column(name = "password")
+    protected String password;
 
     public String getName() {
         return this.username;
     }
-    public int getUserId() {
-        return this.userID;
+    public long getUserId() {
+        return this.id;
     }
     public String getPassword() {
         return this.password;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

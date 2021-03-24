@@ -16,7 +16,7 @@ public class ServerState {
     public boolean createUser(User u) {
         return db.addUser(u);
     }
-    public void printUsers() {
+    public void print() {
         db.print();
     }
     public boolean auth(String uname, String pword) {

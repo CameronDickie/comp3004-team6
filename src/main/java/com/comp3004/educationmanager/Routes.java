@@ -1,7 +1,6 @@
 package com.comp3004.educationmanager;
-import com.comp3004.educationmanager.accounts.Student;
-//import com.comp3004.educationmanager.db.repositories.UserRepository;
-import com.comp3004.educationmanager.misc.UserNotification;
+import com.comp3004.educationmanager.accounts.User;
+import com.comp3004.educationmanager.factory.StudentCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +29,9 @@ public class Routes {
         System.out.println("From '/api/register': " + info);
         HashMap<String, String> map = help.stringToMap(info);
         //this is the notification to be added to the admin's list of notifications -- likely to be a part of the database, but for now I just want to get it all working
-        UserNotification notification = new UserNotification(map.get("firstname"), map.get("lastname"), map.get("password"));
+        User newUser = new StudentCreator().createUser(map.get("firstname") + map.get("lastname"), map.get("password"));
+        s.createUser(newUser);
+        s.print();
         return info + " has attempted to be registered";
     }
 
@@ -51,7 +52,7 @@ public class Routes {
         } catch (Exception e) {
             e.printStackTrace(System.out);
         }
-        s.printUsers();
+        s.print();
         return answer;
     }
 }

@@ -35,24 +35,24 @@ public class Routes {
     }
 
     @PostMapping(value = "/api/login", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
-    public String login(@RequestBody String username) {
-        System.out.println("From '/api/login': " + username);
-        Student a = new Student(username, "1234");
+    public String login(@RequestBody String userinfo) {
+        System.out.println("From '/api/login': " + userinfo);
+        HashMap<String, String> map = help.stringToMap(userinfo);
+        //using this userinfo, see if there is a user with this information (auth)
+        String answer = "";
+        System.out.println(map.get("username"));
+        System.out.println(map.get("password"));
         try {
-            s.createUser(a);
-            s.printUsers();
+            if (s.auth(map.get("username"), map.get("password"))) {
+                answer = "true";
+            } else {
+                answer = "false";
+            }
         } catch (Exception e) {
             e.printStackTrace(System.out);
         }
-        //TEST DATABASE
-//        try {
-//            UserDetails _userDetails = ur.save(new UserDetails("Jaxson", "YOU SUCK"));
-//            System.out.println("Worked");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-        return help.objectToJSONString(a);
+        s.printUsers();
+        return answer;
     }
 }
 

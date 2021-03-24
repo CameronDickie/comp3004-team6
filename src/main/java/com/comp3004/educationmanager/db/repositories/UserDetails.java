@@ -12,15 +12,31 @@ public class UserDetails {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "message")
-    private String message;
+    @Column(name = "password")
+    private String password;
 
-    public UserDetails(String s, String msg){
+    @Column
+    private String type;
+    public UserDetails() {
+        name = null;
+        password = null;
+        type = "";
+    }
+
+    public UserDetails(String s, String p, String t){
         name = s;
-        message = msg;
+        password = p;
+        type = t;
     }
 
     public String getName(){
         return name;
+    }
+
+    public long getId() {
+        return this.id;
+    }
+    public String getPassword() {
+        return this.password;
     }
 }

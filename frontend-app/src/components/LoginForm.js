@@ -22,9 +22,11 @@ class LoginForm extends React.Component {
         };
         
         await fetch('/api/login', requestOptions)
-            .then(response => response.json())
+            .then(response => response.text())
             .then(res => {
-                console.log(res)
+                if(res == "true") console.log('login valid')
+                else if(res == "false") console.log('login invalid');
+                else console.log('unexpected error');
             });
     };
     render() {

@@ -1,16 +1,32 @@
 package com.comp3004.educationmanager.accounts;
 
-import com.comp3004.educationmanager.observer.Observer;
+import javax.persistence.*;
 
-public abstract class User implements Observer {
-    protected int userID;
-    protected String username, password;
-    protected static int nextUID = 0;
+@MappedSuperclass
+public abstract class User {
 
-    public User(String username, String password) {
-        this.userID = nextUID;
+    @Id
+    protected long id;
+
+    @Column(name = "username")
+    protected String username;
+
+    @Column(name = "password")
+    protected String password;
+
+    public String getName() {
+        return this.username;
+    }
+    public long getUserId() {
+        return this.id;
+    }
+    public String getPassword() {
+        return this.password;
+    }
+    public void setUsername(String username) {
         this.username = username;
+    }
+    public void setPassword(String password) {
         this.password = password;
-        this.nextUID +=1;
     }
 }

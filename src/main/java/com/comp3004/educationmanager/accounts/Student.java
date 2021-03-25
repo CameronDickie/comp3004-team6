@@ -11,4 +11,9 @@ public class Student extends User implements Observer{
     public void update() {
 
     }
+
+    @Override
+    public void update() {
+
+    }
 }

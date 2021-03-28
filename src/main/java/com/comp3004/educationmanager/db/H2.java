@@ -7,7 +7,6 @@ import com.comp3004.educationmanager.accounts.User;
 import com.comp3004.educationmanager.db.repositories.*;
 import com.comp3004.educationmanager.factory.AdminCreator;
 import com.comp3004.educationmanager.observer.CourseData;
-import com.comp3004.educationmanager.observer.CourseDataSerialized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,9 +27,6 @@ public class H2 implements Database {
 
     @Autowired
     CourseRepository cr;
-
-    @Autowired
-    CourseSerializedRepository csr;
 
     public H2() {
 
@@ -100,13 +96,6 @@ public class H2 implements Database {
     }
 
     @Override
-    public boolean addSerializedCourseData(CourseDataSerialized courseDataSerialized) {
-
-        csr.save(courseDataSerialized);
-        return true;
-    }
-
-    @Override
     public boolean deleteCourseData(String courseCode) {
 
         CourseData courseData = cr.findByCourseCode(courseCode);
@@ -117,15 +106,6 @@ public class H2 implements Database {
 
         cr.delete(courseData);
         return true;
-    }
-
-
-    public CourseDataSerialized getSerializedCourseData(long id) {
-
-        CourseDataSerialized courseDataSerialized = csr.findById(id);
-
-
-        return courseDataSerialized;
     }
 
     @Override

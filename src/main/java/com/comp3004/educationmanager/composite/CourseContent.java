@@ -1,10 +1,12 @@
 package com.comp3004.educationmanager.composite;
 
 import java.util.List;
+import javax.persistence.*;
 
-public class CourseContent implements Component {
+public class CourseContent implements Component, java.io.Serializable {
     private String name;
     private String path;
+    private String test;
 
     private List<Component> children;
 
@@ -29,7 +31,10 @@ public class CourseContent implements Component {
                 children.get(i).setProperty("path", path);
             }
             return true;
-        } else {
+        } else if(property.equals("test")) {                            // set path of item and all children
+            test = (String) value;
+            return true;
+        }else {
             return false;
         }
     }
@@ -40,7 +45,10 @@ public class CourseContent implements Component {
             return name;
         } else if(property.equals("path")) {                            // get path of item
             return path;
-        } else {
+        }else if(property.equals("test")) {                            // get path of item
+            return test;
+        }
+        else {
             return null;
         }
     }

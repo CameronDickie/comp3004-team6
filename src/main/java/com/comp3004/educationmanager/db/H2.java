@@ -4,10 +4,10 @@ import com.comp3004.educationmanager.accounts.Admin;
 import com.comp3004.educationmanager.accounts.Professor;
 import com.comp3004.educationmanager.accounts.Student;
 import com.comp3004.educationmanager.accounts.User;
-import com.comp3004.educationmanager.db.repositories.AdminRepository;
-import com.comp3004.educationmanager.db.repositories.ProfessorRepository;
-import com.comp3004.educationmanager.db.repositories.StudentRepository;
+import com.comp3004.educationmanager.db.repositories.*;
 import com.comp3004.educationmanager.factory.AdminCreator;
+import com.comp3004.educationmanager.observer.CourseData;
+import com.comp3004.educationmanager.observer.CourseDataSerialized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +25,12 @@ public class H2 implements Database {
 
     @Autowired
     ProfessorRepository pr;
+
+    @Autowired
+    CourseRepository cr;
+
+    @Autowired
+    CourseSerializedRepository csr;
 
     public H2() {
 
@@ -85,4 +91,42 @@ public class H2 implements Database {
         for(Professor p : profs)
             System.out.println(p.getUserId() + " | " + p.getName() + " | " + p.getPassword());
     }
+
+    @Override
+    public boolean addCourseData(CourseData courseData) {
+
+        cr.save(courseData);
+        return true;
+    }
+
+    @Override
+    public boolean addSerializedCourseData(CourseDataSerialized courseDataSerialized) {
+
+        csr.save(courseDataSerialized);
+        return true;
+    }
+
+    @Override
+    public boolean deleteCourseData(String courseCode) {
+
+        CourseData courseData = cr.findByCourseCode(courseCode);
+
+        System.out.println(courseData.getMaxStudents());
+
+        System.out.println("Max Students: " + courseData.getMaxStudents());
+
+        cr.delete(courseData);
+        return true;
+    }
+
+
+    public CourseDataSerialized getSerializedCourseData(long id) {
+
+        CourseDataSerialized courseDataSerialized = csr.findById(id);
+
+
+        return courseDataSerialized;
+    }
+
+
 }

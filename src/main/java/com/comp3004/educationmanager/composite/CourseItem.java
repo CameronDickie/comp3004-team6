@@ -1,6 +1,6 @@
 package com.comp3004.educationmanager.composite;
 
-public class CourseItem implements Component {
+public class CourseItem implements Component, java.io.Serializable {
     private String name;
     private String path;
 

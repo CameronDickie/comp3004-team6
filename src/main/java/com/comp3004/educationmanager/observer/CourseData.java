@@ -3,6 +3,7 @@ package com.comp3004.educationmanager.observer;
 import com.comp3004.educationmanager.composite.Component;
 import com.comp3004.educationmanager.composite.CourseContent;
 import com.comp3004.educationmanager.composite.CourseItem;
+import com.comp3004.educationmanager.strategy.Strategy;
 
 import javax.persistence.*;
 
@@ -24,6 +25,9 @@ public class CourseData extends Subject implements java.io.Serializable{
 
     @Transient
     Component content;
+
+    @Transient
+    Strategy createItemStrategy;
 
     public CourseData() {
         this.content = new CourseItem();

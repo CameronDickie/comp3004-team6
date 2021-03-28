@@ -128,5 +128,11 @@ public class H2 implements Database {
         return courseDataSerialized;
     }
 
+    @Override
+    public CourseData getCourseData(String courseCode) {
+        CourseData data = cr.findByCourseCode(courseCode);
+        return data;
+    }
+
 
 }

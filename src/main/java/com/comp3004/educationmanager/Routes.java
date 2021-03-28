@@ -5,6 +5,7 @@ import com.comp3004.educationmanager.composite.CourseContent;
 import com.comp3004.educationmanager.decorator.EditableDecorator;
 import com.comp3004.educationmanager.factory.CourseCreator;
 import com.comp3004.educationmanager.factory.StudentCreator;
+import com.comp3004.educationmanager.misc.Serialization;
 import com.comp3004.educationmanager.observer.CourseData;
 import com.comp3004.educationmanager.observer.CourseDataSerialized;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.http.MediaType;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-import com.comp3004.educationmanager.misc.SerializationHelper;
 
 @RestController
 public class Routes {
@@ -26,7 +26,7 @@ public class Routes {
     Helper help = new Helper();
     @Autowired
     ServerState s;
-    SerializationHelper serializationHelper = new SerializationHelper();
+    Serialization serialization = new Serialization();
 
 
     @GetMapping("/api/members")
@@ -74,13 +74,17 @@ public class Routes {
 
         CourseData courseData = new CourseCreator().createCourse(courseMap.get("courseCode"), courseMap.get("courseName"), Integer.parseInt(courseMap.get("maxStudents")));
 
-        courseData.addContent("path", "123/123/123");
+        courseData.addContent("path", "123/123/123/");
 
-        CourseDataSerialized courseDataSerialized = (CourseDataSerialized) serializationHelper.createSerializedObject(courseData, "course");
+        byte[] courseObject = serialization.serialize((Object) courseData);
+        courseData.setObject(courseObject);
+        courseData.setCourseCode("COMP3004B");
+
+        //CourseDataSerialized courseDataSerialized = (CourseDataSerialized) serializationHelper.createSerializedObject(courseData, "course");
 
         s.createCourse(courseData);
 
-        s.createCourseSerialized(courseDataSerialized);
+        //s.createCourseSerialized(courseDataSerialized);
 
         return courseInfo + " has been created";
     }
@@ -91,24 +95,28 @@ public class Routes {
 
         //Needs to delete courses AND delete students / professors with course
 
-        CourseDataSerialized courseDataSerialized = s.getCourseSerialized(5);
+        CourseData course = s.getCourseData("COMP3004B");
+        course = (CourseData) serialization.deserialize(course.getObject());
 
-        Object courseDataObject = serializationHelper.deserializeObject(courseDataSerialized.getObj(), "course");
 
-        CourseData courseData = (CourseData) courseDataObject;
+        //CourseDataSerialized courseDataSerialized = s.getCourseSerialized(5);
 
-        Component comp = courseData.getContent();
+        //Object courseDataObject = serialization.deserializeObject(courseDataSerialized.getObj(), "course");
+
+        // CourseData courseData = (CourseData) courseDataObject;
+
+        Component comp = course.getContent();
         System.out.println("COMPONNENT (COURSE DELETION): " + comp.getProperty("path"));
 
-        System.out.println("MAXIMUM STUDENTS (COURSE DELETION):   "  + courseData.getMaxStudents());
+        System.out.println("MAXIMUM STUDENTS (COURSE DELETION):   "  + course.getMaxStudents());
 
-        System.out.println("COURSE CODE (COURSE DELETION):   "  + courseData.getCourseCode());
+        System.out.println("COURSE CODE (COURSE DELETION):   "  + course.getCourseCode());
 
         HashMap <String, String> courseMap = help.stringToMap(courseInfo);
 
-        String courseCode = courseMap.get("courseCode");
+        //String courseCode = courseMap.get("courseCode");
 
-        s.deleteCourse(courseCode);
+        //s.deleteCourse(courseCode);
 
         return courseInfo + " has been deleted";
     }

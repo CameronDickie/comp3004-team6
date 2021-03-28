@@ -23,6 +23,10 @@ public class CourseData extends Subject implements java.io.Serializable{
     @Column(name = "maxStudents")
     int maxStudents;
 
+    @Column(name = "object")
+    @Lob
+    byte[] object;
+
     @Transient
     Component content;
 
@@ -49,6 +53,8 @@ public class CourseData extends Subject implements java.io.Serializable{
         this.courseName = courseName;
     }
 
+    public void setObject(byte[] object) { this.object = object; }
+
     public void setMaxStudents(int maxStudents) {
        this.maxStudents = maxStudents;
     }
@@ -69,6 +75,7 @@ public class CourseData extends Subject implements java.io.Serializable{
         return this.courseCode;
     }
 
+    public byte[] getObject() { return object; }
 
     public void updateAll() {
         //notify all observers (professors and students) who are attached to this course.

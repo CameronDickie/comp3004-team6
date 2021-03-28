@@ -15,4 +15,5 @@ public interface Database {
     boolean auth(String username, String password);
     void print();
 
+    CourseData getCourseData(String courseCode);
 }

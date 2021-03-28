@@ -6,10 +6,19 @@ import com.comp3004.educationmanager.observer.CourseDataSerialized;
 import java.io.*;
 import java.nio.charset.Charset;
 
-public class SerializationHelper {
+public class Serialization {
 
     public void SerializationHelper() {
 
+    }
+
+    public byte[] serialize(Object o) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream( byteArrayOutputStream );
+        objectOutputStream.writeObject(o);
+        objectOutputStream.close();
+
+        return byteArrayOutputStream.toByteArray();
     }
 
     //Function that takes in an object and serializes it and the Serialized Object is returned so it can be stored in the database
@@ -59,5 +68,11 @@ public class SerializationHelper {
        }
 
 
+    }
+
+    public Object deserialize(byte[] object) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(object);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        return objectInputStream.readObject();
     }
 }

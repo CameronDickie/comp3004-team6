@@ -1,8 +1,11 @@
 package com.comp3004.educationmanager.composite;
 
 import java.util.List;
-import javax.persistence.*;
 
+/*
+The Composite object - stores multiple Component objects
+Implements the Component functions
+ */
 public class CourseContent implements Component, java.io.Serializable {
     private String name;
     private String path;

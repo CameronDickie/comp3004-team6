@@ -1,5 +1,9 @@
 package com.comp3004.educationmanager.composite;
 
+/*
+A single course item
+Implements the Component functions
+ */
 public class CourseItem implements Component, java.io.Serializable {
     private String name;
     private String path;

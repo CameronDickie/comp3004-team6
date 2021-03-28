@@ -1,13 +1,10 @@
 package com.comp3004.educationmanager;
 import com.comp3004.educationmanager.accounts.User;
 import com.comp3004.educationmanager.composite.Component;
-import com.comp3004.educationmanager.composite.CourseContent;
-import com.comp3004.educationmanager.decorator.EditableDecorator;
 import com.comp3004.educationmanager.factory.CourseCreator;
 import com.comp3004.educationmanager.factory.StudentCreator;
 import com.comp3004.educationmanager.misc.Serialization;
 import com.comp3004.educationmanager.observer.CourseData;
-import com.comp3004.educationmanager.observer.CourseDataSerialized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.MediaType;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 
 @RestController
@@ -76,7 +72,7 @@ public class Routes {
 
         courseData.addContent("path", "123/123/123/");
 
-        byte[] courseObject = serialization.serialize((Object) courseData);
+        byte[] courseObject = serialization.serialize(courseData);
         courseData.setObject(courseObject);
         courseData.setCourseCode("COMP3004B");
 

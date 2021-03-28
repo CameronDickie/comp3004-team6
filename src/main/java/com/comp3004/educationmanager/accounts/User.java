@@ -2,9 +2,12 @@ package com.comp3004.educationmanager.accounts;
 
 import javax.persistence.*;
 
+/*
+The base class for all Users
+Extended by Admin, Student, and Professor
+ */
 @MappedSuperclass
 public abstract class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected long id;
@@ -15,6 +18,9 @@ public abstract class User {
     @Column(name = "password")
     protected String password;
 
+    /*
+    Getters
+     */
     public String getName() {
         return this.username;
     }
@@ -24,6 +30,10 @@ public abstract class User {
     public String getPassword() {
         return this.password;
     }
+
+    /*
+    Setters
+     */
     public void setUsername(String username) {
         this.username = username;
     }

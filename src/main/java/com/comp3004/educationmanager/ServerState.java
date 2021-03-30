@@ -26,6 +26,7 @@ public class ServerState {
     }
     public boolean createCourse(CourseData courseData) {return db.addCourseData(courseData);}
     public CourseData getCourseData(String courseCode) { return db.getCourseData(courseCode); }
+    public User getUser(String username) { return db.getUser(username); }
 
     public boolean deleteCourse(String courseCode) {return db.deleteCourseData(courseCode);}
 }

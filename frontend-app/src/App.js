@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-import Splash from "./pages/splash.js"
-import Test from "./pages/test.js"
+import LoginForm from './components/LoginForm.js';
+import SignUp from './components/SignUp.js';
+import Dashboard from './pages/Dashboard.js';
 
 function useStickyState(defaultValue, key) {
 
@@ -33,33 +34,31 @@ function App() {
         console.log("App is starting...")
     });
 
-    const doLogin = async () => {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/html' },
-            body: "Billy Bob"
-        };
-        
-        await fetch('/api/login', requestOptions)
-            .then(response => response.json())
-            .then(user => {
-                setUser(user);
-            });
-    };
-
     // for user logout
     const clearStorage = () => {
         setUser({});
+    }
+
+    const setU = (usr) => {
+        setUser(usr);
+        console.log(user.username)
+    }
+
+    const getUser = () => {
+        return user;
     }
   
     return (
         <BrowserRouter>
             <Switch>
                 <Route exact path="/" >
-                    <Splash user={user} setUser={setUser} doLogin={doLogin} clearStorage={clearStorage}/>
+                    <LoginForm setU={setU}/>
                 </Route>
-                <Route exact path="/test">
-                    <Test user={user} />
+                <Route exact path="/signup">
+                    <SignUp />
+                </Route>
+                <Route exact path="/dashboard">
+                    <Dashboard getUser={getUser} logout={clearStorage} />
                 </Route>
             </Switch>
         </BrowserRouter>

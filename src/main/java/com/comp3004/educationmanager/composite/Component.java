@@ -7,5 +7,5 @@ Implemented by the CourseContent, CourseItem, and all Decorators
 public interface Component {
     boolean setProperty(String property, Object value);
     Object getProperty(String property);
-    void executeCommand(String command, Object value);
+    Object executeCommand(String command, Object value);
 }

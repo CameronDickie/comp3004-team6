@@ -5,6 +5,9 @@ import com.comp3004.educationmanager.factory.CourseCreator;
 import com.comp3004.educationmanager.factory.StudentCreator;
 import com.comp3004.educationmanager.misc.Serialization;
 import com.comp3004.educationmanager.observer.CourseData;
+import com.comp3004.educationmanager.strategy.AddDocumentStrategy;
+import com.comp3004.educationmanager.strategy.CourseContentStrategy;
+import com.comp3004.educationmanager.strategy.SubmitDeliverableStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.http.MediaType;
 
+import javax.print.attribute.standard.Media;
 import java.io.*;
+import java.util.Base64;
 import java.util.HashMap;
 
 @RestController
@@ -70,17 +75,9 @@ public class Routes {
 
         CourseData courseData = new CourseCreator().createCourse(courseMap.get("courseCode"), courseMap.get("courseName"), Integer.parseInt(courseMap.get("maxStudents")));
 
-        courseData.addContent("path", "123/123/123/");
-
         byte[] courseObject = serialization.serialize(courseData);
         courseData.setObject(courseObject);
-        courseData.setCourseCode("COMP3004B");
-
-        //CourseDataSerialized courseDataSerialized = (CourseDataSerialized) serializationHelper.createSerializedObject(courseData, "course");
-
         s.createCourse(courseData);
-
-        //s.createCourseSerialized(courseDataSerialized);
 
         return courseInfo + " has been created";
     }
@@ -89,38 +86,21 @@ public class Routes {
     public String deleteCourse(@RequestBody String courseInfo) throws IOException, ClassNotFoundException {
         System.out.println("From '/api/delete-course': " + courseInfo);
 
-        //Needs to delete courses AND delete students / professors with course
-
         CourseData course = s.getCourseData("COMP3004B");
         course = (CourseData) serialization.deserialize(course.getObject());
 
-
-        //CourseDataSerialized courseDataSerialized = s.getCourseSerialized(5);
-
-        //Object courseDataObject = serialization.deserializeObject(courseDataSerialized.getObj(), "course");
-
-        // CourseData courseData = (CourseData) courseDataObject;
-
         Component comp = course.getContent();
         System.out.println("COMPONNENT (COURSE DELETION): " + comp.getProperty("path"));
-
         System.out.println("MAXIMUM STUDENTS (COURSE DELETION):   "  + course.getMaxStudents());
-
         System.out.println("COURSE CODE (COURSE DELETION):   "  + course.getCourseCode());
 
-        HashMap <String, String> courseMap = help.stringToMap(courseInfo);
-
-        //String courseCode = courseMap.get("courseCode");
-
-        //s.deleteCourse(courseCode);
+        s.deleteCourse(course.getCourseCode());
 
         return courseInfo + " has been deleted";
     }
 
     @PostMapping(value ="/api/course-registration", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String courseRegistration(@RequestBody String studentInfo) {
-        System.out.println("From '/api/delete-course': " + studentInfo);
-
         //Needs to delete courses AND delete students / professors with course
 
         HashMap <String, String> studentMap = help.stringToMap(studentInfo);
@@ -128,8 +108,139 @@ public class Routes {
         return studentInfo + " has been deleted";
     }
 
+    /*
+    Route for adding a course content object
+    USAGE:  Call this when the professor wants to create content items such as course sections, lectures,
+            or deliverables. MUST be called before adding any related items like documents.
+        - use a separate post with this component's path to add for adding additional items
+    @param (contentInfo JSON)
+        - courseCode: the course to add the content to
+        - name: the name for the CourseContent object
+        - path: the path for the CourseContent object
+    @return the path of the item added
+    TODO:
+        - How do we want to decide the path for each item?
+            - the addContent method returns a component (either entire course structure or specifically the new item?)
+            - I could implement a method that "stringifies" a component - will just be a long string of all path names
+                and the stucture of how they appear in the course, thereby providing an easy way to pass the whole
+                structure to the front end and get the paths whenever a professor is editing the course
+    */
+    @PostMapping(value = "/api/add-content", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String addContent(@RequestBody String contentInfo) {
+        HashMap<String, String> contentMap = help.stringToMap(contentInfo);
+        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+        course.setStrategy(new CourseContentStrategy());
+        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"));
+
+        return (String) comp.getProperty("fullPath");
+    }
+
+    /*
+    Route for submitting a course deliverable
+    USAGE: Call this when the student wants to submit a course deliverable. MUST be called before adding any related documents.
+        - use a separate post request for creating/attaching documents
+    TODO:
+        -
+     */
+    @PostMapping(value = "/api/submit-deliverable", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String submitDeliverable(@RequestBody String contentInfo) {
+        HashMap<String, String> contentMap = help.stringToMap(contentInfo);
+        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+        course.setStrategy(new SubmitDeliverableStrategy());
+        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"));
+
+        return (String) comp.getProperty("fullPath");
+    }
+
+    /*
+    Route for adding a document
+    USAGE:  Must convert the file to a byte array and then encode that as a string (with Base64 encoding)
+            to be passed in with the contentInfo param
+        - this will decode the String into a byte array and pass that to the file decorator
+    TODO:
+        -
+     */
+    @PostMapping(value = "/api/add-document", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String addDocument(@RequestBody String contentInfo) {
+        HashMap<String, String> contentMap = help.stringToMap(contentInfo);
+        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+
+        String sBytes = contentMap.get("bytes");
+        byte[] bytes = Base64.getDecoder().decode(sBytes);
+
+        course.setStrategy(new AddDocumentStrategy());
+        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"));
+        comp.setProperty("file", bytes);
+
+        return contentInfo + " has been submitted";
+    }
+
+    /*
+    Route for adding a forum post
+    TODO:
+        -
+     */
+    @PostMapping(value = "/api/forum-post", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String addForumPost(@RequestBody String contentInfo) {
+        HashMap<String, String> contentMap = help.stringToMap(contentInfo);
 
 
+        return contentInfo + " has been submitted";
+    }
+
+    /*
+    Route for submitting a deliverable grade(s) for a student(s)
+    TODO:
+        -
+    */
+    @PostMapping(value = "/api/add-grade", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String addGrade(@RequestBody String contentInfo) {
+        HashMap<String, String> contentMap = help.stringToMap(contentInfo);
+        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+        Component c = (Component) course.getContent().executeCommand("findByPath", contentMap.get("path"));
+        c.executeCommand("addGrade", Integer.parseInt(contentMap.get("grade")));
+
+        return contentInfo + " has been submitted";
+    }
+
+    /*
+    Route for submitting the final grade for a student(s)
+    TODO:
+        - Are we using the visitor pattern for this?
+        - How do we want to store the final grades, with the student?
+     */
+    @PostMapping(value = "/api/submit-final-grade", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String addFinalGrade(@RequestBody String contentInfo) {
+        HashMap<String, String> contentMap = help.stringToMap(contentInfo);
+
+        return contentInfo + " has been submitted";
+    }
+
+    /*
+    Route for downloading a file
+    TODO:
+        -
+     */
+    @GetMapping(value = "/api/download-file", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public byte[] downloadFile(@RequestBody String contentInfo) {
+        HashMap<String, String> contentMap = help.stringToMap(contentInfo);
+        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+        Component c = (Component) course.getContent().executeCommand("findByPath", contentMap.get("path"));
+        return (byte[]) c.executeCommand("download", null);
+    }
+
+    /*
+    Route for view a file as PDF
+    TODO:
+        - Must still implement conversion feature within the FileDecorator class
+     */
+    @GetMapping(value = "/api/view-file", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.APPLICATION_PDF_VALUE)
+    public byte[] viewFile(@RequestBody String contentInfo) {
+        HashMap<String, String> contentMap = help.stringToMap(contentInfo);
+        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+        Component c = (Component) course.getContent().executeCommand("findByPath", contentMap.get("path"));
+        return (byte[]) c.executeCommand("viewAsPDF", null);
+    }
 }
 
 

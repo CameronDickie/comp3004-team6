@@ -37,7 +37,7 @@ public class EditableDecorator extends Decorator {
     }
 
     @Override
-    public void executeCommand(String command, Object value) {
-        wrappee.executeCommand(command, value);
+    public Object executeCommand(String command, Object value) {
+        return wrappee.executeCommand(command, value);
     }
 }

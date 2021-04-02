@@ -36,7 +36,7 @@ public class TextDecorator extends Decorator {
     }
 
     @Override
-    public void executeCommand(String command, Object value) {
-
+    public Object executeCommand(String command, Object value) {
+        return wrappee.executeCommand(command, value);
     }
 }

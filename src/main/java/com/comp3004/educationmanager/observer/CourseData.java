@@ -1,11 +1,14 @@
 package com.comp3004.educationmanager.observer;
 
+import com.comp3004.educationmanager.accounts.Professor;
 import com.comp3004.educationmanager.composite.Component;
 import com.comp3004.educationmanager.composite.CourseContent;
 import com.comp3004.educationmanager.composite.CourseItem;
 import com.comp3004.educationmanager.strategy.Strategy;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class CourseData extends Subject implements java.io.Serializable {
@@ -105,10 +108,22 @@ public class CourseData extends Subject implements java.io.Serializable {
 
     public void setObject(byte[] object) { this.object = object; }
 
+    public void printProfessor() {
+        System.out.println(observers.size());
+        Professor prof = (Professor) observers.get(0);
+        System.out.println(prof.getName());
+    }
+
+
+    public void updateAll(String command, Object value) {
+        //notify all observers (professors and students) who are attached to this course.
+        for (Observer observer : observers) {
+            observer.update(command, value);
+        }
+
     public void setMaxStudents(int maxStudents) {
        this.maxStudents = maxStudents;
     }
 
     public void setStrategy(Strategy strategy) { this.strategy = strategy; }
-
 }

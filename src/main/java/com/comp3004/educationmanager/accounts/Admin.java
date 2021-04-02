@@ -10,7 +10,7 @@ Implements all admin-specific functionality, including the observer
 public class Admin extends User {
 
     @Override
-    public void update() {
+    public void update(String command, Object value) {
 
     }
 }

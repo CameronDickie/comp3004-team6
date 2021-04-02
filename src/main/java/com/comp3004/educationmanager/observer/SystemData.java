@@ -8,9 +8,9 @@ public class SystemData extends Subject {
     List<Student> students;
     List<Professor> professors;
 
-    public void updateAll() {
+    public void updateAll(String command, Object value) {
         for (Observer observer : observers) {
-            observer.update();
+            observer.update(command, value);
         }
     }
 }

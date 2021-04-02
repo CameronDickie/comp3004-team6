@@ -13,5 +13,5 @@ public abstract class Subject {
         return observers.remove(o);
     }
 
-    public abstract void updateAll();
+    public abstract void updateAll(String command, Object value);
 }

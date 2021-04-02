@@ -7,10 +7,18 @@ import com.comp3004.educationmanager.observer.CourseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 @Component
 public class ServerState {
     @Autowired
     H2 db;
+
+    HashMap<String, CourseData> courses = new HashMap<String, CourseData>();
+    HashMap<Long, User> users = new HashMap<Long, User>();
+
+
 
     public ServerState () {
         System.out.println("Server state is being made...");

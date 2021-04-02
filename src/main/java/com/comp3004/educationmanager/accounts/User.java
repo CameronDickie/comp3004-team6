@@ -7,7 +7,7 @@ The base class for all Users
 Extended by Admin, Student, and Professor
  */
 @MappedSuperclass
-public abstract class User {
+public abstract class User implements java.io.Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected long id;

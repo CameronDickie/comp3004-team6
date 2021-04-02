@@ -12,7 +12,7 @@ Implements all admin-specific functionality, including the observer
 public class Admin extends User implements Observer {
 
     @Override
-    public void update() {
+    public void update(String command, Object value) {
 
     }
 }

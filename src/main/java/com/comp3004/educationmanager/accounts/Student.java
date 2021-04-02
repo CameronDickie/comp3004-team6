@@ -1,7 +1,5 @@
 package com.comp3004.educationmanager.accounts;
 
-import com.comp3004.educationmanager.observer.Observer;
-
 import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +9,7 @@ Class for the Student user
 Implements all student-specific functionality, including the observer
  */
 @Entity
-public class Student extends User implements Observer{
+public class Student extends User {
 
     long studentID;
 

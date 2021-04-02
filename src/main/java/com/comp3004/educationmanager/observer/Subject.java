@@ -1,9 +1,9 @@
 package com.comp3004.educationmanager.observer;
 
-import java.util.List;
+import java.util.ArrayList;
 
-public abstract class Subject implements java.io.Serializable {
-    protected List<Observer> observers;
+public abstract class Subject {
+    protected ArrayList<Observer> observers = new ArrayList();
 
     public boolean attach(Observer o) {
         return observers.add(o);

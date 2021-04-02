@@ -18,8 +18,6 @@ public class ServerState {
     HashMap<String, CourseData> courses = new HashMap<String, CourseData>();
     HashMap<Long, User> users = new HashMap<Long, User>();
 
-
-
     public ServerState () {
         System.out.println("Server state is being made...");
     }
@@ -32,8 +30,8 @@ public class ServerState {
     public boolean auth(String uname, String pword) {
         return db.auth(uname, pword);
     }
-    public boolean createCourse(CourseData courseData) {return db.addCourseData(courseData);}
-    public CourseData getCourseData(String courseCode) { return db.getCourseData(courseCode); }
+    public void createCourse(CourseData courseData) { courses.put(courseData.getCourseCode(), courseData); }
+    public CourseData getCourseData(String courseCode) { return courses.get(courseCode); }
 
     public boolean deleteCourse(String courseCode) {return db.deleteCourseData(courseCode);}
 }

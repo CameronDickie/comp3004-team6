@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class CourseData extends Subject implements java.io.Serializable{
-
+public class CourseData extends Subject implements java.io.Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected long id;
@@ -34,33 +33,55 @@ public class CourseData extends Subject implements java.io.Serializable{
     Component content;
 
     @Transient
-    Strategy createItemStrategy;
+    Strategy strategy;
 
+    /*
+    Constructor
+     */
     public CourseData() {
-        this.content = new CourseItem();
-        this.observers = new ArrayList<>();
+        this.courseCode = "COUR1234A";
+        this.courseName = "Course Placeholder";
+        this.maxStudents = 0;
+        this.content = new CourseContent(this.courseCode, "/");
     }
-
 
     public CourseData(String courseCode, String courseName, int maxStudents) {
         this.courseCode = courseCode;
         this.courseName = courseName;
         this.maxStudents = maxStudents;
-        this.content = new CourseContent();
+        this.content = new CourseContent(this.courseCode, "/");
     }
 
-    public void setCourseCode(String courseCode) {
-        this.courseCode = courseCode;
+    /*
+    Subject Notify All Method
+     */
+    public void updateAll() {
+        //notify all observers (professors and students) who are attached to this course.
+        for (Observer observer : observers) {
+            observer.update();
+        }
     }
 
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
+    /*
+    Method to add content to the course
+    TODO:
+        - Should new component be returned or the entire content structure?
+            * currently returning entire structure
+            * can also return a "stringified" version of the structure so we can pass it to the front end
+                or have a separate GetMapping to retrieve the entire course structure
+     */
+    public Component addContent(String name, String path) {
+        Component comp = strategy.createCourseItem(name, path);
+        content.executeCommand("addItem", comp);
+        return comp;
     }
 
-    public void setObject(byte[] object) { this.object = object; }
+    /*
+    Getters
+     */
 
-    public void setMaxStudents(int maxStudents) {
-       this.maxStudents = maxStudents;
+    public String getCourseCode() {
+        return this.courseCode;
     }
 
     public int getMaxStudents() {
@@ -71,15 +92,21 @@ public class CourseData extends Subject implements java.io.Serializable{
         return this.content;
     }
 
-    public void addContent(String property, Object value) {
-        content.setProperty(property, value);
-    }
-
-    public String getCourseCode() {
-        return this.courseCode;
-    }
-
     public byte[] getObject() { return object; }
+
+    /*
+    Setters
+     */
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public void setObject(byte[] object) { this.object = object; }
 
     public void printProfessor() {
         System.out.println(observers.size());
@@ -93,6 +120,10 @@ public class CourseData extends Subject implements java.io.Serializable{
         for (Observer observer : observers) {
             observer.update(command, value);
         }
+
+    public void setMaxStudents(int maxStudents) {
+       this.maxStudents = maxStudents;
     }
 
+    public void setStrategy(Strategy strategy) { this.strategy = strategy; }
 }

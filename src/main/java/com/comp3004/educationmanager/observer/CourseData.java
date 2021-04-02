@@ -55,10 +55,10 @@ public class CourseData extends Subject implements java.io.Serializable {
     /*
     Subject Notify All Method
      */
-    public void updateAll() {
+    public void updateAll(String command, Object value) {
         //notify all observers (professors and students) who are attached to this course.
         for (Observer observer : observers) {
-            observer.update();
+            observer.update(command, value);
         }
     }
 
@@ -113,13 +113,6 @@ public class CourseData extends Subject implements java.io.Serializable {
         Professor prof = (Professor) observers.get(0);
         System.out.println(prof.getName());
     }
-
-
-    public void updateAll(String command, Object value) {
-        //notify all observers (professors and students) who are attached to this course.
-        for (Observer observer : observers) {
-            observer.update(command, value);
-        }
 
     public void setMaxStudents(int maxStudents) {
        this.maxStudents = maxStudents;

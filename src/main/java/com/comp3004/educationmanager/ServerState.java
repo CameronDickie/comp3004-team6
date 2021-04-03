@@ -30,6 +30,9 @@ public class ServerState {
     public boolean auth(String uname, String pword) {
         return db.auth(uname, pword);
     }
+    public User getUser(String username) {
+        return db.getUser(username);
+    }
 
     public void createCourse(CourseData courseData) { courses.put(courseData.getCourseCode(), courseData); }
     public CourseData getCourseData(String courseCode) { return courses.get(courseCode); }

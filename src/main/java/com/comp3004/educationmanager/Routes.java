@@ -77,9 +77,14 @@ public class Routes {
         System.out.println(map.get("password"));
         try {
             if (s.auth(map.get("username"), map.get("password"))) {
-                answer = "true";
+                User ur = s.getUser(map.get("username"));
+                String rs = help.objectToJSONString(ur);
+                HashMap<String, String> mm = help.stringToMap(rs);
+
+                mm.put("type", ur.getClass().toString());
+                answer = help.objectToJSONString(mm);
             } else {
-                answer = "false";
+                answer = help.objectToJSONString(help.stringToMap("{error: true}"));
             }
         } catch (Exception e) {
             e.printStackTrace(System.out);

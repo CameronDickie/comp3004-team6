@@ -114,5 +114,14 @@ public class H2 implements Database {
         return data;
     }
 
+    public User getUser(String username){
+        Student s = sr.findByUsername(username);
+        Professor p = pr.findByUsername(username);
 
+        if (s.getName().equals(username)){
+            return (User) s;
+        }
+
+        return (User) p;
+    }
 }

@@ -1,9 +1,9 @@
 package com.comp3004.educationmanager.observer;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public abstract class Subject {
-    protected List<Observer> observers;
+    protected ArrayList<Observer> observers = new ArrayList();
 
     public boolean attach(Observer o) {
         return observers.add(o);
@@ -13,5 +13,5 @@ public abstract class Subject {
         return observers.remove(o);
     }
 
-    public abstract void updateAll();
+    public abstract void updateAll(String command, Object value);
 }

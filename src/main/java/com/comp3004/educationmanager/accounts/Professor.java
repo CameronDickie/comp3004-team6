@@ -1,6 +1,7 @@
 package com.comp3004.educationmanager.accounts;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,8 @@ Implements all professor-specific functionality, including the observer
 @Entity
 public class Professor extends User {
     long professorID;
+
+    @Transient
     List<String> courses = new ArrayList<>();
 
     @Override

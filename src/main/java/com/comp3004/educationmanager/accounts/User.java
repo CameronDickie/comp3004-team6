@@ -9,7 +9,7 @@ The base class for all Users
 Extended by Admin, Student, and Professor
  */
 @MappedSuperclass
-public abstract class User implements Observer, java.io.Serializable {
+public abstract class User implements Observer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected long id;

@@ -1,4 +1,4 @@
-package com.comp3004.educationmanager;
+/*package com.comp3004.educationmanager;
 
 import com.comp3004.educationmanager.accounts.Professor;
 import com.comp3004.educationmanager.accounts.User;
@@ -54,3 +54,4 @@ public class CourseTest {
         assertEquals((String) c.getProperty("fullPath"), path);
     }
 }
+*/

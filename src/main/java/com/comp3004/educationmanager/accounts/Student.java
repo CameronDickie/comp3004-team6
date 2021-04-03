@@ -1,6 +1,7 @@
 package com.comp3004.educationmanager.accounts;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,9 @@ public class Student extends User {
 
     long studentID;
 
+    @Transient
     List<String> courses = new ArrayList<>();
+
     @Override
     public void update(String command, Object value) {
         if (command.equals("deleteCourse")) {

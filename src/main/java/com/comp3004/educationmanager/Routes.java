@@ -110,11 +110,6 @@ public class Routes {
 
         s.courses.put(courseMap.get("courseCode"), courseData); //Storing CourseData in courses hashmap
 
-        s.createCourse(courseData);
-
-        //byte[] courseObject = serialization.serialize(courseData);
-        //courseData.setObject(courseObject);
-
         return courseInfo + " has been created";
     }
 
@@ -134,8 +129,6 @@ public class Routes {
 
         //Removing course from list of courses
         s.courses.remove(courseCode);
-
-        s.deleteCourse(courseCode);
 
         return courseInfo + " has been deleted";
     }

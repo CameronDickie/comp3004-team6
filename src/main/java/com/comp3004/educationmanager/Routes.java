@@ -200,7 +200,7 @@ public class Routes {
         HashMap<String, String> contentMap = help.stringToMap(contentInfo);
         CourseData course = s.getCourseData(contentMap.get("courseCode"));
         course.setStrategy(new CourseContentStrategy());
-        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"));
+        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"), contentMap.get("type"));
 
         return (String) comp.getProperty("fullPath");
     }
@@ -209,15 +209,19 @@ public class Routes {
     Route for submitting a course deliverable
     USAGE: Call this when the student wants to submit a course deliverable. MUST be called before adding any related documents.
         - use a separate post request for creating/attaching documents
-    TODO:
+    @params
         -
+    TODO:
+        - The path for the student's deliverable should probably be something along the lines of /COMP3004B/BENWILLIAMS/ASSIGNMENTPATH/
+            - could we make this only visible to the one student?
      */
     @PostMapping(value = "/api/submit-deliverable", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String submitDeliverable(@RequestBody String contentInfo) {
         HashMap<String, String> contentMap = help.stringToMap(contentInfo);
         CourseData course = s.getCourseData(contentMap.get("courseCode"));
         course.setStrategy(new SubmitDeliverableStrategy());
-        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"));
+        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"), contentMap.get("type"), false);
+        comp.setProperty("type", contentMap.get("type"));
 
         return (String) comp.getProperty("fullPath");
     }
@@ -239,7 +243,7 @@ public class Routes {
         byte[] bytes = Base64.getDecoder().decode(sBytes);
 
         course.setStrategy(new AddDocumentStrategy());
-        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"));
+        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"), contentMap.get("type"));
         comp.setProperty("file", bytes);
 
         return contentInfo + " has been submitted";

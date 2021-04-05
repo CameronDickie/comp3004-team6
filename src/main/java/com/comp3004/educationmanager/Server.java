@@ -6,7 +6,10 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 @SpringBootApplication
 public class Server extends SpringBootServletInitializer {
+	public void run(String[] args) { SpringApplication.run(Server.class, args); }
+
 	public static void main(String[] args) {
-		SpringApplication.run(Server.class, args);
+		Server server = new Server();
+		server.run(args);
 	}
 }

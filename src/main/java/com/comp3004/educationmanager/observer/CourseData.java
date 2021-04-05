@@ -70,8 +70,14 @@ public class CourseData extends Subject implements java.io.Serializable {
             * can also return a "stringified" version of the structure so we can pass it to the front end
                 or have a separate GetMapping to retrieve the entire course structure
      */
-    public Component addContent(String name, String path) {
-        Component comp = strategy.createCourseItem(name, path);
+    public Component addContent(String name, String path, String type) {
+        Component comp = strategy.createCourseItem(name, path, type);
+        content.executeCommand("addItem", comp);
+        return comp;
+    }
+
+    public Component addContent(String name, String path, String type, boolean visible) {
+        Component comp = strategy.createCourseItem(name, path, type, visible);
         content.executeCommand("addItem", comp);
         return comp;
     }

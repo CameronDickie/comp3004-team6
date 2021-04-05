@@ -1,7 +1,8 @@
 package com.comp3004.educationmanager.composite;
 
+import com.comp3004.educationmanager.Helper;
+
 import java.util.ArrayList;
-import java.util.List;
 
 /*
 The Composite object - stores multiple Component objects
@@ -10,6 +11,7 @@ Implements the Component functions
 public class CourseContent implements Component, java.io.Serializable {
     private String name;
     private String path;
+    private String type;
     private boolean visible;
 
     private ArrayList<Component> children = new ArrayList();
@@ -20,12 +22,28 @@ public class CourseContent implements Component, java.io.Serializable {
     public CourseContent(String name, String path) {
         this.name = name;
         this.path = path;
+        this.type = "default";
+        this.visible = true;
+    }
+
+    public CourseContent(String name, String path, String type) {
+        this.name = name;
+        this.path = path;
+        this.type = type;
         this.visible = true;
     }
 
     public CourseContent(String name, String path, boolean visible) {
         this.name = name;
         this.path = path;
+        this.type = "default";
+        this.visible = visible;
+    }
+
+    public CourseContent(String name, String path, String type, boolean visible) {
+        this.name = name;
+        this.path = path;
+        this.type = type;
         this.visible = visible;
     }
 
@@ -38,23 +56,24 @@ public class CourseContent implements Component, java.io.Serializable {
         if(property.equals("name")) {                                   // set name of item
             name = (String) value;
             setProperty("path", path);
-            return true;
         } else if(property.equals("path")) {                            // set path of item and all children
             path = (String) value;
             for(int i = 0; i < children.size(); ++i) {
                 children.get(i).setProperty("path", getProperty("fullPath"));
             }
-            return true;
         } else if(property.equals("visible")) {
             visible = (boolean) value;
             for(int i = 0; i < children.size(); ++i) {
                 children.get(i).setProperty("visible", visible);
             }
-            return true;
+        } else if(property.equals("type")) {
+            type = (String) value;
         } else {
-            System.out.println("Property " + property + " not found.");
-            return false;
+                System.out.println("Property " + property + " not found.");
+                return false;
         }
+
+        return true;
     }
 
     @Override
@@ -67,6 +86,8 @@ public class CourseContent implements Component, java.io.Serializable {
             return path + name + "/";
         } else if(property.equals("visible")) {                         // get visible property (visible to students)
             return visible;
+        } else if(property.equals("type")) {
+            return type;
         } else {
             System.out.println("Property " + property + " not found.");
             return null;
@@ -94,13 +115,15 @@ public class CourseContent implements Component, java.io.Serializable {
         } else if(command.equals("addItem")) {                          // add an item as a descendant (direct child or child of child...)
             Component c = (Component) value;
             String cPath = (String) c.getProperty("path");
-            if(cPath.equals((String) getProperty("fullPath"))) {
+            if (cPath.equals((String) getProperty("fullPath"))) {
                 children.add(c);
             } else {
-                for(int i = 0; i < children.size(); ++i) {
+                for (int i = 0; i < children.size(); ++i) {
                     children.get(i).executeCommand(command, value);
                 }
             }
+        } else if(command.equals("stringify")) {
+            return Helper.objectToJSONString(this);
         } else {
             System.out.println("Command " + command + " not found.");
         }

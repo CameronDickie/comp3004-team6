@@ -8,9 +8,6 @@ import com.comp3004.educationmanager.factory.ProfessorCreator;
 import com.comp3004.educationmanager.factory.StudentCreator;
 import com.comp3004.educationmanager.misc.Serialization;
 import com.comp3004.educationmanager.observer.CourseData;
-import com.comp3004.educationmanager.observer.Observer;
-import org.apache.catalina.valves.StuckThreadDetectionValve;
-import org.hibernate.bytecode.spi.ProxyFactoryFactory;
 import com.comp3004.educationmanager.strategy.AddDocumentStrategy;
 import com.comp3004.educationmanager.strategy.CourseContentStrategy;
 import com.comp3004.educationmanager.strategy.SubmitDeliverableStrategy;
@@ -22,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.http.MediaType;
 
-import javax.print.attribute.standard.Media;
 import java.io.*;
 import java.util.Base64;
 import java.util.HashMap;
@@ -50,6 +46,8 @@ public class Routes {
         //this is the notification to be added to the admin's list of notifications -- likely to be a part of the database, but for now I just want to get it all working
         User newUser = studentCreator.createUser(map.get("firstname") + map.get("lastname"), map.get("password"));
 
+//        newUser.setSocketConnection(new MyTextWebSocketHandler());
+//        s.addSocketConnection(newUser.getSocketConnection());
         s.createUser(newUser);
         s.print();
         return info + " has attempted to be registered";

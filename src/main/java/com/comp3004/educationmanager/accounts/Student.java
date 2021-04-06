@@ -1,5 +1,7 @@
 package com.comp3004.educationmanager.accounts;
 
+
+
 import javax.persistence.Entity;
 import javax.persistence.Transient;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ Implements all student-specific functionality, including the observer
 public class Student extends User {
 
     long studentID;
+
 
     @Transient
     List<String> courses = new ArrayList<>();

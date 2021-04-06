@@ -25,6 +25,7 @@ class Dashboard extends React.Component {
             modalOpen: false,
             currentCourse: 0,
             whichModal: 0,
+            webSocket: null,
             data: {
                 courses: [
                     {
@@ -55,7 +56,39 @@ class Dashboard extends React.Component {
             }
         }
     }
+    componentDidMount() {
+        this.connect();
+    }
+    connect = () => {
+        let ws = new WebSocket('ws://localhost:8080/websocket', 'subprotocol.demo.websocket');
+        ws.onopen = () => {
+            console.log('Client connection opened');
 
+            console.log('Subprotocol: ' + webSocket.protocol);
+            console.log('Extensions: ' + webSocket.extensions);
+        }
+        ws.onmessage = (event) => {
+            console.log('Client received: ' + event.data);
+        }
+        ws.onerror = (event) => {
+            console.log('Client error: ' + event);
+        }
+        ws.onclose = (event) => {
+            console.log('Client connection closed: ' + event.code);
+        }
+        this.setState({webSocket: ws})
+    }
+    disconnect = () => {
+        if(this.state.webSocket != null) {
+            this.state.webSocket.close();
+            this.state.webSocket = null;
+        }
+    }
+    sendMessage = () => {
+        const message = "I am a user connection!";
+        log('Client sends ' + message);
+        this.state.webSocket.send(message);
+    }
     setPage = (pageName) => {
         this.setState({page: pageName});
     }

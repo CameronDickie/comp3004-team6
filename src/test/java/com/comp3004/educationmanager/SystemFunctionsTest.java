@@ -23,9 +23,8 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = Server.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CourseTest {
+public class SystemFunctionsTest {
     CourseCreator cc = new CourseCreator();
     ProfessorCreator pc = new ProfessorCreator();
     StudentCreator sc = new StudentCreator();

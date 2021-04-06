@@ -60,7 +60,7 @@ class Dashboard extends React.Component {
         this.connect();
     }
     connect = () => {
-        let ws = new WebSocket('ws://localhost:8080/websocket', 'subprotocol.demo.websocket');
+        let ws = new WebSocket('ws://localhost:8080/api/websocket', 'subprotocol.demo.websocket');
         ws.onopen = () => {
             console.log('Client connection opened');
 

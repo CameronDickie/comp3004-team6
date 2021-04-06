@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import java.io.*;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class Routes {
@@ -168,6 +169,40 @@ public class Routes {
         courseData.detach(student);//Detach student from course
 
         return studentInfo + " has been deleted";
+    }
+
+    /*
+    Route for getting a student's courses
+    USAGE:
+    @param (userInfo JSON)
+        - userId: ID of user to retrieve courses for
+    @return an array of course content strings
+    TODO:
+        - how to query for user? right now I'm using the "userId" tag?
+    */
+    @GetMapping(value = "/api/get-user-courses", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String[] getUserCourses(@RequestBody String userInfo) {
+        System.out.println("From '/api/get-user-courses: " + userInfo);
+
+        HashMap<String, String> userMap = Helper.stringToMap(userInfo);
+        HashMap<String, CourseData> courseMap = new HashMap<>();
+
+        User user = s.users.get(userMap.get("userId"));
+        if(user instanceof Student) {
+            Student s = (Student) user;
+            courseMap = s.getCourses();
+        } else if(user instanceof Professor) {
+            Professor p = (Professor) user;
+            courseMap = p.getCourses();
+        }
+
+        String[] contentStrings = new String[courseMap.size()];
+        int i = 0;
+        for(CourseData course : courseMap.values()) {
+            contentStrings[i++] = (String) course.getContent().executeCommand("stringify", null);
+        }
+
+        return contentStrings;
     }
 
     /*

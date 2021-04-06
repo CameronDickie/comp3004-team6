@@ -15,13 +15,15 @@ public class Student extends User {
     long studentID;
 
     @Transient
-    List<String> courses = new ArrayList<>();
+    ArrayList<String> courses = new ArrayList<>();
 
     @Override
     public void update(String command, Object value) {
         if (command.equals("deleteCourse")) {
             String courseCode = (String) value;
             courses.remove(courseCode);
+        } else if(command.equals("addCourse")) {
+            addCourse((String) value);
         }
     }
 
@@ -41,6 +43,10 @@ public class Student extends User {
     public void removeCourse(String courseCode) {
         //TODO: Check to see if student must be deleted if last course is removed
         courses.remove(courseCode);
+    }
+
+    public ArrayList<String> getCourses() {
+        return courses;
     }
 
 }

@@ -108,9 +108,6 @@ public class Routes {
         User user = s.users.get(courseMap.get("professorID")); //Retrieving User (The Professor) from List of Users
 
         Professor professor = (Professor) user; //Casting Professor to User
-
-        professor.addCourse(courseCode); //Adding course to list of courses in professor
-
         courseData.attach(professor); //Attaching Professor to CourseData
 
         s.courses.put(courseMap.get("courseCode"), courseData); //Storing CourseData in courses hashmap
@@ -151,9 +148,6 @@ public class Routes {
         User user = s.users.get(infoMap.get("studentNumber")); //Retrieving User (The Student Registering) From List of Users
 
         Student student = (Student) user; //Casting the User object to student
-
-        student.addCourse(infoMap.get("courseCode")); //Adding course to list of courses in the student
-
         courseData.attach(student);//Attaching Student to CourseData
 
         return studentInfo + " has been deleted";

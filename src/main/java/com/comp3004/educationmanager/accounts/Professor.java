@@ -14,13 +14,15 @@ public class Professor extends User {
     long professorID;
 
     @Transient
-    List<String> courses = new ArrayList<>();
+    ArrayList<String> courses = new ArrayList<>();
 
     @Override
     public void update(String command, Object value) {
         if (command.equals("deleteCourse")) {
             String courseCode = (String) value;
             courses.remove(courseCode);
+        } else if(command.equals("addCourse")) {
+            courses.add((String) value);
         }
     }
 
@@ -32,7 +34,7 @@ public class Professor extends User {
         return this.professorID;
     }
 
-    public void addCourse(String courseCode) {
-        courses.add(courseCode);
+    public ArrayList<String> getCourses() {
+        return courses;
     }
 }

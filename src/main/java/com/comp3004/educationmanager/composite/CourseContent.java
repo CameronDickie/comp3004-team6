@@ -19,25 +19,11 @@ public class CourseContent implements Component, java.io.Serializable {
     /*
     Constructor
      */
-    public CourseContent(String name, String path) {
-        this.name = name;
-        this.path = path;
-        this.type = "default";
-        this.visible = true;
-    }
-
     public CourseContent(String name, String path, String type) {
         this.name = name;
         this.path = path;
         this.type = type;
         this.visible = true;
-    }
-
-    public CourseContent(String name, String path, boolean visible) {
-        this.name = name;
-        this.path = path;
-        this.type = "default";
-        this.visible = visible;
     }
 
     public CourseContent(String name, String path, String type, boolean visible) {

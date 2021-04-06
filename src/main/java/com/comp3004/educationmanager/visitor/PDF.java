@@ -6,7 +6,12 @@ public class PDF implements FileInterface {
     private File file;
 
     @Override
-    public void accept(FileVisitor v) {
+    public byte[] accept(FileVisitor v) {
+        return v.visitPDF(this);
+    }
+
+    @Override
+    public void setFile(byte[] bytes) {
 
     }
 }

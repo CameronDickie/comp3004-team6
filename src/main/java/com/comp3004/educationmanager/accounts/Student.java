@@ -21,20 +21,22 @@ public class Student extends User {
 
 
     @Transient
-    List<String> courses = new ArrayList<>();
+    ArrayList<String> courses = new ArrayList<>();
 
     @Override
     public void update(String command, Object value) {
         if (command.equals("deleteCourse")) {
             String courseCode = (String) value;
             courses.remove(courseCode);
+            
             try {
                 TextMessage change = new TextMessage("A course of yours has been deleted");
                 this.socketConnection.sendMessage(change);
             } catch (IOException e) {
                 e.printStackTrace(System.out);
             }
-
+        } else if(command.equals("addCourse")) {
+            addCourse((String) value);
         }
         //session.sendMessage(); //get new courses
     }
@@ -55,6 +57,10 @@ public class Student extends User {
     public void removeCourse(String courseCode) {
         //TODO: Check to see if student must be deleted if last course is removed
         courses.remove(courseCode);
+    }
+
+    public ArrayList<String> getCourses() {
+        return courses;
     }
 
 }

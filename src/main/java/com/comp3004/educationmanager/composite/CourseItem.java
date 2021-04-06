@@ -7,15 +7,27 @@ Implements the Component functions
 public class CourseItem implements Component, java.io.Serializable {
     private String name;
     private String path;
+    private String type;
     private boolean visible;
 
     /*
     Constructor
      */
-    public CourseItem(String name, String path) {
+
+    public CourseItem(String name, String path, String type) {
+       this.name = name;
+       this.path = path;
+       this.type = type;
+       this.visible = true;
+    }
+
+    public CourseItem(String name, String path, String type, boolean visible) {
         this.name = name;
         this.path = path;
+        this.type = type;
+        this.visible = visible;
     }
+
     /*
     Functions from Component class
      */
@@ -23,18 +35,19 @@ public class CourseItem implements Component, java.io.Serializable {
     @Override
     public boolean setProperty(String property, Object value) {
         if(property.equals("name")) {                                   // set name of item
-            name = (String) value;
-            return true;
+            name = (String) value;;
         } else if(property.equals("path")) {                            // set path of item
             path = (String) value;
-            return true;
         } else if(property.equals("visible")) {
             visible = (boolean) value;
-            return true;
+        } else if(property.equals("type")) {
+            type = (String) value;
         } else {
             System.out.println("Property " + property + " not found.");
             return false;
         }
+
+        return true;
     }
 
     @Override
@@ -47,6 +60,8 @@ public class CourseItem implements Component, java.io.Serializable {
             return path + name + "/";
         } else if(property.equals("visible")) {
             return visible;
+        } else if(property.equals("type")) {
+            return type;
         } else {
             System.out.println("Property " + property + " not found.");
             return null;

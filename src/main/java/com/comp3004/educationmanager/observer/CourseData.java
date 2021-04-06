@@ -42,14 +42,23 @@ public class CourseData extends Subject implements java.io.Serializable {
         this.courseCode = "COUR1234A";
         this.courseName = "Course Placeholder";
         this.maxStudents = 0;
-        this.content = new CourseContent(this.courseCode, "/");
+        this.content = new CourseContent(this.courseCode, "/", "section");
     }
 
     public CourseData(String courseCode, String courseName, int maxStudents) {
         this.courseCode = courseCode;
         this.courseName = courseName;
         this.maxStudents = maxStudents;
-        this.content = new CourseContent(this.courseCode, "/");
+        this.content = new CourseContent(this.courseCode, "/", "section");
+    }
+
+    /*
+    Subject attach method
+     */
+    @Override
+    public boolean attach(Observer o) {
+        o.update("addCourse", courseCode);
+        return observers.add(o);
     }
 
     /*
@@ -66,12 +75,16 @@ public class CourseData extends Subject implements java.io.Serializable {
     Method to add content to the course
     TODO:
         - Should new component be returned or the entire content structure?
-            * currently returning entire structure
-            * can also return a "stringified" version of the structure so we can pass it to the front end
-                or have a separate GetMapping to retrieve the entire course structure
+            * currently returning new component, will have a separate method to return whole structure
      */
-    public Component addContent(String name, String path) {
-        Component comp = strategy.createCourseItem(name, path);
+    public Component addContent(String name, String path, String type) {
+        Component comp = strategy.createCourseItem(name, path, type);
+        content.executeCommand("addItem", comp);
+        return comp;
+    }
+
+    public Component addContent(String name, String path, String type, boolean visible) {
+        Component comp = strategy.createCourseItem(name, path, type, visible);
         content.executeCommand("addItem", comp);
         return comp;
     }

@@ -1,7 +1,7 @@
 package com.comp3004.educationmanager.visitor;
 
 public interface FileVisitor {
-    void visitPDF(PDF file);
-    void visitDOCX(DOCX file);
-    void visitPPTX(PPTX file);
+    byte[] visitPDF(PDF file);
+    byte[] visitDOCX(DOCX file);
+    byte[] visitPPTX(PPTX file);
 }

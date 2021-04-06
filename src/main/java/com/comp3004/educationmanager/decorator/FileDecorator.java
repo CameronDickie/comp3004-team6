@@ -1,12 +1,13 @@
 package com.comp3004.educationmanager.decorator;
 
 import com.comp3004.educationmanager.composite.Component;
+import com.comp3004.educationmanager.visitor.FileDownloadVisitor;
+import com.comp3004.educationmanager.visitor.FileInterface;
+import com.comp3004.educationmanager.visitor.FileViewVisitor;
 import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-
 public class FileDecorator extends Decorator {
-    private File file;
+    private FileInterface file;
 
     /*
     Constructor
@@ -22,17 +23,12 @@ public class FileDecorator extends Decorator {
     @Override
     public boolean setProperty(String property, Object value) {
         if(property.equals("file")) {
-            try {
-                byte[] fileBytes = (byte[]) value;
-                FileUtils.writeByteArrayToFile(file, fileBytes);
-                return true;
-            } catch(java.io.IOException e) {
-                System.out.println("Error reading file from bytes:  " + wrappee.getProperty("name"));
-                return false;
-            }
+            file.setFile((byte[]) value);
         } else {
             return wrappee.setProperty(property, value);
         }
+
+        return true;
     }
 
     @Override
@@ -47,30 +43,11 @@ public class FileDecorator extends Decorator {
     @Override
     public Object executeCommand(String command, Object value) {
         if(command.equals("download")) {
-            return downloadFile();
+            return file.accept(new FileDownloadVisitor());
         } else if(command.equals("viewAsPDF")) {
-            return viewFile();
+            return file.accept(new FileViewVisitor());
         } else {
             return wrappee.executeCommand(command, value);
-        }
-    }
-
-    public byte[] downloadFile() {
-        try {
-            return FileUtils.readFileToByteArray(file);
-        } catch(java.io.IOException e) {
-            System.out.println("Error downloading file: " + wrappee.getProperty("name"));
-            return null;
-        }
-    }
-
-    public byte[] viewFile() {
-        try {
-            // TODO: convert file to PDF before returning byte array
-            return FileUtils.readFileToByteArray(file);
-        } catch(java.io.IOException e) {
-            System.out.println("Error viewing file as PDF: " + wrappee.getProperty("name"));
-            return null;
         }
     }
 }

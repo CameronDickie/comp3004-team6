@@ -2,17 +2,17 @@ package com.comp3004.educationmanager.visitor;
 
 public class FileDownloadVisitor implements FileVisitor {
     @Override
-    public void visitPDF(PDF file) {
-
+    public byte[] visitPDF(PDF file) {
+        return null;
     }
 
     @Override
-    public void visitDOCX(DOCX file) {
-
+    public byte[] visitDOCX(DOCX file) {
+        return null;
     }
 
     @Override
-    public void visitPPTX(PPTX file) {
-
+    public byte[] visitPPTX(PPTX file) {
+        return null;
     }
 }

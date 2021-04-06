@@ -10,9 +10,7 @@ import {
     faHome, 
     faCog, 
     faSignOutAlt, 
-    faChevronCircleLeft, 
-    faSchool, 
-    faSearch} from '@fortawesome/free-solid-svg-icons'
+    faSchool,} from '@fortawesome/free-solid-svg-icons'
 
 import FullScreenCourseModal from "../components/FullScreenCourseModal";
 import FullScreenRegisterModal from "../components/FullScreenRegisterModal";
@@ -82,8 +80,6 @@ class Dashboard extends React.Component {
     render() {
 
         let u = this.props.getUser();
-
-        console.log(u);
 
         if (u.username == null){
             return (

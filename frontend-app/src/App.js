@@ -52,10 +52,10 @@ function App() {
         <BrowserRouter>
             <Switch>
                 <Route exact path="/" >
-                    <LoginForm setU={setU}/>
+                    <LoginForm setU={setU} getUser={getUser}/>
                 </Route>
                 <Route exact path="/signup">
-                    <SignUp />
+                    <SignUp getUser={getUser}/>
                 </Route>
                 <Route exact path="/dashboard">
                     <Dashboard getUser={getUser} logout={clearStorage} />

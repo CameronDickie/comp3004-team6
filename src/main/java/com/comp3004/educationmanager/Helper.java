@@ -19,7 +19,9 @@ public class Helper {
         return jsonString;
     }
     public static HashMap<String, String> stringToMap(String s) {
-        String[] sets = s.replace("{","").replace("}","").split(",");
+        String nString = s.substring(1, s.length()-1); //remove the first and last curly brace
+        String[] sets = nString.split(","); //need to make this replace only the first and last curly braces
+
         HashMap<String, String> m = new HashMap<>();
         for (String set : sets) {
             String[] spl = set.replace("\"", "").split(":");

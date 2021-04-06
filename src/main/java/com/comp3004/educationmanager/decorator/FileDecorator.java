@@ -1,9 +1,7 @@
 package com.comp3004.educationmanager.decorator;
 
 import com.comp3004.educationmanager.composite.Component;
-import com.comp3004.educationmanager.visitor.FileDownloadVisitor;
-import com.comp3004.educationmanager.visitor.FileInterface;
-import com.comp3004.educationmanager.visitor.FileViewVisitor;
+import com.comp3004.educationmanager.visitor.*;
 import org.apache.commons.io.FileUtils;
 
 public class FileDecorator extends Decorator {
@@ -14,6 +12,7 @@ public class FileDecorator extends Decorator {
      */
     public FileDecorator(Component c) {
         super(c);
+        setFileType((String) c.getProperty("type"));
     }
 
     /*
@@ -34,7 +33,7 @@ public class FileDecorator extends Decorator {
     @Override
     public Object getProperty(String property) {
         if(property.equals("file")) {
-            return file;
+            return file.getBytes();
         } else {
             return wrappee.getProperty(property);
         }
@@ -48,6 +47,16 @@ public class FileDecorator extends Decorator {
             return file.accept(new FileViewVisitor());
         } else {
             return wrappee.executeCommand(command, value);
+        }
+    }
+
+    private void setFileType(String type) {
+        if(type.equals("PDF")) {
+            file = new PDF();
+        } else if(type.equals("PPTX")) {
+            file = new PPTX();
+        } else if(type.equals("DOCX")) {
+            file = new DOCX();
         }
     }
 }

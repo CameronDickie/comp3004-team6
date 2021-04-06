@@ -11,8 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = Server.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServerTest {
-    
-
     @Test
     @Order(1)
     public void testServerInitialization() {

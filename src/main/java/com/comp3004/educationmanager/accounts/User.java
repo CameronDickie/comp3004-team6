@@ -40,6 +40,7 @@ public abstract class User implements Observer {
     /*
     Setters
      */
+    public void setSocketConnection(WebSocketSession s) {this.socketConnection = s;}
 //    public void setSocketConnection(MyTextWebSocketHandler s) { this.socketConnection = s;}
     public void setUsername(String username) {
         this.username = username;

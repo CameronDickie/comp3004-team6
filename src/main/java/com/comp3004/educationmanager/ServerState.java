@@ -15,15 +15,16 @@ public class ServerState {
     @Autowired
     H2 db;
 
-//    MyTextWebSocketHandler globalSocket = new MyTextWebSocketHandler();
     HashMap<String, CourseData> courses = new HashMap<>();
-    HashMap<Long, User> users = new HashMap<>();
+    public static HashMap<Long, User> users = new HashMap<>();
 
     public ServerState () {
         System.out.println("Server state is being made...");
     }
     public boolean createUser(User u) {
-        return db.addUser(u);
+        boolean res = db.addUser(u);
+        if(res) users.put(u.getUserId(), u);
+        return res;
     }
     public void print() {
         db.print();
@@ -34,9 +35,6 @@ public class ServerState {
     public User getUser(String username) {
         return db.getUser(username);
     }
-//    public void addSocketConnection(WebSocketSession s) {
-//        globalSocket.addConnection(s);
-//    }
     public void createCourse(CourseData courseData) { courses.put(courseData.getCourseCode(), courseData); }
     public CourseData getCourseData(String courseCode) { return courses.get(courseCode); }
 

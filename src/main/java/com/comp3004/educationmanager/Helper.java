@@ -5,7 +5,7 @@ import org.codehaus.jackson.annotate.JsonMethod;
 import org.codehaus.jackson.map.ObjectMapper;
 import java.util.HashMap;
 public class Helper {
-    public String objectToJSONString(Object o){
+    public static String objectToJSONString(Object o){
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
         String jsonString = "";
@@ -13,12 +13,12 @@ public class Helper {
         try {
             jsonString = mapper.writeValueAsString(o);
         } catch (Exception e){
-            System.out.println(e);
+            e.printStackTrace(System.out);
         }
 
         return jsonString;
     }
-    public HashMap<String, String> stringToMap(String s) {
+    public static HashMap<String, String> stringToMap(String s) {
         String[] sets = s.replace("{","").replace("}","").split(",");
         HashMap<String, String> m = new HashMap<>();
         for (String set : sets) {

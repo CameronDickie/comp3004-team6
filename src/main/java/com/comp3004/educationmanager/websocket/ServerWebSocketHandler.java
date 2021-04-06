@@ -1,5 +1,8 @@
 package com.comp3004.educationmanager.websocket;
 
+import com.comp3004.educationmanager.Helper;
+import com.comp3004.educationmanager.ServerState;
+import com.comp3004.educationmanager.accounts.User;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.SubProtocolCapable;
@@ -13,6 +16,7 @@ import org.springframework.web.util.HtmlUtils;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -22,8 +26,10 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.info("Server connection opened");
-        sessions.add(session);       TextMessage message = new TextMessage("one-time message from server");
+        sessions.add(session);
+        TextMessage message = new TextMessage("one-time message from server");
         logger.info("Server sends: {}", message);
+
         session.sendMessage(message);
     }
 
@@ -38,7 +44,17 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String request = message.getPayload();
         logger.info("Server received: {}", request);
+        //search for the user with the id in message
 
+        HashMap<String, String> map = Helper.stringToMap(request);
+        HashMap<Long, User> users = ServerState.users;
+        User u = users.get(Long.parseLong(map.get("userId"))); //get the user with this user id
+        u.setSocketConnection(session);
+        if(u.getSocketConnection() == null) {
+            System.out.println("failed to add the socket connection");
+        }
+
+        //attach session to that user
         String response = String.format("response from server to '%s'", HtmlUtils.htmlEscape(request));
         logger.info("Server sends: {}", response);
         session.sendMessage(new TextMessage(response));

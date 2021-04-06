@@ -64,14 +64,14 @@ class Dashboard extends React.Component {
         ws.onopen = () => {
             console.log('Client connection opened');
 
-            console.log('Subprotocol: ' + webSocket.protocol);
-            console.log('Extensions: ' + webSocket.extensions);
+            console.log('Subprotocol: ' + ws.protocol);
+            console.log('Extensions: ' + ws.extensions);
         }
         ws.onmessage = (event) => {
             console.log('Client received: ' + event.data);
         }
         ws.onerror = (event) => {
-            console.log('Client error: ' + event);
+            console.log('Client error: ' + event.data);
         }
         ws.onclose = (event) => {
             console.log('Client connection closed: ' + event.code);
@@ -84,10 +84,14 @@ class Dashboard extends React.Component {
             this.state.webSocket = null;
         }
     }
-    sendMessage = () => {
-        const message = "I am a user connection!";
-        log('Client sends ' + message);
-        this.state.webSocket.send(message);
+    sendMessage = (msg) => {
+        console.log('Client sends ' + msg);
+        this.state.webSocket.send(msg);
+    }
+    sendUser = () => {
+        let uString = JSON.stringify(this.props.getUser());
+        console.log('Client sends: ' + uString);
+        this.state.webSocket.send(uString);
     }
     setPage = (pageName) => {
         this.setState({page: pageName});
@@ -167,6 +171,7 @@ class Dashboard extends React.Component {
                                     <FontAwesomeIcon size="lg" icon={faSignOutAlt}/>
                                 </a>
                             </div>
+                            <button onClick={this.sendUser} className="w-5 rounded-lg bg-gray-200">Send User info</button>
                         </div>
                         <div class="flex-grow w-10/12">
                             <div className={`mx-auto bg-gray-100 py-3 border-b-4 h-12 ${(this.state.page == "courses") ? "border-black" : ""}`}>
@@ -177,7 +182,6 @@ class Dashboard extends React.Component {
                                     </div>
                                 </div>
                             </div>
-            
                             <div className={`${(this.state.page == "courses") ? "" : "hidden"}`}>{makeCourseSection(this)}</div>
                             <div className={`${(this.state.page == "settings") ? "" : "hidden"}`}>{settings()}</div>
                         </div>

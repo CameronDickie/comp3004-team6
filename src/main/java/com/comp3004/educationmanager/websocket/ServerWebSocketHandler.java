@@ -49,7 +49,7 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
         HashMap<String, String> map = Helper.stringToMap(request);
         HashMap<Long, User> users = ServerState.users;
         User u = users.get(Long.parseLong(map.get("userId"))); //get the user with this user id
-        u.setSocketConnection(session);
+        u.setSocketConnection(session); //give this user their session instance
         if(u.getSocketConnection() == null) {
             System.out.println("failed to add the socket connection");
         }

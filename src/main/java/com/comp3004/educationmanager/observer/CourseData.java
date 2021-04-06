@@ -57,7 +57,7 @@ public class CourseData extends Subject implements java.io.Serializable {
      */
     @Override
     public boolean attach(Observer o) {
-        o.update("addCourse", courseCode);
+        o.update("addCourse", this);
         return observers.add(o);
     }
 

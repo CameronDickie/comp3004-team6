@@ -2,12 +2,14 @@ package com.comp3004.educationmanager.accounts;
 
 
 
+import com.comp3004.educationmanager.observer.CourseData;
 import org.springframework.web.socket.TextMessage;
 
 import javax.persistence.Entity;
 import javax.persistence.Transient;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /*
@@ -21,7 +23,9 @@ public class Student extends User {
 
 
     @Transient
-    ArrayList<String> courses = new ArrayList<>();
+    ArrayList<String> pastCourses = new ArrayList<>();
+    @Transient
+    HashMap<String, CourseData> courses = new HashMap<>();
 
     @Override
     public void update(String command, Object value) {
@@ -31,12 +35,12 @@ public class Student extends User {
             
             try {
                 TextMessage change = new TextMessage("A course of yours has been deleted");
-                this.socketConnection.sendMessage(change);
+                this.socketConnection.sendMessage(change); //change should consist of courses
             } catch (IOException e) {
                 e.printStackTrace(System.out);
             }
         } else if(command.equals("addCourse")) {
-            addCourse((String) value);
+            addCourse((CourseData) value);
         }
         //session.sendMessage(); //get new courses
     }
@@ -49,9 +53,9 @@ public class Student extends User {
         return this.studentID;
     }
 
-    public void addCourse(String courseCode) {
+    public void addCourse(CourseData data) {
         //TODO: Check to make sure student meets pre-req, course is not full and students timetable has no conflicts and it is not past deadline
-        courses.add(courseCode);
+        courses.put(data.getCourseCode(), data);
     }
 
     public void removeCourse(String courseCode) {
@@ -59,8 +63,11 @@ public class Student extends User {
         courses.remove(courseCode);
     }
 
-    public ArrayList<String> getCourses() {
+    public HashMap<String, CourseData> getCourses() {
         return courses;
+    }
+    public ArrayList<String> getPastCourses() {
+        return pastCourses;
     }
 
 }

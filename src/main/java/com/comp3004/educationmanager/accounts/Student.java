@@ -1,7 +1,12 @@
 package com.comp3004.educationmanager.accounts;
 
+
+
+import org.springframework.web.socket.TextMessage;
+
 import javax.persistence.Entity;
 import javax.persistence.Transient;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +19,7 @@ public class Student extends User {
 
     long studentID;
 
+
     @Transient
     ArrayList<String> courses = new ArrayList<>();
 
@@ -22,9 +28,17 @@ public class Student extends User {
         if (command.equals("deleteCourse")) {
             String courseCode = (String) value;
             courses.remove(courseCode);
+            
+            try {
+                TextMessage change = new TextMessage("A course of yours has been deleted");
+                this.socketConnection.sendMessage(change);
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
         } else if(command.equals("addCourse")) {
             addCourse((String) value);
         }
+        //session.sendMessage(); //get new courses
     }
 
     public void setStudentID(long studentID) {

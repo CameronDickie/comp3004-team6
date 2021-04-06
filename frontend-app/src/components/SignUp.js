@@ -1,5 +1,5 @@
 import React from "react"
-import { Link } from "react-router-dom"
+import { Link, Redirect } from "react-router-dom"
 
 class SignUp extends React.Component {
     constructor(props) {
@@ -8,7 +8,8 @@ class SignUp extends React.Component {
             firstname: '',
             lastname: '',
             bpassword: '',
-            cpassword: ''
+            cpassword: '',
+            didWork: false
         }
     }
     handleChange = (event) => {
@@ -29,19 +30,18 @@ class SignUp extends React.Component {
             .then(response => response.text())
             .then(res => {
                 console.log(res)
+                this.setState({didWork: true})
             });
     };
     render() {
-        return (
-            // <div className="bg-gray-300 rounded-lg my-4 p-4">
-            //     <h2 className="underline mx-2 uppercase text-lg">Request to register in the system</h2>
-            //     <input id="firstname" onChange={this.handleChange.bind(this)} placeholder="First Name" className="w-full px-4 text-gray-300 focus:text-gray-900 border border-blue-200 outline-none focus:border-blue-500 rounded-full p-2 my-3" />
-            //     <input id="lastname" onChange={this.handleChange.bind(this)} placeholder="Last Name" className="w-full px-4 text-gray-300 focus:text-gray-900 border border-blue-200 outline-none focus:border-blue-500 rounded-full p-2 my-3" />
-            //     <input id="bpassword" onChange={this.handleChange.bind(this)} type="password" placeholder="password" className="w-full px-4 text-gray-300 focus:text-gray-900 border border-blue-200 outline-none focus:border-blue-500 rounded-full p-2 my-3" />
-            //     <input id="cpassword" onChange={this.handleChange.bind(this)} type="password" placeholder="confirm password" className="w-full px-4 text-gray-300 focus:text-gray-900 border border-blue-200 outline-none focus:border-blue-500 rounded-full p-2 my-3" />
-            //     <button className="mx-2 my-1 bg-gray-400 px-2 py-1 outline-none rounded-full" onClick={() => {this.doRegister()}}>Apply to be a student!</button>
-            // </div>
 
+        if (this.state.didWork == true){
+            return (
+                <Redirect to="/" />
+            )
+        }
+
+        return (
             <div class="min-w-screen min-h-screen flex items-center justify-center px-5 py-5">
                 <div class="bg-gray-100 text-gray-500 rounded-3xl shadow-xl w-1/3 overflow-hidden">
                     <div class="md:flex w-full">

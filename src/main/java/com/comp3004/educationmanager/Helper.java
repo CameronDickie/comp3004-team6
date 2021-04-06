@@ -13,7 +13,7 @@ public class Helper {
         try {
             jsonString = mapper.writeValueAsString(o);
         } catch (Exception e){
-            System.out.println(e);
+            e.printStackTrace(System.out);
         }
 
         return jsonString;

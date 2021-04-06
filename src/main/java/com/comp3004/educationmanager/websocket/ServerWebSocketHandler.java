@@ -55,7 +55,7 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
         }
 
         //attach session to that user
-        String response = String.format("response from server to '%s'", HtmlUtils.htmlEscape(request));
+        String response = String.format("response from server to '%s'", request);
         logger.info("Server sends: {}", response);
         session.sendMessage(new TextMessage(response));
     }

@@ -54,16 +54,17 @@ class Dashboard extends React.Component {
             }
         }
     }
-    componentDidMount() {
+    componentWillMount() {
         this.connect();
     }
     connect = () => {
-        let ws = new WebSocket('ws://'+ window.location.hostname + ':' + window.location.port + '/api/websocket', 'subprotocol.demo.websocket');
+        let ws = new WebSocket('ws://localhost:8080/api/websocket', 'subprotocol.demo.websocket');
         ws.onopen = () => {
             console.log('Client connection opened');
 
             console.log('Subprotocol: ' + ws.protocol);
             console.log('Extensions: ' + ws.extensions);
+            this.sendUser(ws);
         }
         ws.onmessage = (event) => {
             console.log('Client received: ' + event.data);
@@ -83,13 +84,22 @@ class Dashboard extends React.Component {
         }
     }
     sendMessage = (msg) => {
+        if(this.state.webSocket == null) {
+            console.log("unable to find websocket");
+            return;
+        }
         console.log('Client sends ' + msg);
         this.state.webSocket.send(msg);
     }
-    sendUser = () => {
+    sendUser = (ws) => {
+        
+        if(ws == null) {
+            console.log("unable to find websocket");
+            return;
+        }
         let uString = JSON.stringify(this.props.getUser());
         console.log('Client sends: ' + uString);
-        this.state.webSocket.send(uString);
+        ws.send(uString);
     }
     setPage = (pageName) => {
         this.setState({page: pageName});
@@ -140,7 +150,7 @@ class Dashboard extends React.Component {
         if (this.state.page == "logout"){
 
             this.props.logout();
-
+            this.disconnect();
             return (
                 <Redirect to="/"></Redirect>
             )
@@ -167,7 +177,6 @@ class Dashboard extends React.Component {
                                     <FontAwesomeIcon size="lg" icon={faSignOutAlt}/>
                                 </a>
                             </div>
-                            <button onClick={this.sendUser} className="w-5 rounded-lg bg-gray-200">Send User info</button>
                         </div>
                         <div class="flex-grow w-10/12">
                             <div className={`mx-auto bg-gray-100 py-3 border-b-4 h-12 ${(this.state.page == "courses") ? "border-black" : ""}`}>

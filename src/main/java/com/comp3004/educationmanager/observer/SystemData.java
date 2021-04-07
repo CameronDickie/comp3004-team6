@@ -14,6 +14,12 @@ public class SystemData extends Subject {
         return observers.add(o);
     }
 
+    @Override
+    public boolean detach(Observer o) {
+        return observers.remove(o);
+    }
+
+
     public void updateAll(String command, Object value) {
         for (Observer observer : observers) {
             observer.update(command, value);

@@ -20,16 +20,8 @@ public class Helper {
 
         return jsonString;
     }
-    public static HashMap<String, Object> stringToMap(String s) {
 
-//        String nString = s.substring(1, s.length()-1); //remove the first and last curly brace
-//        String[] sets = nString.split(","); //need to make this replace only the first and last curly braces
-//
-//        HashMap<String, String> m = new HashMap<>();
-//        for (String set : sets) {
-//            String[] spl = set.replace("\"", "").split(":");
-//            m.put(spl[0], spl[1]);
-//        }
+    public static HashMap<String, Object> stringToMap(String s) {
         HashMap<String, Object> m = null;
         try {
              m = new ObjectMapper().readValue(s, HashMap.class);

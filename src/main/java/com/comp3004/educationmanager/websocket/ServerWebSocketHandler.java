@@ -48,8 +48,16 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
 
         HashMap<String, Object> map = Helper.stringToMap(request);
         HashMap<Long, User> users = ServerState.users;
-//        System.out.println(map.get("userId"));
-        User u = users.get(Long.valueOf((Integer) map.get("userId"))); //get the user with this user id
+        //determine if this is a professor or student
+        Object id = map.get("studentID");
+        if(id == null) {
+            id = map.get("professorID");
+        }
+        if(id == null) {
+            System.out.println("Id error getting user @ Web Socket");
+            return;
+        }
+        User u = users.get(Long.valueOf((Integer) id)); //get the user with this user id
         if(u == null) {
             System.out.println("Failed to find the user with this id");
             return;

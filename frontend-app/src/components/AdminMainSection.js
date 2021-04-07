@@ -38,8 +38,8 @@ class AdminMainSection extends Component{
     render() {
         return (
             <div class="flex flex-col mx-24 mt-14 max-w-8xl h-full">
-                    <div className="mx-auto text-7xl font-bold pb-12 -ml-6 text-gray-500"><FontAwesomeIcon className="-ml-2 pr-4 text-black" size="1x" icon={faHome}/>Admin</div>
-                    <div className="pb-20 grid grid-cols-10 gap-2">
+                    <div className="mx-auto text-7xl font-bold pb-10 -ml-6 text-gray-500"><FontAwesomeIcon className="-ml-2 pr-4 text-black" size="1x" icon={faHome}/>Admin</div>
+                    <div className="pb-20 grid grid-cols-10">
                         <div className="flex col-span-5 min-h-96 border-2 rounded-lg border-gray-300 p-2">
                             <div className="w-2/2">
                                 <div class="grid grid-cols-12 gap-2 -mr-2 p-8">
@@ -59,13 +59,76 @@ class AdminMainSection extends Component{
                             </div>
                         </div>
         
-                        <div className="flex col-span-5 min-h-96 border-2 rounded-lg border-gray-300 p-2">
+                        <div className="flex col-span-5 min-h-96 rounded-lg border-gray-300 p-2">
                             <div className="w-2/2">
-                                <div class="grid grid-cols-12 gap-2 -mr-2 p-8">
+                                <div class="grid grid-cols-12 gap-2 -mr-2 p-8 pb-0">
                                     <div className="col-start-1 col-end-3 pb-2 pl-2">
                                         <div className="text-5xl font-semibold font-mono text-gray-900 italic">APPLICATIONS:</div>
                                     </div>
         
+                                </div>
+
+                                <div className="grid grid-cols-2 p-4 pl-8 pt-6">
+
+                                    <div class="w-full">
+                                        <div class="inline-grid lg:flex bg-black rounded-lg border shadow-lg pb-6 lg:pb-0 min-w-full">
+                                            <div class="w-full p-4">
+                                                <div class="inline-grid">
+                                                    <p class="work-sans font-semibold text-xl text-white">Jaxson Hood</p>
+                                                    <p class="raleway text-sm my-2 text-white opacity-75">Student Application.</p>
+                                                </div>
+                                            </div>
+                                            <div className="w-full pl-4 grid-cols-2">
+                                                <button className="px-3 py-2 text-md font-medium text-white border border-green-500 rounded-lg">Accept</button>
+                                                <button className="ml-2 px-3 py-2 text-md font-medium text-white border border-red-500 rounded-lg">Decline</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="w-full">
+                                        <div class="inline-grid lg:flex bg-black rounded-lg border shadow-lg pb-6 lg:pb-0 min-w-full">
+                                            <div class="w-full p-4">
+                                                <div class="inline-grid">
+                                                    <p class="work-sans font-semibold text-xl text-white">Cam Dickie</p>
+                                                    <p class="raleway text-sm my-2 text-white opacity-75">Student Application.</p>
+                                                </div>
+                                            </div>
+                                            <div className="w-full pl-4 grid-cols-2">
+                                                <button className="px-3 py-2 text-md font-medium text-white border border-green-500 rounded-lg">Accept</button>
+                                                <button className="ml-2 px-3 py-2 text-md font-medium text-white border border-red-500 rounded-lg">Decline</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="w-full">
+                                        <div class="inline-grid lg:flex bg-black rounded-lg border shadow-lg pb-6 lg:pb-0 min-w-full">
+                                            <div class="w-full p-4">
+                                                <div class="inline-grid">
+                                                    <p class="work-sans font-semibold text-xl text-white">Dr. Snooze Warts</p>
+                                                    <p class="raleway text-sm my-2 text-white opacity-75">Professor Application.</p>
+                                                </div>
+                                            </div>
+                                            <div className="w-full pl-4 grid-cols-2">
+                                                <button className="px-3 py-2 text-md font-medium text-white border border-green-500 rounded-lg">Accept</button>
+                                                <button className="ml-2 px-3 py-2 text-md font-medium text-white border border-red-500 rounded-lg">Decline</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="w-full">
+                                        <div class="inline-grid lg:flex bg-black rounded-lg border shadow-lg pb-6 lg:pb-0 min-w-full">
+                                            <div class="w-full p-4">
+                                                <div class="inline-grid">
+                                                    <p class="work-sans font-semibold text-xl text-white">Professor Blake Walden</p>
+                                                    <p class="raleway text-sm my-2 text-white opacity-75">Professor Application.</p>
+                                                </div>
+                                            </div>
+                                            <div className="w-full pl-4 grid-cols-2">
+                                                <button className="px-3 py-2 text-md font-medium text-white border border-green-500 rounded-lg">Accept</button>
+                                                <button className="ml-2 px-3 py-2 text-md font-medium text-white border border-red-500 rounded-lg">Decline</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

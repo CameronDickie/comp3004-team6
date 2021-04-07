@@ -6,7 +6,7 @@ import com.comp3004.educationmanager.composite.Component;
 import com.comp3004.educationmanager.factory.CourseCreator;
 import com.comp3004.educationmanager.factory.ProfessorCreator;
 import com.comp3004.educationmanager.factory.StudentCreator;
-import com.comp3004.educationmanager.misc.Serialization;
+
 import com.comp3004.educationmanager.observer.CourseData;
 import com.comp3004.educationmanager.strategy.AddDocumentStrategy;
 import com.comp3004.educationmanager.strategy.CourseContentStrategy;
@@ -21,17 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.MediaType;
 
 import java.io.*;
-import java.lang.reflect.Array;
-import java.sql.Time;
 import java.util.*;
 
 @RestController
 public class Routes {
     // For things like converting Objects to json
-//    Helper help = new Helper();
     @Autowired
     ServerState s;
-    Serialization serialization = new Serialization();
     StudentCreator studentCreator = new StudentCreator();
     ProfessorCreator professorCreator = new ProfessorCreator();
 
@@ -239,7 +235,7 @@ public class Routes {
 
         CourseData courseData = s.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
-        User user = s.users.get(infoMap.get("studentNumber")); //Retrieving User (The Student Registering) From List of Users
+        User user = s.users.get(infoMap.get("studentID")); //Retrieving User (The Student Registering) From List of Users
 
         Student student = (Student) user; //Casting the User object to student
 
@@ -266,7 +262,11 @@ public class Routes {
         HashMap<String, Object> userMap = Helper.stringToMap(userInfo);
         HashMap<String, CourseData> courseMap = new HashMap<>();
 
-        User user = s.users.get(userMap.get("userId"));
+        Object id = userMap.get("studentID");
+        if(id == null) {
+            id = userMap.get("professorID");
+        }
+        User user = ServerState.users.get(userMap.get("userId"));
         if(user instanceof Student) {
             Student s = (Student) user;
             courseMap = s.getCourses();

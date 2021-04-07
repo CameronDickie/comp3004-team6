@@ -44,14 +44,27 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String request = message.getPayload();
         logger.info("Server received: {}", request);
-        //search for the user with the id in message
 
+        /*
+        Code for attaching a web socket to a given user
+            TODO:
+                ensure that the message sent is stating that this is meant for the courses or notifications, and can handle admin user
+         */
+        //search for the user with the id in message
         HashMap<String, Object> map = Helper.stringToMap(request);
         HashMap<Long, User> users = ServerState.users;
         //determine if this is a professor or student
         Object id = map.get("studentID");
         if(id == null) {
             id = map.get("professorID");
+        }
+        if(id == null && map.get("name").equals("admin")) {
+            //this is likely the admin, or we have broken the code
+            ServerState.admin.setSocketConnection(session);
+            String response = String.format("response from server to '%s'", request);
+            logger.info("Server sends: {}", response);
+            session.sendMessage(new TextMessage(response));
+            return;
         }
         if(id == null) {
             System.out.println("Id error getting user @ Web Socket");

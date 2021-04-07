@@ -1,6 +1,7 @@
 package com.comp3004.educationmanager;
 
 
+import com.comp3004.educationmanager.accounts.Admin;
 import com.comp3004.educationmanager.accounts.Professor;
 import com.comp3004.educationmanager.accounts.Student;
 import com.comp3004.educationmanager.accounts.User;
@@ -21,6 +22,7 @@ public class ServerState {
     H2 db;
 
     HashMap<String, CourseData> courses = new HashMap<>();
+    public static Admin admin;
     public static HashMap<Long, User> users = new HashMap<>();
     Calendar date = Calendar.getInstance();
     Calendar lastRegistrationDate = Calendar.getInstance();

@@ -60,6 +60,7 @@ class AdminDashboard extends Component {
 
             console.log('Subprotocol: ' + ws.protocol);
             console.log('Extensions: ' + ws.extensions);
+            this.sendUser(ws);
         }
         ws.onmessage = (event) => {
             console.log('Client received: ' + event.data);
@@ -86,10 +87,15 @@ class AdminDashboard extends Component {
 
     //Local stuff
 
-    sendUser = () => {
+    sendUser = (ws) => {
+
+        if(ws == null) {
+            console.log("unable to find websocket");
+            return;
+        }
         let uString = JSON.stringify(this.props.getUser());
         console.log('Client sends: ' + uString);
-        this.state.webSocket.send(uString);
+        ws.send(uString);
     }
 
     setPage = (pageName) => {

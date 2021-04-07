@@ -250,8 +250,7 @@ public class Routes {
 
         Student student = (Student) user; //Casting the User object to student
 
-        //TODO: Implement Global Time / Date,
-        // Do not let student widthdraw if past certain date OR handle withdraw differently past certain date
+        // TODO: Do not let student widthdraw if past certain date OR handle withdraw differently past certain date
 
         student.removeCourse(infoMap.get("courseCode")); //Removing course in list of courses in the student
 

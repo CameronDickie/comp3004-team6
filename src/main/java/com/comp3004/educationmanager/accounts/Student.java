@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Transient;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -68,6 +69,40 @@ public class Student extends User {
     }
     public ArrayList<String> getPastCourses() {
         return pastCourses;
+    }
+
+    public void addPastCourse (String courseCode) {
+        pastCourses.add(courseCode);
+    }
+
+
+    //Function to determine if a student meets the prerequisites to a course
+    public boolean doesStudentMeetPrerequisites(ArrayList<String> prerequisites) {
+        boolean hasPrerequisites = false;
+        int prerequisiteCount = 0;
+        if (prerequisites.size() > 0) {
+            for (String prerequisite : prerequisites) {
+                if (Arrays.stream(pastCourses.toArray()).anyMatch(prerequisite::equals)) {
+                    System.out.println("Student does have course:   " + prerequisite);
+                    prerequisiteCount++;
+                }
+                else {
+                    System.out.println("Student does not have course:   " + prerequisite);
+                }
+            }
+
+            if (prerequisiteCount == prerequisites.size()) {
+                hasPrerequisites = true;
+            }
+
+            return hasPrerequisites;
+
+        }
+        else {
+            return true;
+        }
+
+
     }
 
 }

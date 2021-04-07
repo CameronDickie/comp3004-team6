@@ -1,12 +1,14 @@
 package com.comp3004.educationmanager.observer;
 
 import com.comp3004.educationmanager.accounts.Professor;
+import com.comp3004.educationmanager.accounts.Student;
 import com.comp3004.educationmanager.composite.Component;
 import com.comp3004.educationmanager.composite.CourseContent;
 import com.comp3004.educationmanager.composite.CourseItem;
 import com.comp3004.educationmanager.strategy.Strategy;
 
 import javax.persistence.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +37,13 @@ public class CourseData extends Subject implements java.io.Serializable {
     @Transient
     Strategy strategy;
 
+    static int currStudents = 0;
+    ArrayList<String> prerequisites = new ArrayList<>();
+
+    String startTime;
+    int classDuration;
+
+
     /*
     Constructor
      */
@@ -58,7 +67,18 @@ public class CourseData extends Subject implements java.io.Serializable {
     @Override
     public boolean attach(Observer o) {
         o.update("addCourse", this);
+
+        if (o instanceof Student) {
+            currStudents++;
+
+        }
         return observers.add(o);
+    }
+
+    @Override
+    public boolean detach(Observer o) {
+        currStudents--;
+        return observers.remove(o);
     }
 
     /*
@@ -132,4 +152,21 @@ public class CourseData extends Subject implements java.io.Serializable {
     }
 
     public void setStrategy(Strategy strategy) { this.strategy = strategy; }
+
+    public int getCurrStudents() {
+        return this.currStudents;
+    }
+
+    public boolean isCourseFull (){
+        return this.currStudents == this.maxStudents;
+    }
+
+    public void addPrerequisite(String courseCode) {
+        this.prerequisites.add(courseCode);
+    }
+
+    public ArrayList<String> getPrerequisites() {
+        return this.prerequisites;
+    }
+
 }

@@ -6,7 +6,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
     faPlus, 
     faHome, 
-    faPen,} from '@fortawesome/free-solid-svg-icons'
+    faPen,
+    faCheck,
+    faTimes,} from '@fortawesome/free-solid-svg-icons'
 
 import CreateCourseModal from "../components/CreateCourseModal";
 
@@ -17,7 +19,25 @@ class AdminMainSection extends Component{
 
         this.state = {
             data: this.props.app.state.data,
-            modalOpen: false
+            modalOpen: false,
+            applications: [
+                {
+                    name: "Jaxson Hood",
+                    type: "Student Application."
+                },
+                {
+                    name: "Cam Dickie",
+                    type: "Student Application."
+                },
+                {
+                    name: "Dr. Snooze Warts",
+                    type: "Professor Application."
+                },
+                {
+                    name: "Professor Blake Walden",
+                    type: "Professor Application."
+                }
+            ]
         }
     }
 
@@ -31,16 +51,26 @@ class AdminMainSection extends Component{
         return table
     }
 
+    createApplicationTable = () => {
+        let table = []
+
+        for (let i in this.state.applications){
+            table.push(makeApplicationCard(this.state.applications[i]))
+        }
+
+        return table
+    }
+
     toggleCreateCourseModal = () => {
         this.setState({modalOpen: !this.state.modalOpen})
     }
 
     render() {
         return (
-            <div class="flex flex-col mx-24 mt-14 max-w-8xl h-full">
+            <div class="flex flex-col mx-20 mt-12 max-w-8xl h-full">
                     <div className="mx-auto text-7xl font-bold pb-10 -ml-6 text-gray-500"><FontAwesomeIcon className="-ml-2 pr-4 text-black" size="1x" icon={faHome}/>Admin</div>
                     <div className="pb-20 grid grid-cols-10">
-                        <div className="flex col-span-5 min-h-96 border-2 rounded-lg border-gray-300 p-2">
+                        <div className="flex col-span-5 min-h-96 border-2 rounded-lg border-gray-300 p-2 mr-2">
                             <div className="w-2/2">
                                 <div class="grid grid-cols-12 gap-2 -mr-2 p-8">
                                     <div className="col-start-1 col-end-3 pl-2">
@@ -59,7 +89,7 @@ class AdminMainSection extends Component{
                             </div>
                         </div>
         
-                        <div className="flex col-span-5 min-h-96 rounded-lg border-gray-300 p-2">
+                        <div className="flex col-span-5 min-h-96 border-t-2 border-b-2 ml-2 border-gray-600 p-2">
                             <div className="w-2/2">
                                 <div class="grid grid-cols-12 gap-2 -mr-2 p-8 pb-0">
                                     <div className="col-start-1 col-end-3 pb-2 pl-2">
@@ -69,66 +99,7 @@ class AdminMainSection extends Component{
                                 </div>
 
                                 <div className="grid grid-cols-2 p-4 pl-8 pt-6">
-
-                                    <div class="w-full">
-                                        <div class="inline-grid lg:flex bg-black rounded-lg border shadow-lg pb-6 lg:pb-0 min-w-full">
-                                            <div class="w-full p-4">
-                                                <div class="inline-grid">
-                                                    <p class="work-sans font-semibold text-xl text-white">Jaxson Hood</p>
-                                                    <p class="raleway text-sm my-2 text-white opacity-75">Student Application.</p>
-                                                </div>
-                                            </div>
-                                            <div className="w-full pl-4 grid-cols-2">
-                                                <button className="px-3 py-2 text-md font-medium text-white border border-green-500 rounded-lg">Accept</button>
-                                                <button className="ml-2 px-3 py-2 text-md font-medium text-white border border-red-500 rounded-lg">Decline</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="w-full">
-                                        <div class="inline-grid lg:flex bg-black rounded-lg border shadow-lg pb-6 lg:pb-0 min-w-full">
-                                            <div class="w-full p-4">
-                                                <div class="inline-grid">
-                                                    <p class="work-sans font-semibold text-xl text-white">Cam Dickie</p>
-                                                    <p class="raleway text-sm my-2 text-white opacity-75">Student Application.</p>
-                                                </div>
-                                            </div>
-                                            <div className="w-full pl-4 grid-cols-2">
-                                                <button className="px-3 py-2 text-md font-medium text-white border border-green-500 rounded-lg">Accept</button>
-                                                <button className="ml-2 px-3 py-2 text-md font-medium text-white border border-red-500 rounded-lg">Decline</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="w-full">
-                                        <div class="inline-grid lg:flex bg-black rounded-lg border shadow-lg pb-6 lg:pb-0 min-w-full">
-                                            <div class="w-full p-4">
-                                                <div class="inline-grid">
-                                                    <p class="work-sans font-semibold text-xl text-white">Dr. Snooze Warts</p>
-                                                    <p class="raleway text-sm my-2 text-white opacity-75">Professor Application.</p>
-                                                </div>
-                                            </div>
-                                            <div className="w-full pl-4 grid-cols-2">
-                                                <button className="px-3 py-2 text-md font-medium text-white border border-green-500 rounded-lg">Accept</button>
-                                                <button className="ml-2 px-3 py-2 text-md font-medium text-white border border-red-500 rounded-lg">Decline</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="w-full">
-                                        <div class="inline-grid lg:flex bg-black rounded-lg border shadow-lg pb-6 lg:pb-0 min-w-full">
-                                            <div class="w-full p-4">
-                                                <div class="inline-grid">
-                                                    <p class="work-sans font-semibold text-xl text-white">Professor Blake Walden</p>
-                                                    <p class="raleway text-sm my-2 text-white opacity-75">Professor Application.</p>
-                                                </div>
-                                            </div>
-                                            <div className="w-full pl-4 grid-cols-2">
-                                                <button className="px-3 py-2 text-md font-medium text-white border border-green-500 rounded-lg">Accept</button>
-                                                <button className="ml-2 px-3 py-2 text-md font-medium text-white border border-red-500 rounded-lg">Decline</button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    {this.createApplicationTable()}
                                 </div>
                             </div>
                         </div>
@@ -136,7 +107,6 @@ class AdminMainSection extends Component{
                     </div>
 
                     <CreateCourseModal show={this.state.modalOpen} hide={this.toggleCreateCourseModal}/>
-        
             </div>
             )
     }
@@ -162,6 +132,26 @@ function makeAdminCourseCard(course){
                      </div>
                  </div>
              </div>
+        </div>
+    )
+}
+
+function makeApplicationCard(application){
+    return (
+        <div class="w-full p-2">
+            <div class="inline-grid lg:flex rounded-lg border-2 hover:border-gray-700 pb-6 lg:pb-0 min-w-full">
+                <div class="w-full p-4">
+                    <div class="inline-grid">
+                        <p class="work-sans font-semibold text-xl">{application.name}</p>
+                        <p class="raleway text-sm my-2 opacity-75">{application.type}</p>
+                    </div>
+                </div>
+                <div className="w-full pl-4 grid-cols-2">
+                    <button className="hover:shadow-md px-3 py-2 text-md font-medium border-2 border-gray-900 rounded-lg">Accept
+                    <span><FontAwesomeIcon className="ml-2 text-pink-500" size="lg" icon={faCheck}/></span></button>
+                    <button className="hover:shadow-md ml-2 px-3 py-2 text-md font-medium border-2 border-gray-900 rounded-lg">Decline <span><FontAwesomeIcon className="ml-2 text-purple-500" size="lg" icon={faTimes}/></span></button>
+                </div>
+            </div>
         </div>
     )
 }

@@ -19,7 +19,7 @@ class Dashboard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            page: "courses",
+            page: "dashboard",
             modalOpen: false,
             currentCourse: 0,
             whichModal: 0,
@@ -92,7 +92,7 @@ class Dashboard extends React.Component {
         this.state.webSocket.send(msg);
     }
     sendUser = (ws) => {
-        
+
         if(ws == null) {
             console.log("unable to find websocket");
             return;
@@ -164,8 +164,8 @@ class Dashboard extends React.Component {
                                 <FontAwesomeIcon className="pb-1" size="md" icon={faSchool}/>
                             </div>
                             <div class="border-gray-300 pt-1">
-                                <a onClick={() => this.setPage("courses")}
-                                className={`shadow-md m-4 rounded-md ${(this.state.page == "courses") ? "bg-white font-bold border-2 border-gray-900 text-lg block py-6 px-6 cursor-pointer text-center text-yellow-500" : "bg-black text-white hover:text-yellow-500 text-lg block py-6 px-6 cursor-pointer text-center border border-gray-300"}`}>
+                                <a onClick={() => this.setPage("dashboard")}
+                                className={`shadow-md m-4 rounded-md ${(this.state.page == "dashboard") ? "bg-white font-bold border-2 border-gray-900 text-lg block py-6 px-6 cursor-pointer text-center text-yellow-500" : "bg-black text-white hover:text-yellow-500 text-lg block py-6 px-6 cursor-pointer text-center border border-gray-300"}`}>
                                     <FontAwesomeIcon size="lg" icon={faHome}/>
                                 </a>
                                 <a onClick={() => this.setPage("settings")}
@@ -177,6 +177,7 @@ class Dashboard extends React.Component {
                                     <FontAwesomeIcon size="lg" icon={faSignOutAlt}/>
                                 </a>
                             </div>
+                            {/* <button onClick={this.sendUser} className="w-5 rounded-lg bg-gray-200">Send User info</button> */}
                         </div>
                         <div class="flex-grow w-10/12">
                             <div className={`mx-auto bg-gray-100 py-3 border-b-4 h-12 ${(this.state.page == "courses") ? "border-black" : ""}`}>
@@ -187,7 +188,7 @@ class Dashboard extends React.Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className={`${(this.state.page == "courses") ? "" : "hidden"}`}>{makeCourseSection(this)}</div>
+                            <div className={`${(this.state.page == "dashboard") ? "" : "hidden"}`}>{makeCourseSection(this)}</div>
                             <div className={`${(this.state.page == "settings") ? "" : "hidden"}`}>{settings()}</div>
                         </div>
                         

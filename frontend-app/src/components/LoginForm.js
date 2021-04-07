@@ -76,6 +76,10 @@ class LoginForm extends React.Component {
                                     <button type="button" class="w-full px-3 py-4 text-white bg-yellow-500 rounded-md focus:bg-yellow-600 focus:outline-none" onClick={this.doLogin}>Sign in</button>
                                 </div>
                                 <p class="text-sm text-center text-gray-400">Don&#x27;t have an account yet? <Link to="/signup" class="text-yellow-500 focus:outline-none focus:underline focus:text-indigo-500 dark:focus:border-indigo-800">Sign up</Link>.</p>
+
+                                <div className="p-4">
+                                    <Link to="/admin" class="text-purple-500 focus:outline-none focus:underline focus:text-pink-500 dark:focus:border-indigo-800">GO TO ADMIN</Link>
+                                </div>
                             </form>
                         </div>
                     </div>

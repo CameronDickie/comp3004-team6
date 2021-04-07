@@ -43,9 +43,11 @@ public class Routes {
     @PostMapping(value ="/api/register", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String register(@RequestBody String info) {
         System.out.println("From '/api/register': " + info);
-        HashMap<String, String> map = Helper.stringToMap(info);
+        HashMap<String, Object> map = Helper.stringToMap(info);
+        map.replace("firstname", ((String) map.get("firstname")).toLowerCase());
+        map.replace("lastname", ((String) map.get("lastname")).toLowerCase());
         //this is the notification to be added to the admin's list of notifications -- likely to be a part of the database, but for now I just want to get it all working
-        User newUser = studentCreator.createUser(map.get("firstname") + map.get("lastname"), map.get("password"));
+        User newUser = studentCreator.createUser((String) map.get("firstname") + map.get("lastname"), (String) map.get("password"));
 
 //        newUser.setSocketConnection(new MyTextWebSocketHandler());
 //        s.addSocketConnection(newUser.getSocketConnection());
@@ -57,9 +59,9 @@ public class Routes {
     @PostMapping(value ="/api/register-professor", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String registerProfessor(@RequestBody String info) {
         System.out.println("From '/api/register': " + info);
-        HashMap<String, String> map = Helper.stringToMap(info);
+        HashMap<String, Object> map = Helper.stringToMap(info);
         //this is the notification to be added to the admin's list of notifications -- likely to be a part of the database, but for now I just want to get it all working
-        User newUser = professorCreator.createUser(map.get("firstname") + map.get("lastname"), map.get("password"));
+        User newUser = professorCreator.createUser((String) map.get("firstname") + map.get("lastname"), (String) map.get("password"));
 
         s.createUser(newUser);
         s.print();
@@ -69,16 +71,16 @@ public class Routes {
     @PostMapping(value = "/api/login", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String login(@RequestBody String userinfo) {
         System.out.println("From '/api/login': " + userinfo);
-        HashMap<String, String> map = Helper.stringToMap(userinfo);
+        HashMap<String, Object> map = Helper.stringToMap(userinfo);
         //using this userinfo, see if there is a user with this information (auth)
         String answer = "";
         System.out.println(map.get("username"));
         System.out.println(map.get("password"));
         try {
-            if (s.auth(map.get("username"), map.get("password"))) {
-                User ur = s.getUser(map.get("username"));
+            if (s.auth((String) map.get("username"), (String) map.get("password"))) {
+                User ur = s.getUser((String) map.get("username"));
                 String rs = Helper.objectToJSONString(ur);
-                HashMap<String, String> mm = Helper.stringToMap(rs);
+                HashMap<String, Object> mm = Helper.stringToMap(rs);
 
                 mm.put("type", ur.getClass().toString());
                 answer = Helper.objectToJSONString(mm);
@@ -98,18 +100,18 @@ public class Routes {
 
         //Creating HashMap of data sent in request
 
-        HashMap <String, String> courseMap = Helper.stringToMap(courseInfo);
+        HashMap <String, Object> courseMap = Helper.stringToMap(courseInfo);
 
-        CourseData courseData = new CourseCreator().createCourse(courseMap.get("courseCode"), courseMap.get("courseName"), Integer.parseInt(courseMap.get("maxStudents")));
+        CourseData courseData = new CourseCreator().createCourse((String) courseMap.get("courseCode"), (String) courseMap.get("courseName"), (Integer) courseMap.get("maxStudents"));
 
-        String courseCode = courseMap.get("courseCode");
+        String courseCode = (String) courseMap.get("courseCode");
 
-        User user = s.users.get(courseMap.get("professorID")); //Retrieving User (The Professor) from List of Users
+        User user = s.users.get((Long) courseMap.get("professorID")); //Retrieving User (The Professor) from List of Users
 
         Professor professor = (Professor) user; //Casting Professor to User
         courseData.attach(professor); //Attaching Professor to CourseData
 
-        s.courses.put(courseMap.get("courseCode"), courseData); //Storing CourseData in courses hashmap
+        s.courses.put((String) courseMap.get("courseCode"), courseData); //Storing CourseData in courses hashmap
 
         return courseInfo + " has been created";
     }
@@ -120,9 +122,9 @@ public class Routes {
 
         //Needs to delete courses AND delete students / professors with course
 
-        HashMap <String, String> courseMap = Helper.stringToMap(courseInfo);  //Creating HashMap of data sent in request
+        HashMap <String, Object> courseMap = Helper.stringToMap(courseInfo);  //Creating HashMap of data sent in request
 
-        String courseCode = courseMap.get("courseCode");
+        String courseCode = (String) courseMap.get("courseCode");
 
         //Calling updateAll with command deleteCourse on all observers for courseData
         //This will remove the course from the course list stored within the class
@@ -140,7 +142,7 @@ public class Routes {
 
         //Needs to delete courses AND delete students / professors with course
 
-        HashMap <String, String> infoMap = Helper.stringToMap(studentInfo);   //Creating HashMap of data sent in request
+        HashMap <String, Object> infoMap = Helper.stringToMap(studentInfo);   //Creating HashMap of data sent in request
 
         CourseData courseData = s.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
@@ -156,7 +158,7 @@ public class Routes {
     public String courseWithdrawal(@RequestBody String studentInfo) {
         System.out.println("From '/api/course-withdrawl': " + studentInfo);
 
-        HashMap <String, String> infoMap = Helper.stringToMap(studentInfo);   //Creating HashMap of data sent in request
+        HashMap <String, Object> infoMap = Helper.stringToMap(studentInfo);   //Creating HashMap of data sent in request
 
         CourseData courseData = s.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
@@ -164,7 +166,7 @@ public class Routes {
 
         Student student = (Student) user; //Casting the User object to student
 
-        student.removeCourse(infoMap.get("courseCode")); //Removing course in list of courses in the student
+        student.removeCourse((String) infoMap.get("courseCode")); //Removing course in list of courses in the student
 
         courseData.detach(student);//Detach student from course
 
@@ -184,7 +186,7 @@ public class Routes {
     public String[] getUserCourses(@RequestBody String userInfo) {
         System.out.println("From '/api/get-user-courses: " + userInfo);
 
-        HashMap<String, String> userMap = Helper.stringToMap(userInfo);
+        HashMap<String, Object> userMap = Helper.stringToMap(userInfo);
         HashMap<String, CourseData> courseMap = new HashMap<>();
 
         User user = s.users.get(userMap.get("userId"));
@@ -224,10 +226,10 @@ public class Routes {
     */
     @PostMapping(value = "/api/add-content", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String addContent(@RequestBody String contentInfo) {
-        HashMap<String, String> contentMap = Helper.stringToMap(contentInfo);
-        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+        HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
+        CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         course.setStrategy(new CourseContentStrategy());
-        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"), contentMap.get("type"));
+        Component comp = course.addContent((String) contentMap.get("name"), (String) contentMap.get("path"), (String) contentMap.get("type"));
 
         return (String) comp.getProperty("fullPath");
     }
@@ -244,10 +246,10 @@ public class Routes {
      */
     @PostMapping(value = "/api/submit-deliverable", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String submitDeliverable(@RequestBody String contentInfo) {
-        HashMap<String, String> contentMap = Helper.stringToMap(contentInfo);
-        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+        HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
+        CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         course.setStrategy(new SubmitDeliverableStrategy());
-        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"), contentMap.get("type"), false);
+        Component comp = course.addContent((String) contentMap.get("name"), (String) contentMap.get("path"), (String) contentMap.get("type"), false);
         comp.setProperty("type", contentMap.get("type"));
 
         return (String) comp.getProperty("fullPath");
@@ -263,14 +265,14 @@ public class Routes {
      */
     @PostMapping(value = "/api/add-document", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String addDocument(@RequestBody String contentInfo) {
-        HashMap<String, String> contentMap = Helper.stringToMap(contentInfo);
-        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+        HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
+        CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
 
-        String sBytes = contentMap.get("bytes");
+        String sBytes = (String) contentMap.get("bytes");
         byte[] bytes = Base64.getDecoder().decode(sBytes);
 
         course.setStrategy(new AddDocumentStrategy());
-        Component comp = course.addContent(contentMap.get("name"), contentMap.get("path"), contentMap.get("type"));
+        Component comp = course.addContent((String) contentMap.get("name"), (String) contentMap.get("path"), (String) contentMap.get("type"));
         comp.setProperty("file", bytes);
 
         return contentInfo + " has been submitted";
@@ -283,7 +285,7 @@ public class Routes {
      */
     @PostMapping(value = "/api/forum-post", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String addForumPost(@RequestBody String contentInfo) {
-        HashMap<String, String> contentMap = Helper.stringToMap(contentInfo);
+        HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
 
 
         return contentInfo + " has been submitted";
@@ -296,10 +298,10 @@ public class Routes {
     */
     @PostMapping(value = "/api/add-grade", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String addGrade(@RequestBody String contentInfo) {
-        HashMap<String, String> contentMap = Helper.stringToMap(contentInfo);
-        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+        HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
+        CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         Component c = (Component) course.getContent().executeCommand("findByPath", contentMap.get("path"));
-        c.executeCommand("addGrade", Integer.parseInt(contentMap.get("grade")));
+        c.executeCommand("addGrade", Integer.parseInt((String) contentMap.get("grade")));
 
         return contentInfo + " has been submitted";
     }
@@ -312,7 +314,7 @@ public class Routes {
      */
     @PostMapping(value = "/api/submit-final-grade", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String addFinalGrade(@RequestBody String contentInfo) {
-        HashMap<String, String> contentMap = Helper.stringToMap(contentInfo);
+        HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
 
         return contentInfo + " has been submitted";
     }
@@ -324,8 +326,8 @@ public class Routes {
      */
     @GetMapping(value = "/api/download-file", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public byte[] downloadFile(@RequestBody String contentInfo) {
-        HashMap<String, String> contentMap = Helper.stringToMap(contentInfo);
-        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+        HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
+        CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         Component c = (Component) course.getContent().executeCommand("findByPath", contentMap.get("path"));
         return (byte[]) c.executeCommand("download", null);
     }
@@ -337,8 +339,8 @@ public class Routes {
      */
     @GetMapping(value = "/api/view-file", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.APPLICATION_PDF_VALUE)
     public byte[] viewFile(@RequestBody String contentInfo) {
-        HashMap<String, String> contentMap = Helper.stringToMap(contentInfo);
-        CourseData course = s.getCourseData(contentMap.get("courseCode"));
+        HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
+        CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         Component c = (Component) course.getContent().executeCommand("findByPath", contentMap.get("path"));
         return (byte[]) c.executeCommand("viewAsPDF", null);
     }

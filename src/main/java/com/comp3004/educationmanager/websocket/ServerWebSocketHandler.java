@@ -46,16 +46,21 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
         logger.info("Server received: {}", request);
         //search for the user with the id in message
 
-        HashMap<String, String> map = Helper.stringToMap(request);
+        HashMap<String, Object> map = Helper.stringToMap(request);
         HashMap<Long, User> users = ServerState.users;
-        User u = users.get(Long.parseLong(map.get("userId"))); //get the user with this user id
+//        System.out.println(map.get("userId"));
+        User u = users.get(Long.valueOf((Integer) map.get("userId"))); //get the user with this user id
+        if(u == null) {
+            System.out.println("Failed to find the user with this id");
+            return;
+        }
         u.setSocketConnection(session); //give this user their session instance
         if(u.getSocketConnection() == null) {
             System.out.println("failed to add the socket connection");
         }
 
         //attach session to that user
-        String response = String.format("response from server to '%s'", HtmlUtils.htmlEscape(request));
+        String response = String.format("response from server to '%s'", request);
         logger.info("Server sends: {}", response);
         session.sendMessage(new TextMessage(response));
     }

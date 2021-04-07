@@ -138,7 +138,7 @@ public class Routes {
         String courseCode = (String) courseMap.get("courseCode");
 
         //Removing [ and ] from String of coursecodes and converting that String to array
-        String coursePrerequisitesStringArray = courseMap.get("prerequisites");
+        String coursePrerequisitesStringArray = (String) courseMap.get("prerequisites");
 
         StringBuilder stringBuilder = new StringBuilder(coursePrerequisitesStringArray);
 
@@ -210,9 +210,9 @@ public class Routes {
 
         HashMap <String, Object> infoMap = Helper.stringToMap(studentInfo);   //Creating HashMap of data sent in request
 
-        CourseData courseData = s.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
+        CourseData courseData = s.courses.get((String) infoMap.get("courseCode")); //Retrieving Course from list of courses
 
-        long studentID = Long.valueOf(infoMap.get("studentID")).longValue();
+        long studentID = Long.valueOf((Integer) infoMap.get("studentID"));
 
         User user = s.users.get(studentID); //Retrieving User (The Student Registering) From List of Users
 

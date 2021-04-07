@@ -117,18 +117,10 @@ public class Routes {
     public String createCourse(@RequestBody String courseInfo) throws IOException, ClassNotFoundException {
         System.out.println("From '/api/create-course': " + courseInfo);
 
-        Calendar calender = Calendar.getInstance();
-        calender.set(Calendar.MONTH, Calendar.JANUARY);
-        calender.set(Calendar.DAY_OF_MONTH, 1);
-        calender.set(Calendar.HOUR_OF_DAY , 0);
-        calender.set(Calendar.MINUTE ,0);
-        calender.set(Calendar.SECOND ,0);
-        calender.set(Calendar.MILLISECOND, 0);
-
-
-        //Creating HashMap of data sent in request
 
         //HashMap <String, String> courseMap = Helper.stringToMap(courseInfo);
+
+        //Creating HashMap of data sent in request
 
         Map<String,String> courseMap = new ObjectMapper().readValue(courseInfo, HashMap.class);
 

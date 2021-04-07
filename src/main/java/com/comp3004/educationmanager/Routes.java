@@ -117,8 +117,6 @@ public class Routes {
     public String createCourse(@RequestBody String courseInfo) throws IOException, ClassNotFoundException {
         System.out.println("From '/api/create-course': " + courseInfo);
 
-
-//        System.out.println(calender.getTime());
         Calendar calender = Calendar.getInstance();
         calender.set(Calendar.MONTH, Calendar.JANUARY);
         calender.set(Calendar.DAY_OF_MONTH, 1);
@@ -130,15 +128,19 @@ public class Routes {
 
         //Creating HashMap of data sent in request
 
+        //HashMap <String, String> courseMap = Helper.stringToMap(courseInfo);
 
-        HashMap <String, Object> courseMap = Helper.stringToMap(courseInfo);
+        Map<String,String> courseMap = new ObjectMapper().readValue(courseInfo, HashMap.class);
 
-        CourseData courseData = new CourseCreator().createCourse((String) courseMap.get("courseCode"), (String) courseMap.get("courseName"), (Integer) courseMap.get("maxStudents"));
+        CourseData courseData = new CourseCreator().createCourse(courseMap.get("courseCode"), courseMap.get("courseName"), Integer.parseInt(courseMap.get("maxStudents")));
 
-        String courseCode = (String) courseMap.get("courseCode");
+        String courseCode = courseMap.get("courseCode");
 
+        long professorID =Long.valueOf(courseMap.get("professorID")).longValue();
+
+        User user = s.users.get(professorID); //Retrieving User (The Professor) from List of Users
         //Removing [ and ] from String of coursecodes and converting that String to array
-        String coursePrerequisitesStringArray = (String) courseMap.get("prerequisites");
+        String coursePrerequisitesStringArray = courseMap.get("prerequisites");
 
         StringBuilder stringBuilder = new StringBuilder(coursePrerequisitesStringArray);
 
@@ -155,11 +157,12 @@ public class Routes {
                 courseData.addPrerequisite(prerequisite);
             }
         }
-        User user = s.users.get( Long.valueOf((Integer) courseMap.get("professorID"))); //Retrieving User (The Professor) from List of Users
+
 
         Professor professor = (Professor) user; //Casting Professor to User
         courseData.attach(professor); //Attaching Professor to CourseData
 
+        s.courses.put(courseMap.get("courseCode"), courseData); //Storing CourseData in courses hashmap
         s.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
 
         return courseInfo + " has been created";
@@ -178,9 +181,9 @@ public class Routes {
 
         //Needs to delete courses AND delete students / professors with course
 
-        HashMap <String, Object> courseMap = Helper.stringToMap(courseInfo);  //Creating HashMap of data sent in request
+        HashMap <String, String> courseMap = new ObjectMapper().readValue(courseInfo, HashMap.class);  //Creating HashMap of data sent in request
 
-        String courseCode = (String) courseMap.get("courseCode");
+        String courseCode = courseMap.get("courseCode");
 
         //Calling updateAll with command deleteCourse on all observers for courseData
         //This will remove the course from the course list stored within the class
@@ -203,16 +206,16 @@ public class Routes {
 
      */
     @PostMapping(value ="/api/course-registration", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
-    public String courseRegistration(@RequestBody String studentInfo) {
+    public String courseRegistration(@RequestBody String studentInfo) throws IOException {
         System.out.println("From '/api/course-registration': " + studentInfo);
 
         //Needs to delete courses AND delete students / professors with course
 
-        HashMap <String, Object> infoMap = Helper.stringToMap(studentInfo);   //Creating HashMap of data sent in request
+        HashMap <String, String> infoMap = new ObjectMapper().readValue(studentInfo, HashMap.class);  //Creating HashMap of data sent in request
 
-        CourseData courseData = s.courses.get((String) infoMap.get("courseCode")); //Retrieving Course from list of courses
+        CourseData courseData = s.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
-        long studentID = Long.valueOf((Integer) infoMap.get("studentID"));
+        long studentID = Long.valueOf(infoMap.get("studentID"));
 
         User user = s.users.get(studentID); //Retrieving User (The Student Registering) From List of Users
 
@@ -237,10 +240,10 @@ public class Routes {
     }
 
     @PostMapping(value ="/api/course-withdrawal", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
-    public String courseWithdrawal(@RequestBody String studentInfo) {
+    public String courseWithdrawal(@RequestBody String studentInfo) throws IOException {
         System.out.println("From '/api/course-withdrawl': " + studentInfo);
 
-        HashMap <String, Object> infoMap = Helper.stringToMap(studentInfo);   //Creating HashMap of data sent in request
+        HashMap <String, String> infoMap = new ObjectMapper().readValue(studentInfo, HashMap.class);  //Creating HashMap of data sent in request
 
         CourseData courseData = s.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
@@ -248,7 +251,7 @@ public class Routes {
 
         Student student = (Student) user; //Casting the User object to student
 
-        student.removeCourse((String) infoMap.get("courseCode")); //Removing course in list of courses in the student
+        student.removeCourse(infoMap.get("courseCode")); //Removing course in list of courses in the student
 
         courseData.detach(student);//Detach student from course
 

@@ -8,6 +8,7 @@ import com.comp3004.educationmanager.accounts.User;
 import com.comp3004.educationmanager.db.repositories.*;
 import com.comp3004.educationmanager.factory.AdminCreator;
 import com.comp3004.educationmanager.observer.CourseData;
+import com.comp3004.educationmanager.observer.SystemData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +41,7 @@ public class H2 implements Database {
         Admin admin = (Admin) factory.createUser("admin", "pass");
         if (addUser(admin)) {
             System.out.println("admin user added to the db");
-            ServerState.admin = admin;
+            SystemData.admin = admin;
         } else {
             System.out.println("admin has failed to be created");
         }

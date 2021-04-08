@@ -20,6 +20,24 @@ class AdminDashboard extends Component {
             currentCourse: 0,
             whichModal: 0,
             webSocket: null,
+            applications: [
+                {
+                    name: "Jaxson Hood",
+                    type: "Student Application."
+                },
+                {
+                    name: "Cam Dickie",
+                    type: "Student Application."
+                },
+                {
+                    name: "Dr. Snooze Warts",
+                    type: "Professor Application."
+                },
+                {
+                    name: "Professor Blake Walden",
+                    type: "Professor Application."
+                }
+            ],
             data: {
                 courses: [
                     {
@@ -46,7 +64,8 @@ class AdminDashboard extends Component {
                         name: "Intro to Web Development",
                         code: "COMP2406"
                     }
-                ]
+                ],
+                
             }
         }
     }
@@ -64,6 +83,9 @@ class AdminDashboard extends Component {
         }
         ws.onmessage = (event) => {
             console.log('Client received: ' + event.data);
+            if(event.data == 'get-applications') {
+                this.updateApplications();
+            }
         }
         ws.onerror = (event) => {
             console.log('Client error: ' + event.data);
@@ -98,6 +120,34 @@ class AdminDashboard extends Component {
         ws.send(uString);
     }
 
+    updateApplications = async () => {
+        if(this.state.webSocket == null) {
+            console.log("no socket connection found");
+            return;
+        }
+        const requestOptions = {
+            method: 'GET',
+            headers: {'Content-Type': 'text/html'},
+        };
+
+        await fetch('/api/get-applications', requestOptions)
+            .then(response => response.json())
+            .then(res => {
+                //update this.state.data.applictions
+                let formatted = res;
+                //formatting the response to be of type {name, type}
+                for(let i = 0; i < formatted.length; i++) {
+                    delete formatted[i].password;
+                    formatted[i].name = formatted[i].firstname + " " + formatted[i].lastname
+                    delete formatted[i].firstname;
+                    delete formatted[i].lastname;
+                }
+                
+                this.setState({applications: formatted}, () => {
+                    console.log(JSON.stringify(this.state.applications))
+                })
+            })
+    }
     setPage = (pageName) => {
         this.setState({page: pageName});
     }

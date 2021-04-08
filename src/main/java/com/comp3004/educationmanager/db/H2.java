@@ -37,15 +37,15 @@ public class H2 implements Database {
     @Override
     public void initialize() {
         //create the admin user and add them to the database
-        AdminCreator factory = new AdminCreator();
-        Admin admin = (Admin) factory.createUser("admin", "pass");
-        if (addUser(admin)) {
-            System.out.println("admin user added to the db");
-            SystemData.admin = admin;
-        } else {
-            System.out.println("admin has failed to be created");
-        }
-        this.printAdmin();
+//        AdminCreator factory = new AdminCreator();
+//        Admin admin = (Admin) factory.createUser("admin", "pass");
+//        if (addUser(admin)) {
+//            System.out.println("admin user added to the db");
+//            SystemData.admin = admin;
+//        } else {
+//            System.out.println("admin has failed to be created");
+//        }
+//        this.printAdmin();
     }
 
     @Override

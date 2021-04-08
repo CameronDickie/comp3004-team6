@@ -41,8 +41,14 @@ class LoginForm extends React.Component {
 
         let tu = this.props.getUser();
 
+        if(this.state.didLogin && tu.username == "admin") {
+            return (
+                <Redirect to="/admin" />
+            )
+        }
         // If login is successful or already logged in
-        if (this.state.didLogin || (tu.username != null)){
+
+        else if (this.state.didLogin && (tu.username != null)){
             return (
                 <Redirect to="/dashboard" />
             )
@@ -77,9 +83,9 @@ class LoginForm extends React.Component {
                                 </div>
                                 <p class="text-sm text-center text-gray-400">Don&#x27;t have an account yet? <Link to="/signup" class="text-yellow-500 focus:outline-none focus:underline focus:text-indigo-500 dark:focus:border-indigo-800">Sign up</Link>.</p>
 
-                                <div className="p-4">
+                                {/* <div className="p-4">
                                     <Link to="/admin" class="text-purple-500 focus:outline-none focus:underline focus:text-pink-500 dark:focus:border-indigo-800">GO TO ADMIN</Link>
-                                </div>
+                                </div> */}
                             </form>
                         </div>
                     </div>

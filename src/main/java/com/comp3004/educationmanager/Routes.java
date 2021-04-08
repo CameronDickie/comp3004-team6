@@ -117,17 +117,18 @@ public class Routes {
 
         //Creating HashMap of data sent in request
 
-        Map<String,String> courseMap = new ObjectMapper().readValue(courseInfo, HashMap.class);
+        Map<String, Object> courseMap = Helper.stringToMap(courseInfo);
 
-        CourseData courseData = new CourseCreator().createCourse(courseMap.get("courseCode"), courseMap.get("courseName"), Integer.parseInt(courseMap.get("maxStudents")));
+        CourseData courseData = new CourseCreator().createCourse((String) courseMap.get("courseCode"), (String) courseMap.get("courseName") , (Integer) courseMap.get("maxStudents"));
 
-        String courseCode = courseMap.get("courseCode");
+        String courseCode = String.valueOf(courseMap.get("courseCode"));
 
-        long professorID =Long.valueOf(courseMap.get("professorID")).longValue();
+        long professorID =Long.valueOf((Integer) courseMap.get("professorID")).longValue();
+
 
         User user = SystemData.users.get(professorID); //Retrieving User (The Professor) from List of Users
         //Removing [ and ] from String of coursecodes and converting that String to array
-        String coursePrerequisitesStringArray = courseMap.get("prerequisites");
+        String coursePrerequisitesStringArray = (String) courseMap.get("prerequisites");
 
         StringBuilder stringBuilder = new StringBuilder(coursePrerequisitesStringArray);
 
@@ -148,6 +149,7 @@ public class Routes {
 
         Professor professor = (Professor) user; //Casting Professor to User
         courseData.attach(professor); //Attaching Professor to CourseData
+
 
         SystemData.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
 

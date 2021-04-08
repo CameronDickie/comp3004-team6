@@ -1,5 +1,10 @@
 package com.comp3004.educationmanager.visitor;
 
+import java.io.File;
+
 public interface FileInterface {
-    void accept(FileVisitor v);
+    byte[] accept(FileVisitor v);
+    void setFile(byte[] bytes);
+    byte[] getBytes();
+    File getFile();
 }

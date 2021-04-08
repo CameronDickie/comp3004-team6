@@ -337,6 +337,12 @@ public class Routes {
     USAGE:  Must convert the file to a byte array and then encode that as a string (with Base64 encoding)
             to be passed in with the contentInfo param
         - this will decode the String into a byte array and pass that to the file decorator
+    @params (contentInfo JSON)
+        - courseCode: course to add document to
+        - bytes: byte array (as string) that stores the file data
+        - name: name of document to add
+        - path: path of where to add document
+        - type: one of PDF, DOCX, PPTX
     TODO:
         -
      */

@@ -20,14 +20,13 @@ class AdminMainSection extends Component{
         this.state = {
             data: this.props.app.state.data,
             modalOpen: false,
-            applications: this.props.app.state.applications
         }
+
+        // Get applications from server on creation
+        this.props.updateApplications();
     }
 
     processApplication = async (status, name, type) => {
-        // console.log(status);
-        // console.log(name);
-        // console.log(type);
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type':'text/html'},
@@ -45,8 +44,9 @@ class AdminMainSection extends Component{
                     if(res == "error") {
                         console.log('error processing application');
                     }
-                    // this.props.app.updateApplications();
+                    //  else this.props.updateApplications();
                 })
+
         } else if(!status) {
             //deny this application
             await fetch ('/api/delete-application', requestOptions)
@@ -56,12 +56,14 @@ class AdminMainSection extends Component{
                     if(res == "error") {
                         console.log('error deleting this application')
                     }
-                    // this.props.app.updateApplications();
+                    //  else this.props.updateApplications()
                 })
+
         } else {
             console.log("error with application processing ocurred");
         }
     }
+
     createCourseTable = () => {
         let table = []
 
@@ -75,14 +77,15 @@ class AdminMainSection extends Component{
     createApplicationTable = () => {
         let table = []
 
-        for (let i in this.props.app.state.applications){
-            table.push(this.makeApplicationCard(this.props.app.state.applications[i]))
+        for (let i in this.props.applications){
+            table.push(this.makeApplicationCard(this.props.applications[i]))
         }
 
         return table
     }
-    makeAdminCourseCard = (course) => {
 
+
+    makeAdminCourseCard = (course) => {
         return (
             <div className="p-2">
                 <div className="p-3 rounded-md h-40 w-72 bg-gray-50 border-2 hover:border-blue-500 flex flex-wrap content-between">
@@ -105,7 +108,7 @@ class AdminMainSection extends Component{
         )
     }
     
-    makeApplicationCard = (application)=>{
+    makeApplicationCard = (application) => {
         return (
             <div class="w-full p-2">
                 <div class="inline-grid lg:flex rounded-lg border-2 hover:border-gray-700 pb-6 lg:pb-0 min-w-full">

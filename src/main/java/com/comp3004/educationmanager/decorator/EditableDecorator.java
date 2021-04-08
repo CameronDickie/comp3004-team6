@@ -38,6 +38,16 @@ public class EditableDecorator extends Decorator {
 
     @Override
     public Object executeCommand(String command, Object value) {
-        return wrappee.executeCommand(command, value);
+        System.out.println("Executing command (editable): " + command);
+        if(command.equals("findByPath")) {
+            Component c = (Component) wrappee.executeCommand(command, value);
+            if(c != null) {
+                return this;
+            } else {
+                return null;
+            }
+        } else {
+            return wrappee.executeCommand(command, value);
+        }
     }
 }

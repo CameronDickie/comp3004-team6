@@ -161,7 +161,6 @@ public class Routes {
         //Removing [ and ] from String of coursecodes and converting that String to array
         ArrayList<String> coursePrerequisitesArray = (ArrayList<String>) courseMap.get("prerequisites");
 
-
         //Making sure to not add empty strings to prerequisite array (Only add if String has data)
         if (coursePrerequisitesArray.size() > 0) {
             for (String prerequisite : coursePrerequisitesArray) {
@@ -278,7 +277,7 @@ public class Routes {
     TODO:
         - how to query for user? right now I'm using the "userId" tag?
     */
-    @GetMapping(value = "/api/get-user-courses", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(value = "/api/get-user-courses", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.ALL_VALUE)
     public String[] getUserCourses(@RequestBody String userInfo) {
         System.out.println("From '/api/get-user-courses: " + userInfo);
 
@@ -376,7 +375,7 @@ public class Routes {
 
         String sBytes = (String) contentMap.get("bytes");
         System.out.println("BYTES: " + sBytes);
-        byte[] bytes = new byte[] {1,2,3,4};
+        byte[] bytes = Base64.getDecoder().decode(sBytes);
 
         course.setStrategy(new AddDocumentStrategy());
         Component comp = course.addContent((String) contentMap.get("name"), (String) contentMap.get("path"), (String) contentMap.get("type"));
@@ -444,7 +443,7 @@ public class Routes {
     TODO:
         - Must still implement conversion feature within the FileDecorator class
      */
-    @GetMapping(value = "/api/view-file", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.APPLICATION_PDF_VALUE)
+    @GetMapping(value = "/api/view-file", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.ALL_VALUE)
     public byte[] viewFile(@RequestBody String contentInfo) {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));

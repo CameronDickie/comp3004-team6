@@ -6,7 +6,9 @@ import com.comp3004.educationmanager.accounts.Professor;
 import com.comp3004.educationmanager.accounts.Student;
 import com.comp3004.educationmanager.accounts.User;
 import com.comp3004.educationmanager.db.H2;
+import com.comp3004.educationmanager.factory.StudentCreator;
 import com.comp3004.educationmanager.observer.CourseData;
+import com.comp3004.educationmanager.observer.SystemData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
@@ -16,6 +18,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
 @Component
 public class ServerState {
     @Autowired
@@ -24,6 +27,7 @@ public class ServerState {
     HashMap<String, CourseData> courses = new HashMap<>();
     public static Admin admin;
     public static HashMap<Long, User> users = new HashMap<>();
+
 
     Calendar date = Calendar.getInstance();
     Calendar lastRegistrationDate = Calendar.getInstance();
@@ -67,10 +71,10 @@ public class ServerState {
         boolean res = db.addUser(u);
         if(res) {
             if (u instanceof Student) {
-                users.put(((Student) u).getStudentID(), u);
+                SystemData.users.put(((Student) u).getStudentID(), u);
             }
             else if (u instanceof Professor){
-                users.put(((Professor) u).getProfessorID(), u);
+                SystemData.users.put(((Professor) u).getProfessorID(), u);
             }
         }
         return res;
@@ -84,8 +88,8 @@ public class ServerState {
     public User getUser(String username) {
         return db.getUser(username);
     }
-    public void createCourse(CourseData courseData) { courses.put(courseData.getCourseCode(), courseData); }
-    public CourseData getCourseData(String courseCode) { return courses.get(courseCode); }
+    public void createCourse(CourseData courseData) { SystemData.courses.put(courseData.getCourseCode(), courseData); }
+    public CourseData getCourseData(String courseCode) { return SystemData.courses.get(courseCode); }
 
     public boolean deleteCourse(String courseCode) {return db.deleteCourseData(courseCode);}
 

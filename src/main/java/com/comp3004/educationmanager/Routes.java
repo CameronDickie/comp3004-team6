@@ -8,6 +8,7 @@ import com.comp3004.educationmanager.factory.ProfessorCreator;
 import com.comp3004.educationmanager.factory.StudentCreator;
 
 import com.comp3004.educationmanager.observer.CourseData;
+import com.comp3004.educationmanager.observer.SystemData;
 import com.comp3004.educationmanager.strategy.AddDocumentStrategy;
 import com.comp3004.educationmanager.strategy.CourseContentStrategy;
 import com.comp3004.educationmanager.strategy.SubmitDeliverableStrategy;
@@ -124,7 +125,7 @@ public class Routes {
 
         long professorID =Long.valueOf(courseMap.get("professorID")).longValue();
 
-        User user = s.users.get(professorID); //Retrieving User (The Professor) from List of Users
+        User user = SystemData.users.get(professorID); //Retrieving User (The Professor) from List of Users
         //Removing [ and ] from String of coursecodes and converting that String to array
         String coursePrerequisitesStringArray = courseMap.get("prerequisites");
 
@@ -148,8 +149,7 @@ public class Routes {
         Professor professor = (Professor) user; //Casting Professor to User
         courseData.attach(professor); //Attaching Professor to CourseData
 
-        s.courses.put(courseMap.get("courseCode"), courseData); //Storing CourseData in courses hashmap
-        s.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
+        SystemData.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
 
         return courseInfo + " has been created";
     }
@@ -173,10 +173,10 @@ public class Routes {
 
         //Calling updateAll with command deleteCourse on all observers for courseData
         //This will remove the course from the course list stored within the class
-        s.courses.get(courseCode).updateAll("deleteCourse", courseCode);
+        SystemData.courses.get(courseCode).updateAll("deleteCourse", courseCode);
 
         //Removing course from list of courses
-        s.courses.remove(courseCode);
+        SystemData.courses.remove(courseCode);
 
         return courseInfo + " has been deleted";
     }
@@ -199,11 +199,11 @@ public class Routes {
 
         HashMap <String, String> infoMap = new ObjectMapper().readValue(studentInfo, HashMap.class);  //Creating HashMap of data sent in request
 
-        CourseData courseData = s.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
+        CourseData courseData = SystemData.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
         long studentID = Long.valueOf(infoMap.get("studentID"));
 
-        User user = s.users.get(studentID); //Retrieving User (The Student Registering) From List of Users
+        User user = SystemData.users.get(studentID); //Retrieving User (The Student Registering) From List of Users
 
         Student student = (Student) user; //Casting the User object to student
 
@@ -231,9 +231,9 @@ public class Routes {
 
         HashMap <String, String> infoMap = new ObjectMapper().readValue(studentInfo, HashMap.class);  //Creating HashMap of data sent in request
 
-        CourseData courseData = s.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
+        CourseData courseData = SystemData.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
-        User user = s.users.get(infoMap.get("studentID")); //Retrieving User (The Student Registering) From List of Users
+        User user = SystemData.users.get(infoMap.get("studentID")); //Retrieving User (The Student Registering) From List of Users
 
         Student student = (Student) user; //Casting the User object to student
 
@@ -264,7 +264,7 @@ public class Routes {
         if(id == null) {
             id = userMap.get("professorID");
         }
-        User user = ServerState.users.get(userMap.get("userId"));
+        User user = SystemData.users.get(userMap.get("userId"));
         if(user instanceof Student) {
             Student s = (Student) user;
             courseMap = s.getCourses();

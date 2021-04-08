@@ -61,6 +61,8 @@ public class Routes {
     public String registerProfessor(@RequestBody String info) {
         System.out.println("From '/api/register': " + info);
         HashMap<String, Object> map = Helper.stringToMap(info);
+        map.replace("firstname", ((String) map.get("firstname")).toLowerCase());
+        map.replace("lastname", ((String) map.get("lastname")).toLowerCase());
         //this is the notification to be added to the admin's list of notifications -- likely to be a part of the database, but for now I just want to get it all working
         User newUser = professorCreator.createUser((String) map.get("firstname") + map.get("lastname"), (String) map.get("password"));
 

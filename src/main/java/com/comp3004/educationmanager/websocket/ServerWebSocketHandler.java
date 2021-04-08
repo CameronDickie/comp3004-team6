@@ -3,6 +3,7 @@ package com.comp3004.educationmanager.websocket;
 import com.comp3004.educationmanager.Helper;
 import com.comp3004.educationmanager.ServerState;
 import com.comp3004.educationmanager.accounts.User;
+import com.comp3004.educationmanager.observer.SystemData;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.SubProtocolCapable;
@@ -54,7 +55,7 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
         if(typeMap.get("attachUser") != null) {
             //search for the user with the id in message
             HashMap<String, Object> map = (HashMap<String, Object>) typeMap.get("attachUser");
-            HashMap<Long, User> users = ServerState.users;
+            HashMap<Long, User> users = SystemData.users;
             //determine if this is a professor or student
             Object id = map.get("studentID");
             if(id == null) {
@@ -62,7 +63,7 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
             }
             if(id == null && map.get("name").equals("admin")) {
                 //this is likely the admin, or we have broken the code
-                ServerState.admin.setSocketConnection(session);
+                SystemData.admin.setSocketConnection(session);
                 String response = String.format("response from server to '%s'", request);
                 logger.info("Server sends: {}", response);
                 session.sendMessage(new TextMessage(response));

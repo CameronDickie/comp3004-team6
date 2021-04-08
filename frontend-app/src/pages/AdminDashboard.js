@@ -146,7 +146,7 @@ class AdminDashboard extends Component {
                                 <div class="flex items-end pl-10">
                                     <div className="text-md font-mono text-black">
                                         LOGGED-IN=<span className="font-semibold pr-10">ADMIN</span>
-                                        USERTYPE=<span className="font-semibold">{getUser().type}</span>
+                                        USERTYPE=<span className="font-semibold">{this.props.getUser().type}</span>
                                     </div>
                                 </div>
                             </div>

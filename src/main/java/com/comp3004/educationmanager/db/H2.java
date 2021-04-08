@@ -1,5 +1,6 @@
 package com.comp3004.educationmanager.db;
 
+import com.comp3004.educationmanager.ServerState;
 import com.comp3004.educationmanager.accounts.Admin;
 import com.comp3004.educationmanager.accounts.Professor;
 import com.comp3004.educationmanager.accounts.Student;
@@ -7,6 +8,7 @@ import com.comp3004.educationmanager.accounts.User;
 import com.comp3004.educationmanager.db.repositories.*;
 import com.comp3004.educationmanager.factory.AdminCreator;
 import com.comp3004.educationmanager.observer.CourseData;
+import com.comp3004.educationmanager.observer.SystemData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +41,7 @@ public class H2 implements Database {
         Admin admin = (Admin) factory.createUser("admin", "pass");
         if (addUser(admin)) {
             System.out.println("admin user added to the db");
+            SystemData.admin = admin;
         } else {
             System.out.println("admin has failed to be created");
         }
@@ -58,9 +61,11 @@ public class H2 implements Database {
 
     @Override
     public boolean auth(String username, String password) {
+        username = username == null ? "" : username;
+        password = password == null ? "" : password;
         Student s = sr.findByUsername(username);
         Professor p = pr.findByUsername(username);
-        return (p != null && p.getPassword().equals(password)) || (s != null && s.getPassword().equals(password));
+        return (p != null && p.getPassword().equals(password)) || (s != null && s.getPassword().equals(password) || (username.equals("admin") && password.equals("pass")));
     }
     @Override
     public void print() {
@@ -118,10 +123,15 @@ public class H2 implements Database {
         Student s = sr.findByUsername(username);
         Professor p = pr.findByUsername(username);
 
-        if (s.getName().equals(username)){
+        if (s != null && s.getName().equals(username)){
             return (User) s;
+        } else if(p != null && p.getName().equals(username)) {
+            return (User) p;
+        } else if(username.equals("admin")) {
+            Admin a = ar.findByUsername(username);
+            return (User) a;
         }
+        return null;
 
-        return (User) p;
     }
 }

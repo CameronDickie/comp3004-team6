@@ -7,9 +7,7 @@ public abstract class Subject {
 
     public abstract boolean attach(Observer o);
 
-    public boolean detach(Observer o) {
-        return observers.remove(o);
-    }
+    public abstract boolean detach(Observer o);
 
     public ArrayList<Observer> getObservers() { return observers; }
 

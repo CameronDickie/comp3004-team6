@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import LoginForm from './components/LoginForm.js';
 import SignUp from './components/SignUp.js';
+import AdminDashboard from './pages/AdminDashboard.js';
 import Dashboard from './pages/Dashboard.js';
 
 function useStickyState(defaultValue, key) {
@@ -41,10 +42,11 @@ function App() {
 
     const setU = (usr) => {
         setUser(usr);
-        console.log(user.username)
+        console.log(user)
     }
 
     const getUser = () => {
+        // console.log(user)
         return user;
     }
   
@@ -59,6 +61,9 @@ function App() {
                 </Route>
                 <Route exact path="/dashboard">
                     <Dashboard getUser={getUser} logout={clearStorage} />
+                </Route>
+                <Route exact path="/admin">
+                    <AdminDashboard getUser={getUser} logout={clearStorage} />
                 </Route>
             </Switch>
         </BrowserRouter>

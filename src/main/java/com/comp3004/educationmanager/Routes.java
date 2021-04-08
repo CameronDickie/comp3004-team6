@@ -467,8 +467,10 @@ public class Routes {
         //find this application in the admin's list of applications
         System.out.println(applicationInfo);
         HashMap<String, Object> appinfo = Helper.stringToMap(applicationInfo);
+
         String[] names = ((String) appinfo.get("name")).split(" ");
         ArrayList<Application> pending = SystemData.admin.getApplications();
+
         for(int i = 0; i < pending.size(); i++) {
             if(names[0].equals(pending.get(i).getFirstname()) && names[1].equals(pending.get(i).getLastname()) && appinfo.get("type").equals(pending.get(i).getType())) {
                 //this is the application we are looking for. Create a user from this application, and end the request

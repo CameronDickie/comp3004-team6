@@ -18,10 +18,10 @@ class SignUp extends React.Component {
     }
     doRegister = async () => {
 
-        let thisType = "Student"
+        let thisType = "student"
 
         if (this.state.toggle){
-            thisType = "Professor"
+            thisType = "professor"
         }
 
         const requestOptions = {

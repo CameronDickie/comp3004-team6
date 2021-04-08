@@ -116,7 +116,9 @@ public class Routes {
                 mm.put("type", type.substring(startIndex));
                 answer = Helper.objectToJSONString(mm);
             } else {
-                answer = Helper.objectToJSONString(Helper.stringToMap("{error: true}"));
+                HashMap<String, String> errorMessage = new HashMap<>();
+                errorMessage.put("error", "login failed");
+                answer = Helper.objectToJSONString(errorMessage);
             }
         } catch (Exception e) {
             e.printStackTrace(System.out);

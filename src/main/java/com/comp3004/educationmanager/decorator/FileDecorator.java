@@ -2,7 +2,6 @@ package com.comp3004.educationmanager.decorator;
 
 import com.comp3004.educationmanager.composite.Component;
 import com.comp3004.educationmanager.visitor.*;
-import org.apache.commons.io.FileUtils;
 
 public class FileDecorator extends Decorator {
     private FileInterface file;

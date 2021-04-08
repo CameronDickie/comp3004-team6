@@ -97,7 +97,7 @@ class Dashboard extends React.Component {
             console.log("unable to find websocket");
             return;
         }
-        let uString = JSON.stringify(this.props.getUser());
+        let uString = JSON.stringify({attachUser:this.props.getUser()});
         console.log('Client sends: ' + uString);
         ws.send(uString);
     }
@@ -177,14 +177,13 @@ class Dashboard extends React.Component {
                                     <FontAwesomeIcon size="lg" icon={faSignOutAlt}/>
                                 </a>
                             </div>
-                            {/* <button onClick={this.sendUser} className="w-5 rounded-lg bg-gray-200">Send User info</button> */}
                         </div>
                         <div class="flex-grow w-10/12">
                             <div className={`mx-auto bg-gray-100 py-3 border-b-4 h-12 ${(this.state.page == "courses") ? "border-black" : ""}`}>
                                 <div class="flex items-end pl-10">
                                     <div className="text-md font-mono text-black">
                                         LOGGED-IN=<span className="font-semibold pr-10">{u.username}</span>
-                                        USERTYPE=<span className="font-semibold">STUDENT</span>
+                                        USERTYPE=<span className="font-semibold">{u.type}</span>
                                     </div>
                                 </div>
                             </div>

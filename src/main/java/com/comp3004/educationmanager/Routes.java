@@ -6,8 +6,9 @@ import com.comp3004.educationmanager.composite.Component;
 import com.comp3004.educationmanager.factory.CourseCreator;
 import com.comp3004.educationmanager.factory.ProfessorCreator;
 import com.comp3004.educationmanager.factory.StudentCreator;
-import com.comp3004.educationmanager.misc.Serialization;
+
 import com.comp3004.educationmanager.observer.CourseData;
+import com.comp3004.educationmanager.observer.SystemData;
 import com.comp3004.educationmanager.strategy.AddDocumentStrategy;
 import com.comp3004.educationmanager.strategy.CourseContentStrategy;
 import com.comp3004.educationmanager.strategy.SubmitDeliverableStrategy;
@@ -21,17 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.MediaType;
 
 import java.io.*;
-import java.lang.reflect.Array;
-import java.sql.Time;
 import java.util.*;
 
 @RestController
 public class Routes {
     // For things like converting Objects to json
-//    Helper help = new Helper();
     @Autowired
     ServerState s;
-    Serialization serialization = new Serialization();
     StudentCreator studentCreator = new StudentCreator();
     ProfessorCreator professorCreator = new ProfessorCreator();
 
@@ -55,9 +52,6 @@ public class Routes {
         student.addPastCourse("COMP2803");
         student.addPastCourse("COMP3203");
 
-
-//        newUser.setSocketConnection(new MyTextWebSocketHandler());
-//        s.addSocketConnection(newUser.getSocketConnection());
         s.createUser(newUser);
         s.print();
         return info + " has attempted to be registered";
@@ -88,8 +82,9 @@ public class Routes {
                 User ur = s.getUser((String) map.get("username"));
                 String rs = Helper.objectToJSONString(ur);
                 HashMap<String, Object> mm = Helper.stringToMap(rs);
-
-                mm.put("type", ur.getClass().toString());
+                String type = ur.getClass().toString();
+                int startIndex = type.indexOf(".accounts.") + ".accounts.".length();
+                mm.put("type", type.substring(startIndex));
                 answer = Helper.objectToJSONString(mm);
             } else {
                 answer = Helper.objectToJSONString(Helper.stringToMap("{error: true}"));
@@ -130,6 +125,8 @@ public class Routes {
 
         long professorID =Long.valueOf((Integer) courseMap.get("professorID")).longValue();
 
+
+        User user = SystemData.users.get(professorID); //Retrieving User (The Professor) from List of Users
         //Removing [ and ] from String of coursecodes and converting that String to array
         String coursePrerequisitesStringArray = (String) courseMap.get("prerequisites");
 
@@ -149,13 +146,12 @@ public class Routes {
             }
         }
 
-        User user = s.users.get(professorID); //Retrieving User (The Professor) from List of Users
 
         Professor professor = (Professor) user; //Casting Professor to User
         courseData.attach(professor); //Attaching Professor to CourseData
 
-        s.courses.put((String) courseMap.get("courseCode"), courseData); //Storing CourseData in courses hashmap
-        s.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
+
+        SystemData.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
 
         return courseInfo + " has been created";
     }
@@ -179,10 +175,10 @@ public class Routes {
 
         //Calling updateAll with command deleteCourse on all observers for courseData
         //This will remove the course from the course list stored within the class
-        s.courses.get(courseCode).updateAll("deleteCourse", courseCode);
+        SystemData.courses.get(courseCode).updateAll("deleteCourse", courseCode);
 
         //Removing course from list of courses
-        s.courses.remove(courseCode);
+        SystemData.courses.remove(courseCode);
 
         return courseInfo + " has been deleted";
     }
@@ -205,11 +201,11 @@ public class Routes {
 
         HashMap <String, String> infoMap = new ObjectMapper().readValue(studentInfo, HashMap.class);  //Creating HashMap of data sent in request
 
-        CourseData courseData = s.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
+        CourseData courseData = SystemData.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
         long studentID = Long.valueOf(infoMap.get("studentID"));
 
-        User user = s.users.get(studentID); //Retrieving User (The Student Registering) From List of Users
+        User user = SystemData.users.get(studentID); //Retrieving User (The Student Registering) From List of Users
 
         Student student = (Student) user; //Casting the User object to student
 
@@ -237,9 +233,9 @@ public class Routes {
 
         HashMap <String, String> infoMap = new ObjectMapper().readValue(studentInfo, HashMap.class);  //Creating HashMap of data sent in request
 
-        CourseData courseData = s.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
+        CourseData courseData = SystemData.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
-        User user = s.users.get(infoMap.get("studentID")); //Retrieving User (The Student Registering) From List of Users
+        User user = SystemData.users.get(infoMap.get("studentID")); //Retrieving User (The Student Registering) From List of Users
 
         Student student = (Student) user; //Casting the User object to student
 
@@ -266,7 +262,11 @@ public class Routes {
         HashMap<String, Object> userMap = Helper.stringToMap(userInfo);
         HashMap<String, CourseData> courseMap = new HashMap<>();
 
-        User user = s.users.get(userMap.get("userId"));
+        Object id = userMap.get("studentID");
+        if(id == null) {
+            id = userMap.get("professorID");
+        }
+        User user = SystemData.users.get(userMap.get("userId"));
         if(user instanceof Student) {
             Student s = (Student) user;
             courseMap = s.getCourses();

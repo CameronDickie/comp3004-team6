@@ -9,5 +9,6 @@ import java.util.List;
 A repository for the Admin users - used by the database
  */
 public interface AdminRepository extends JpaRepository<Admin, Long> {
+    Admin findByUsername(String username);
 //    List<Admin> findByNameContaining(String username);
 }

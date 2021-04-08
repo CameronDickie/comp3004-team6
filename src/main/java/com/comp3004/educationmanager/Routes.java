@@ -130,19 +130,11 @@ public class Routes {
 
         User user = SystemData.users.get(professorID); //Retrieving User (The Professor) from List of Users
         //Removing [ and ] from String of coursecodes and converting that String to array
-        String coursePrerequisitesStringArray = (String) courseMap.get("prerequisites");
+        ArrayList<String> coursePrerequisitesArray = (ArrayList<String>) courseMap.get("prerequisites");
 
-        StringBuilder stringBuilder = new StringBuilder(coursePrerequisitesStringArray);
-
-        stringBuilder.deleteCharAt(0);
-        stringBuilder.deleteCharAt(stringBuilder.length()-1);
-
-        coursePrerequisitesStringArray = stringBuilder.toString();
-
-        String[] coursePrerequisitesArray = coursePrerequisitesStringArray.split(",");
 
         //Making sure to not add empty strings to prerequisite array (Only add if String has data)
-        if (coursePrerequisitesStringArray.length() > 0) {
+        if (coursePrerequisitesArray.size() > 0) {
             for (String prerequisite : coursePrerequisitesArray) {
                 courseData.addPrerequisite(prerequisite);
             }

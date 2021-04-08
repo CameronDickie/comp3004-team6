@@ -18,7 +18,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 
@@ -92,9 +91,10 @@ public class SystemFunctionsTest {
         course.setStrategy(new AddDocumentStrategy());
         c = course.addContent("testDoc", "/COMP3004B/testContent/", "PDF");
         c.setProperty("file", new byte[] {1, 2, 3, 4});
-        assertNotNull(c.executeCommand("download", null));
 
         Component test = (Component) course.getContent().executeCommand("findByPath", "/COMP3004B/testContent/testDoc/");
+
+        System.out.println("Path of object: " + test.getProperty("fullPath"));
         assertNotNull(test);
 
         System.out.println((String) test.executeCommand("stringify", null));

@@ -1,5 +1,6 @@
 package com.comp3004.educationmanager.decorator;
 
+import com.comp3004.educationmanager.Helper;
 import com.comp3004.educationmanager.composite.Component;
 
 public class EditableDecorator extends Decorator {
@@ -38,14 +39,23 @@ public class EditableDecorator extends Decorator {
 
     @Override
     public Object executeCommand(String command, Object value) {
-        System.out.println("Executing command (editable): " + command);
+        System.out.println("Editable: " + getProperty("fullPath") + " | " + command + " | " + value);
+        // System.out.println("Executing command (editable): " + command);
         if(command.equals("findByPath")) {
             Component c = (Component) wrappee.executeCommand(command, value);
             if(c != null) {
-                return this;
-            } else {
-                return null;
+                System.out.println("EDITABLE: " + c.getProperty("fullPath") + " | " + getProperty("fullPath"));
+                if(((String) c.getProperty("fullPath")).equals((String) getProperty("fullPath"))) {
+                    System.out.println("returning decorator");
+                    return this;
+                } else if(((String) c.getProperty("fullPath")).equals((String) value)) {
+                    System.out.println("returning wrappee return");
+                    return c;
+                }
             }
+            return null;
+        } else if(command.equals("stringify")) {
+            return Helper.objectToJSONString(this);
         } else {
             return wrappee.executeCommand(command, value);
         }

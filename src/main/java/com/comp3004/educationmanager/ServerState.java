@@ -28,7 +28,7 @@ public class ServerState {
     public static Admin admin;
     public static HashMap<Long, User> users = new HashMap<>();
 
-
+    boolean freezeTime = true;
     Calendar date = Calendar.getInstance();
     Calendar lastRegistrationDate = Calendar.getInstance();
 
@@ -60,8 +60,10 @@ public class ServerState {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                date.add(Calendar.DATE,1);
-                System.out.println(date.getTime());
+                if(!freezeTime) {
+                    date.add(Calendar.DATE, 1);
+                    System.out.println(date.getTime());
+                }
             }
         };
 

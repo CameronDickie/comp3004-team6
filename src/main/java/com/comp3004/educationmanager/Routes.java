@@ -203,7 +203,7 @@ public class Routes {
 
         CourseData courseData = SystemData.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
-        long studentID = Long.valueOf(infoMap.get("studentID"));
+        long studentID = Long.parseLong(infoMap.get("studentID"));
 
         User user = SystemData.users.get(studentID); //Retrieving User (The Student Registering) From List of Users
 
@@ -266,7 +266,7 @@ public class Routes {
         if(id == null) {
             id = userMap.get("professorID");
         }
-        User user = SystemData.users.get(userMap.get("userId"));
+        User user = SystemData.users.get(id);
         if(user instanceof Student) {
             Student s = (Student) user;
             courseMap = s.getCourses();
@@ -352,7 +352,8 @@ public class Routes {
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
 
         String sBytes = (String) contentMap.get("bytes");
-        byte[] bytes = Base64.getDecoder().decode(sBytes);
+        System.out.println("BYTES: " + sBytes);
+        byte[] bytes = new byte[] {1,2,3,4};
 
         course.setStrategy(new AddDocumentStrategy());
         Component comp = course.addContent((String) contentMap.get("name"), (String) contentMap.get("path"), (String) contentMap.get("type"));

@@ -6,5 +6,4 @@ public interface FileInterface {
     byte[] accept(FileVisitor v);
     void setFile(byte[] bytes);
     byte[] getBytes();
-    File getFile();
 }

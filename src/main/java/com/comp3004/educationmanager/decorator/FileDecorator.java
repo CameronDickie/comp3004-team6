@@ -40,10 +40,18 @@ public class FileDecorator extends Decorator {
 
     @Override
     public Object executeCommand(String command, Object value) {
+        System.out.println("Executing command (file): " + command);
         if(command.equals("download")) {
             return file.accept(new FileDownloadVisitor());
         } else if(command.equals("viewAsPDF")) {
             return file.accept(new FileViewVisitor());
+        } else if(command.equals("findByPath")) {
+            Component c = (Component) wrappee.executeCommand(command, value);
+            if(c != null) {
+                return this;
+            } else {
+                return null;
+            }
         } else {
             return wrappee.executeCommand(command, value);
         }

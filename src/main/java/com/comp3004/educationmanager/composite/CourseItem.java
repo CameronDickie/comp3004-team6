@@ -71,15 +71,15 @@ public class CourseItem implements Component, java.io.Serializable {
     @Override
     public Object executeCommand(String command, Object value) {
         if(command.equals("delete")) {                                  // delete this object (does nothing right now)
-
+            return null;
         } else if(command.equals("findByPath")) {
             if(((String) getProperty("fullPath")).equals((String) value)) {
                 return this;
             }
+            return null;
         } else {
             System.out.println("Command " + command + " not found.");
+            return null;
         }
-
-        return null;
     }
 }

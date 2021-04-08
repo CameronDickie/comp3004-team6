@@ -15,7 +15,7 @@ public class FileViewVisitor implements FileVisitor {
     @Override
     public byte[] visitDOCX(DOCX file) {
         try {
-            InputStream docStream = new FileInputStream(file.getFile());
+            InputStream docStream = new ByteArrayInputStream(file.getBytes());
             XWPFDocument doc = new XWPFDocument(docStream);
             PdfOptions options = PdfOptions.getDefault();
             ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
@@ -30,7 +30,7 @@ public class FileViewVisitor implements FileVisitor {
     @Override
     public byte[] visitPPTX(PPTX file) {
         try {
-            InputStream docStream = new FileInputStream(file.getFile());
+            InputStream docStream = new ByteArrayInputStream(file.getBytes());
             XWPFDocument doc = new XWPFDocument(docStream);
             PdfOptions options = PdfOptions.getDefault();
             ByteArrayOutputStream byteStream = new ByteArrayOutputStream();

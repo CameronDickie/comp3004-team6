@@ -1,5 +1,7 @@
 package com.comp3004.educationmanager.composite;
 
+import com.comp3004.educationmanager.Helper;
+
 /*
 A single course item
 Implements the Component functions
@@ -70,13 +72,16 @@ public class CourseItem implements Component, java.io.Serializable {
 
     @Override
     public Object executeCommand(String command, Object value) {
+        System.out.println("Item: " + getProperty("fullPath") + " | " + command + " | " + value);
         if(command.equals("delete")) {                                  // delete this object (does nothing right now)
-            return null;
+            return true;
         } else if(command.equals("findByPath")) {
             if(((String) getProperty("fullPath")).equals((String) value)) {
                 return this;
             }
             return null;
+        } else if(command.equals("stringify")) {
+            return Helper.objectToJSONString(this);
         } else {
             System.out.println("Command " + command + " not found.");
             return null;

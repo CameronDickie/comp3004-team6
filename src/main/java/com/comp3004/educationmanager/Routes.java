@@ -277,8 +277,8 @@ public class Routes {
     TODO:
         - how to query for user? right now I'm using the "userId" tag?
     */
-    @GetMapping(value = "/api/get-user-courses", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.ALL_VALUE)
-    public String[] getUserCourses(@RequestBody String userInfo) {
+    @GetMapping(value = "/api/get-user-courses", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String getUserCourses(@RequestBody String userInfo) {
         System.out.println("From '/api/get-user-courses: " + userInfo);
 
         HashMap<String, Object> userMap = Helper.stringToMap(userInfo);
@@ -303,7 +303,7 @@ public class Routes {
             contentStrings[i++] = (String) course.getContent().executeCommand("stringify", null);
         }
 
-        return contentStrings;
+        return Helper.objectToJSONString(contentStrings);
     }
 
     /*

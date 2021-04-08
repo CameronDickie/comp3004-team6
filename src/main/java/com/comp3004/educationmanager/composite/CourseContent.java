@@ -82,7 +82,6 @@ public class CourseContent implements Component, java.io.Serializable {
 
     @Override
     public Object executeCommand(String command, Object value) {
-        System.out.println("Content: " + getProperty("fullPath") + " | " + command + " | " + value);
         if(command.equals("delete")) {                                  // delete all children
             for (int i = 0; i < children.size(); ++i) {
                 children.get(i).executeCommand(command, value);

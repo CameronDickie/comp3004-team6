@@ -72,7 +72,6 @@ public class CourseItem implements Component, java.io.Serializable {
 
     @Override
     public Object executeCommand(String command, Object value) {
-        System.out.println("Item: " + getProperty("fullPath") + " | " + command + " | " + value);
         if(command.equals("delete")) {                                  // delete this object (does nothing right now)
             return true;
         } else if(command.equals("findByPath")) {

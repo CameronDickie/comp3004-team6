@@ -5,6 +5,7 @@ import com.comp3004.educationmanager.accounts.Professor;
 import com.comp3004.educationmanager.accounts.Student;
 import com.comp3004.educationmanager.accounts.User;
 import com.comp3004.educationmanager.composite.Component;
+import com.comp3004.educationmanager.decorator.FileDecorator;
 import com.comp3004.educationmanager.factory.AdminCreator;
 import com.comp3004.educationmanager.factory.CourseCreator;
 import com.comp3004.educationmanager.factory.ProfessorCreator;
@@ -87,14 +88,24 @@ public class SystemFunctionsTest {
     public void testAddingContent() {
         course.setStrategy(new CourseContentStrategy());
         Component c = course.addContent("testContent", "/COMP3004B/", "section");
+
         course.setStrategy(new AddDocumentStrategy());
-        c = course.addContent("testDoc", "/COMP3004B/testContent/", "PPTX");
+        c = course.addContent("testDoc", "/COMP3004B/testContent/", "PDF");
+        c.setProperty("file", new byte[] {1, 2, 3, 4});
+        assertNotNull(c.executeCommand("download", null));
 
-        assertNotNull(c);
+        Component test = (Component) course.getContent().executeCommand("findByPath", "/COMP3004B/testContent/testDoc/");
+        assertNotNull(test);
 
-        System.out.println((String) course.getContent().executeCommand("stringify", null));
+        System.out.println((String) test.executeCommand("stringify", null));
 
-        String path = (String) ((Component) course.getContent().executeCommand("findByPath", "/COMP3004B/testContent/testDoc/")).getProperty("fullPath");
-        assertEquals((String) c.getProperty("fullPath"), path);
+        String content = (String) course.getContent().executeCommand("stringify", null);
+        System.out.println(content);
+
+        byte[] downloadBytes = (byte[]) test.executeCommand("download", null);
+        byte[] viewBytes = (byte[]) test.executeCommand("viewAsPDF", null);
+
+        assertNotNull(downloadBytes);
+        assertNotNull(viewBytes);
     }
 }

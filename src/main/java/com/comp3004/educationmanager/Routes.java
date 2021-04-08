@@ -122,17 +122,16 @@ public class Routes {
 
         //Creating HashMap of data sent in request
 
-        Map<String,String> courseMap = new ObjectMapper().readValue(courseInfo, HashMap.class);
+        Map<String, Object> courseMap = Helper.stringToMap(courseInfo);
 
-        CourseData courseData = new CourseCreator().createCourse(courseMap.get("courseCode"), courseMap.get("courseName"), Integer.parseInt(courseMap.get("maxStudents")));
+        CourseData courseData = new CourseCreator().createCourse((String) courseMap.get("courseCode"), (String) courseMap.get("courseName") , (Integer) courseMap.get("maxStudents"));
 
-        String courseCode = courseMap.get("courseCode");
+        String courseCode = String.valueOf(courseMap.get("courseCode"));
 
-        long professorID =Long.valueOf(courseMap.get("professorID")).longValue();
+        long professorID =Long.valueOf((Integer) courseMap.get("professorID")).longValue();
 
-        User user = s.users.get(professorID); //Retrieving User (The Professor) from List of Users
         //Removing [ and ] from String of coursecodes and converting that String to array
-        String coursePrerequisitesStringArray = courseMap.get("prerequisites");
+        String coursePrerequisitesStringArray = (String) courseMap.get("prerequisites");
 
         StringBuilder stringBuilder = new StringBuilder(coursePrerequisitesStringArray);
 
@@ -150,11 +149,12 @@ public class Routes {
             }
         }
 
+        User user = s.users.get(professorID); //Retrieving User (The Professor) from List of Users
 
         Professor professor = (Professor) user; //Casting Professor to User
         courseData.attach(professor); //Attaching Professor to CourseData
 
-        s.courses.put(courseMap.get("courseCode"), courseData); //Storing CourseData in courses hashmap
+        s.courses.put((String) courseMap.get("courseCode"), courseData); //Storing CourseData in courses hashmap
         s.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
 
         return courseInfo + " has been created";
@@ -239,7 +239,7 @@ public class Routes {
 
         CourseData courseData = s.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
-        User user = s.users.get(infoMap.get("studentNumber")); //Retrieving User (The Student Registering) From List of Users
+        User user = s.users.get(infoMap.get("studentID")); //Retrieving User (The Student Registering) From List of Users
 
         Student student = (Student) user; //Casting the User object to student
 

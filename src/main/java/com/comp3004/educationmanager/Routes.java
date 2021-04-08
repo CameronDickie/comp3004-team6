@@ -1,12 +1,15 @@
 package com.comp3004.educationmanager;
+import com.comp3004.educationmanager.accounts.Admin;
 import com.comp3004.educationmanager.accounts.Professor;
 import com.comp3004.educationmanager.accounts.Student;
 import com.comp3004.educationmanager.accounts.User;
 import com.comp3004.educationmanager.composite.Component;
+import com.comp3004.educationmanager.factory.AdminCreator;
 import com.comp3004.educationmanager.factory.CourseCreator;
 import com.comp3004.educationmanager.factory.ProfessorCreator;
 import com.comp3004.educationmanager.factory.StudentCreator;
 
+import com.comp3004.educationmanager.misc.Application;
 import com.comp3004.educationmanager.observer.CourseData;
 import com.comp3004.educationmanager.observer.SystemData;
 import com.comp3004.educationmanager.strategy.AddDocumentStrategy;
@@ -21,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.http.MediaType;
 
+import javax.annotation.PostConstruct;
+import javax.print.attribute.standard.Media;
 import java.io.*;
 import java.util.*;
 
@@ -31,7 +36,21 @@ public class Routes {
     ServerState s;
     StudentCreator studentCreator = new StudentCreator();
     ProfessorCreator professorCreator = new ProfessorCreator();
+    //meant for subject usage, to notify the admin
+    SystemData data = new SystemData();
 
+    @PostConstruct
+    public void initializeAdmin() {
+        AdminCreator factory = new AdminCreator();
+        Admin admin = (Admin) factory.createUser("admin", "pass");
+        if (s.createUser(admin)) {
+            System.out.println("admin user added to the db");
+            data.attach(admin);
+        } else {
+            System.out.println("admin has failed to be created");
+        }
+        s.print();
+    }
 
     @GetMapping("/api/members")
     public String members() {
@@ -44,17 +63,25 @@ public class Routes {
         HashMap<String, Object> map = Helper.stringToMap(info);
         map.replace("firstname", ((String) map.get("firstname")).toLowerCase());
         map.replace("lastname", ((String) map.get("lastname")).toLowerCase());
-        //this is the notification to be added to the admin's list of notifications -- likely to be a part of the database, but for now I just want to get it all working
-        User newUser = studentCreator.createUser((String) map.get("firstname") + map.get("lastname"), (String) map.get("password"));
+        //have this route create an application for the admin to validate
 
-        Student student = (Student) newUser;
-        student.addPastCourse("COMP2804");
-        student.addPastCourse("COMP2803");
-        student.addPastCourse("COMP3203");
+        //add this to the admin's list of applications
+        Application a = new Application((String) map.get("firstname"), (String) map.get("lastname"), (String) map.get("password"), (String) map.get("type"));
+        SystemData.admin.addApplication(a);
+        //notify the admin
+        data.updateAll("application", a);
 
-        s.createUser(newUser);
-        s.print();
-        return info + " has attempted to be registered";
+        //send back that this user needs to wait to be approved
+//        User newUser = studentCreator.createUser((String) map.get("firstname") + map.get("lastname"), (String) map.get("password"));
+//
+//        Student student = (Student) newUser;
+//        student.addPastCourse("COMP2804");
+//        student.addPastCourse("COMP2803");
+//        student.addPastCourse("COMP3203");
+//
+//        s.createUser(newUser);
+//        s.print();
+        return info + " has attempted to be registered... waiting for permission from the admin";
     }
 
     @PostMapping(value ="/api/register-professor", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
@@ -421,6 +448,61 @@ public class Routes {
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         Component c = (Component) course.getContent().executeCommand("findByPath", contentMap.get("path"));
         return (byte[]) c.executeCommand("viewAsPDF", null);
+    }
+
+    @GetMapping(value = "/api/get-applications", produces = MediaType.TEXT_HTML_VALUE)
+    public String getApplications() {
+        String list = Helper.objectToJSONString(SystemData.admin.getApplications());
+        System.out.println("Sending: " + list);
+        return list;
+    }
+    /*
+        This method takes in two fields: name (firstname + " " + lastname) and type: "Student"/"Professor"
+        It is meant to create a user from this application information if it can find the application currently pending
+        It then removes this application and updates the admin via web socket to get the new list of applications
+     */
+    @PostMapping(value = "/api/process-application", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String processApplication(@RequestBody String applicationInfo) {
+        //find this application in the admin's list of applications
+        System.out.println(applicationInfo);
+        HashMap<String, Object> appinfo = Helper.stringToMap(applicationInfo);
+        String[] names = ((String) appinfo.get("name")).split(" ");
+        ArrayList<Application> pending = SystemData.admin.getApplications();
+        for(int i = 0; i < pending.size(); i++) {
+            if(names[0].equals(pending.get(i).getFirstname()) && names[1].equals(pending.get(i).getLastname()) && appinfo.get("type").equals(pending.get(i).getType())) {
+                //this is the application we are looking for. Create a user from this application, and end the request
+                Application thisApplication = SystemData.admin.getApplications().get(i);
+                s.createUserFromApplication(thisApplication);
+                SystemData.admin.getApplications().remove(i);
+                data.updateAll("application", thisApplication);
+                return "success";
+            }
+        }
+        //if we reach the end of the for loop, we know that the application with this information was not found. Return an error
+        return "error";
+    }
+
+    /*
+        This method takes in two fields: name (firstname + " " + lastname) and type: "Student"/"Professor"
+        It serves to find this application with these parameters and delete them from the list of applications in the admin
+        It then tells the admin via web socket that it needs to update its list of applications.
+     */
+    @PostMapping(value = "/api/delete-application", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String deleteApplication(@RequestBody String applicationInfo) {
+        //find this application in the admin's list of applications
+        HashMap<String, Object> appinfo = Helper.stringToMap(applicationInfo);
+        String[] names = ((String) appinfo.get("name")).split(" ");
+        ArrayList<Application> pending = SystemData.admin.getApplications();
+        for(int i = 0; i < pending.size(); i++) {
+            if(names[0].equals(pending.get(i).getFirstname()) && names[1].equals(pending.get(i).getLastname()) && appinfo.get("type").equals(pending.get(i).getType())) {
+                //we want to delete this application and end the request.
+                SystemData.admin.getApplications().remove(i);
+                data.updateAll("application", null);
+                return "success";
+            }
+        }
+        //if we reach this part of the code, then we were unable to find this application
+        return "error";
     }
 }
 

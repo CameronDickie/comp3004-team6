@@ -91,16 +91,16 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
 
     }
 
-    @Scheduled(fixedRate = 10000)
-    void sendPeriodicMessages() throws IOException {
-        for (WebSocketSession session : sessions) {
-            if(session.isOpen()) {
-                String broadcast = "server periodic message " + LocalTime.now();
-                logger.info("Server sends: {}", broadcast);
-                session.sendMessage(new TextMessage(broadcast));
-            }
-        }
-    }
+//    @Scheduled(fixedRate = 10000)
+//    void sendPeriodicMessages() throws IOException {
+//        for (WebSocketSession session : sessions) {
+//            if(session.isOpen()) {
+//                String broadcast = "server periodic message " + LocalTime.now();
+//                logger.info("Server sends: {}", broadcast);
+//                session.sendMessage(new TextMessage(broadcast));
+//            }
+//        }
+//    }
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
         logger.info("Server transport error: {}", exception.getMessage());

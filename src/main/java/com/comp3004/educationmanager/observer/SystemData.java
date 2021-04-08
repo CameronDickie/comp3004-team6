@@ -1,7 +1,9 @@
 package com.comp3004.educationmanager.observer;
 
 import com.comp3004.educationmanager.accounts.*;
+import org.springframework.web.socket.TextMessage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,8 +26,18 @@ public class SystemData extends Subject {
 
 
     public void updateAll(String command, Object value) {
-        for (Observer observer : observers) {
-            observer.update(command, value);
+        if(command.equals("application")) {
+            //send the message via web socket to the front-end
+            TextMessage message = new TextMessage("get-applications");
+            try {
+                if(admin == null || admin.getSocketConnection() == null) {
+                    System.out.println("Unable to connect to admin");
+                    return;
+                }
+                admin.getSocketConnection().sendMessage(message);
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
         }
     }
 }

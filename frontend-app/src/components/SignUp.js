@@ -9,6 +9,7 @@ class SignUp extends React.Component {
             lastname: '',
             bpassword: '',
             cpassword: '',
+            type: 'student',
             didWork: false
         }
     }
@@ -22,7 +23,8 @@ class SignUp extends React.Component {
             body: JSON.stringify({
                 firstname: this.state.firstname,
                 lastname: this.state.lastname,
-                password: this.state.bpassword
+                password: this.state.bpassword,
+                type: this.state.type
             })
         };
         

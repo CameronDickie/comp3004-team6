@@ -6,17 +6,16 @@ import com.comp3004.educationmanager.accounts.Professor;
 import com.comp3004.educationmanager.accounts.Student;
 import com.comp3004.educationmanager.accounts.User;
 import com.comp3004.educationmanager.db.H2;
+import com.comp3004.educationmanager.factory.ProfessorCreator;
 import com.comp3004.educationmanager.factory.StudentCreator;
+import com.comp3004.educationmanager.misc.Application;
 import com.comp3004.educationmanager.observer.CourseData;
 import com.comp3004.educationmanager.observer.SystemData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 
 @Component
@@ -25,8 +24,8 @@ public class ServerState {
     H2 db;
     //all three of these need to be moved to SystemData
     HashMap<String, CourseData> courses = new HashMap<>();
-    public static Admin admin;
-    public static HashMap<Long, User> users = new HashMap<>();
+//    public static Admin admin;
+//    public static HashMap<Long, User> users = new HashMap<>();
 
     boolean freezeTime = true;
     Calendar date = Calendar.getInstance();
@@ -77,9 +76,24 @@ public class ServerState {
             }
             else if (u instanceof Professor){
                 SystemData.users.put(((Professor) u).getProfessorID(), u);
+            } else if(u instanceof Admin) {
+                SystemData.admin = (Admin) u;
             }
         }
         return res;
+    }
+    public boolean createUserFromApplication(Application a) {
+        User newUser;
+        if(a.getType().equals("student")) {
+            newUser = new StudentCreator().createUser(a.getFirstname().toLowerCase() + a.getLastname().toLowerCase(), a.getPassword());
+        } else if(a.getType().equals("professor")) {
+            newUser = new ProfessorCreator().createUser(a.getFirstname().toLowerCase() + a.getLastname().toLowerCase(), a.getPassword());
+        } else {
+            newUser = null;
+            System.out.println("Failed to make user from application form");
+            return false;
+        }
+        return createUser(newUser);
     }
     public void print() {
         db.print();

@@ -28,7 +28,7 @@ class LoginForm extends React.Component {
         await fetch('/api/login', requestOptions)
             .then(response => response.json())
             .then(res => {
-                if (res.error == true) {
+                if (res.error) {
                     console.log('login invalid'); 
                 } else {
                     console.log('login valid')

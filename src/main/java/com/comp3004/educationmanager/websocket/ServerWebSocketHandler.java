@@ -44,46 +44,50 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String request = message.getPayload();
         logger.info("Server received: {}", request);
-
+        HashMap<String, Object> typeMap = Helper.stringToMap(request);
         /*
         Code for attaching a web socket to a given user
             TODO:
                 ensure that the message sent is stating that this is meant for the courses or notifications, and can handle admin user
          */
-        //search for the user with the id in message
-        HashMap<String, Object> map = Helper.stringToMap(request);
-        HashMap<Long, User> users = ServerState.users;
-        //determine if this is a professor or student
-        Object id = map.get("studentID");
-        if(id == null) {
-            id = map.get("professorID");
-        }
-        if(id == null && map.get("name").equals("admin")) {
-            //this is likely the admin, or we have broken the code
-            ServerState.admin.setSocketConnection(session);
+        //this is the path for when a user logs in and must attach its WebSocketSession to its User object.
+        if(typeMap.get("attachUser") != null) {
+            //search for the user with the id in message
+            HashMap<String, Object> map = (HashMap<String, Object>) typeMap.get("attachUser");
+            HashMap<Long, User> users = ServerState.users;
+            //determine if this is a professor or student
+            Object id = map.get("studentID");
+            if(id == null) {
+                id = map.get("professorID");
+            }
+            if(id == null && map.get("name").equals("admin")) {
+                //this is likely the admin, or we have broken the code
+                ServerState.admin.setSocketConnection(session);
+                String response = String.format("response from server to '%s'", request);
+                logger.info("Server sends: {}", response);
+                session.sendMessage(new TextMessage(response));
+                return;
+            }
+            if(id == null) {
+                System.out.println("Id error getting user @ Web Socket");
+                return;
+            }
+            User u = users.get(Long.valueOf((Integer) id)); //get the user with this user id
+            if(u == null) {
+                System.out.println("Failed to find the user with this id");
+                return;
+            }
+            u.setSocketConnection(session); //give this user their session instance
+            if(u.getSocketConnection() == null) {
+                System.out.println("failed to add the socket connection");
+            }
+
+            //attach session to that user
             String response = String.format("response from server to '%s'", request);
             logger.info("Server sends: {}", response);
             session.sendMessage(new TextMessage(response));
-            return;
-        }
-        if(id == null) {
-            System.out.println("Id error getting user @ Web Socket");
-            return;
-        }
-        User u = users.get(Long.valueOf((Integer) id)); //get the user with this user id
-        if(u == null) {
-            System.out.println("Failed to find the user with this id");
-            return;
-        }
-        u.setSocketConnection(session); //give this user their session instance
-        if(u.getSocketConnection() == null) {
-            System.out.println("failed to add the socket connection");
         }
 
-        //attach session to that user
-        String response = String.format("response from server to '%s'", request);
-        logger.info("Server sends: {}", response);
-        session.sendMessage(new TextMessage(response));
     }
 
     @Scheduled(fixedRate = 10000)

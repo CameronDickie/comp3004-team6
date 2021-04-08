@@ -41,14 +41,13 @@ class LoginForm extends React.Component {
 
         let tu = this.props.getUser();
 
-        // If login is successful or already logged in
-        console.log("login status " + this.state.didLogin);
-        console.log("username: " + tu.username);
         if(this.state.didLogin && tu.username == "admin") {
             return (
                 <Redirect to="/admin" />
             )
         }
+        // If login is successful or already logged in
+
         else if (this.state.didLogin && (tu.username != null)){
             return (
                 <Redirect to="/dashboard" />

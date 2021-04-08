@@ -20,10 +20,11 @@ import java.util.TimerTask;
 public class ServerState {
     @Autowired
     H2 db;
-
+    //all three of these need to be moved to SystemData
     HashMap<String, CourseData> courses = new HashMap<>();
     public static Admin admin;
     public static HashMap<Long, User> users = new HashMap<>();
+
     Calendar date = Calendar.getInstance();
     Calendar lastRegistrationDate = Calendar.getInstance();
 

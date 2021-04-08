@@ -51,9 +51,6 @@ public class Routes {
         student.addPastCourse("COMP2803");
         student.addPastCourse("COMP3203");
 
-
-//        newUser.setSocketConnection(new MyTextWebSocketHandler());
-//        s.addSocketConnection(newUser.getSocketConnection());
         s.createUser(newUser);
         s.print();
         return info + " has attempted to be registered";
@@ -84,8 +81,9 @@ public class Routes {
                 User ur = s.getUser((String) map.get("username"));
                 String rs = Helper.objectToJSONString(ur);
                 HashMap<String, Object> mm = Helper.stringToMap(rs);
-
-                mm.put("type", ur.getClass().toString());
+                String type = ur.getClass().toString();
+                int startIndex = type.indexOf(".accounts.") + ".accounts.".length();
+                mm.put("type", type.substring(startIndex));
                 answer = Helper.objectToJSONString(mm);
             } else {
                 answer = Helper.objectToJSONString(Helper.stringToMap("{error: true}"));

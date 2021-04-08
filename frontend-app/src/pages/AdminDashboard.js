@@ -93,7 +93,7 @@ class AdminDashboard extends Component {
             console.log("unable to find websocket");
             return;
         }
-        let uString = JSON.stringify(this.props.getUser());
+        let uString = JSON.stringify({attachUser:this.props.getUser()});
         console.log('Client sends: ' + uString);
         ws.send(uString);
     }
@@ -146,7 +146,7 @@ class AdminDashboard extends Component {
                                 <div class="flex items-end pl-10">
                                     <div className="text-md font-mono text-black">
                                         LOGGED-IN=<span className="font-semibold pr-10">ADMIN</span>
-                                        USERTYPE=<span className="font-semibold">ADMIN</span>
+                                        USERTYPE=<span className="font-semibold">{getUser().type}</span>
                                     </div>
                                 </div>
                             </div>

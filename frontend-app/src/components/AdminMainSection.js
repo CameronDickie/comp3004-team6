@@ -21,9 +21,6 @@ class AdminMainSection extends Component{
             data: this.props.app.state.data,
             modalOpen: false,
         }
-
-        // Get applications from server on creation
-        this.props.updateApplications();
     }
 
     processApplication = async (status, name, type) => {
@@ -67,8 +64,8 @@ class AdminMainSection extends Component{
     createCourseTable = () => {
         let table = []
 
-        for (let i in this.state.data.courses){
-            table.push(this.makeAdminCourseCard(this.state.data.courses[i]))
+        for (let i in this.props.courses){
+            table.push(this.makeAdminCourseCard(this.props.courses[i]))
         }
 
         return table
@@ -129,6 +126,10 @@ class AdminMainSection extends Component{
     }
 
     toggleCreateCourseModal = () => {
+        if(this.props.professors.length == 0) {
+            alert("There needs to be a professor in the system to create a course");
+            return;
+        }
         this.setState({modalOpen: !this.state.modalOpen})
     }
 
@@ -173,7 +174,7 @@ class AdminMainSection extends Component{
         
                     </div>
 
-                    <CreateCourseModal show={this.state.modalOpen} hide={this.toggleCreateCourseModal}/>
+                    <CreateCourseModal show={this.state.modalOpen} professors={this.props.professors} hide={this.toggleCreateCourseModal}/>
             </div>
             )
     }

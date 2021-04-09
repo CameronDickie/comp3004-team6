@@ -20,6 +20,7 @@ import java.util.*;
 
 @Component
 public class ServerState {
+
     @Autowired
     H2 db;
     //all three of these need to be moved to SystemData
@@ -30,7 +31,7 @@ public class ServerState {
     boolean freezeTime = true;
     Calendar date = Calendar.getInstance();
     Calendar deadline = Calendar.getInstance();
-
+    public Calendar lastRegistrationDate = Calendar.getInstance();
 
 
 

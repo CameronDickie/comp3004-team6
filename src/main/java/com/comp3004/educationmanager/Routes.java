@@ -17,12 +17,12 @@ import com.comp3004.educationmanager.strategy.CourseContentStrategy;
 import com.comp3004.educationmanager.strategy.SubmitDeliverableStrategy;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.annotation.PostConstruct;
 import javax.print.attribute.standard.Media;
@@ -127,59 +127,57 @@ public class Routes {
         return answer;
     }
 
+
     /*
        Route for creating a course
        USAGE:
        @param (courseInfo JSON)
-           - courseCode: courseCode of course, includes section (Ex. COMP3004B)         (String)
-           - courseName: Name of course (Ex. Object-Oriented Software Engineering)      (String)
-           - maxStudents: Maximum students allowed in course                            (Int)
-           - prerequisites: List of courses that are prerequisites for the course being taken   (ArrayList<String>)
-           - professorID: ID of professor to be assigned to class                               (Int)
-           - days: The days the course takes place      (ArrayList <String>)
-           - startTime: Start time of class in form of "12:30"      (String)
-           - classDuration: Total amount of time the classes takes in hours     (Int)
-       @return Status of course creation
+           - courseCode: courseCode of course, includes section (Ex. COMP3004B)
+           - courseName: Name of course (Ex. Object-Oriented Software Engineering)
+           - maxStudents: Maximum students allowed in course
+           - prerequisites: List of courses that are prerequisites for the course being taken
+           - professorID: ID of professor to be assigned to class
+       @return Status of course creation (Success / Failure)
        */
     @PostMapping(value ="/api/create-course", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String createCourse(@RequestBody String courseInfo) throws IOException, ClassNotFoundException {
         System.out.println("From '/api/create-course': " + courseInfo);
 
+
+        //HashMap <String, String> courseMap = Helper.stringToMap(courseInfo);
+
         //Creating HashMap of data sent in request
+
         Map<String, Object> courseMap = Helper.stringToMap(courseInfo);
 
-        CourseData courseData = new CourseCreator().createCourse(
-                (String) courseMap.get("courseCode"),
-                (String) courseMap.get("courseName"),
-                (Integer) courseMap.get("maxStudents"),
-                (ArrayList<String>) courseMap.get("days"),
-                (String) courseMap.get("startTime"),
-                (Double) courseMap.get("classDuration"),
-                (ArrayList<String>) courseMap.get("prerequisites"));
+
+        CourseData courseData = new CourseCreator().createCourse((String) courseMap.get("courseCode"), (String) courseMap.get("courseName") , Integer.parseInt((String) courseMap.get("maxStudents")), (ArrayList<String>) courseMap.get("days"), (String) courseMap.get("startTime"), Double.valueOf((Integer) courseMap.get("classDuration")), (ArrayList<String>) courseMap.get("prerequisites"));
 
         String courseCode = String.valueOf(courseMap.get("courseCode"));
 
-        long professorID =Long.valueOf((Integer) courseMap.get("professorID")).longValue();
+        long professorID =Long.parseLong((String) courseMap.get("professorID"));
+
 
         User user = SystemData.users.get(professorID); //Retrieving User (The Professor) from List of Users
-      
+
         Professor professor = (Professor) user; //Casting Professor to User
         courseData.attach(professor); //Attaching Professor to CourseData
 
+
         SystemData.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
 
-        String jsonReturn = "{success:'";
-        jsonReturn+= courseCode + " has been created'}";
+        //call SystemData.updateAll
+        data.updateAll("get-courses", courseData);
 
-        return jsonReturn;
+        return courseInfo + " has been created";
     }
 
     /*
       Route for deleting a course
       USAGE:
       @param (courseInfo JSON)
-          - courseCode: courseCode of course, includes section (Ex. COMP3004B)      (String)
-      @return Status of course deletion
+          - courseCode: courseCode of course, includes section (Ex. COMP3004B)
+      @return Status of course deletion (Success / Failure, should always succeed though)
       */
     @PostMapping(value ="/api/delete-course", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String deleteCourse(@RequestBody String courseInfo) throws IOException, ClassNotFoundException {
@@ -187,9 +185,9 @@ public class Routes {
 
         //Needs to delete courses AND delete students / professors with course
 
-        HashMap <String, Object> courseMap = Helper.stringToMap(courseInfo);  //Creating HashMap of data sent in request
+        HashMap <String, String> courseMap = new ObjectMapper().readValue(courseInfo, HashMap.class);  //Creating HashMap of data sent in request
 
-        String courseCode = (String) courseMap.get("courseCode");
+        String courseCode = courseMap.get("courseCode");
 
         //Calling updateAll with command deleteCourse on all observers for courseData
         //This will remove the course from the course list stored within the class
@@ -198,99 +196,70 @@ public class Routes {
         //Removing course from list of courses
         SystemData.courses.remove(courseCode);
 
-        String jsonReturn = "{success:'";
-        jsonReturn+= courseCode + " has been deleted'}";
-        return jsonReturn;
+        return courseInfo + " has been deleted";
     }
 
     /*
      Route for student registering in course
      USAGE:
      @param (courseInfo JSON)
-         - courseCode: courseCode of course, includes section (Ex. COMP3004B)   (String)
-         - studentID: ID of student wanting to register in course               (Integer)
-     @return Status of course registration
+         - courseCode: courseCode of course, includes section (Ex. COMP3004B)
+         - studentID: ID of student wanting to register in course
+         -
+     @return Status of course deletion (Success / Failure, should always succeed though)
 
      */
     @PostMapping(value ="/api/course-registration", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String courseRegistration(@RequestBody String studentInfo) throws IOException {
         System.out.println("From '/api/course-registration': " + studentInfo);
 
-        HashMap <String, Object> infoMap = Helper.stringToMap(studentInfo);  //Creating HashMap of data sent in request
+        //Needs to delete courses AND delete students / professors with course
+
+        HashMap <String, String> infoMap = new ObjectMapper().readValue(studentInfo, HashMap.class);  //Creating HashMap of data sent in request
 
         CourseData courseData = SystemData.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
 
-        long studentID = Long.valueOf((Integer) infoMap.get("studentID"));
+        long studentID = Long.parseLong(infoMap.get("studentID"));
 
         User user = SystemData.users.get(studentID); //Retrieving User (The Student Registering) From List of Users
 
         Student student = (Student) user; //Casting the User object to student
 
-        int studentRegistrationStatus = student.canStudentRegisterInCourse(courseData, s.date, s.deadline);
-
-        String jsonReturn = "{error:'";
-        //0 = Student can register successfully
-        //1 = Course Registration Closed
-        //2 = Course is Full
-        //3 = Student does not meet prerequisites
-        //4 = Timetable Conflicts
-        if (studentRegistrationStatus == 0) {
-            courseData.attach(student);
-            student.update("addCourse", courseData);
-            jsonReturn = "{success:'";
-            jsonReturn+= "Student has successfully registered in course " + courseData.getCourseCode() + "'}";
+        //If student does not meet prerequisites let user know
+        if (!student.doesStudentMeetPrerequisites(courseData.getPrerequisites())) {
+            return "Student could not be registered in course as they do not meet prerequisites";
+        } //If course is full, let user know that they could not be registered
+        else if (courseData.isCourseFull()) {
+            return "Student could not be registered in course as it is full";
         }
-        else if (studentRegistrationStatus == 1) {
-            jsonReturn+= "Student could not be registered in course as course registration has closed'}";
-        }
-        else if (studentRegistrationStatus == 2) {
-            jsonReturn+= "Student could not be registered in course as it is full'}";
-        }
-        else if (studentRegistrationStatus == 3) {
-            jsonReturn+= "Student could not be registered in course as they do not meet prerequisites'}";
-        }
-        else if (studentRegistrationStatus == 4) {
-            jsonReturn+= "Student could not be registered in course as there are timetable conflicts'}";
-        }
-
-        return jsonReturn;
-    }
-
-    /*
-     Route for student withdrawing from course
-     USAGE:
-     @param (courseInfo JSON)
-         - courseCode: courseCode of course, includes section (Ex. COMP3004B)   (String)
-         - studentID: ID of student wanting to register in course               (Integer)
-     @return Status of course widthdrawl
-
-     */
-    @PostMapping(value ="/api/course-withdrawal", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
-    public String courseWithdrawal(@RequestBody String studentInfo) throws IOException {
-        System.out.println("From '/api/course-withdrawal': " + studentInfo);
-
-        HashMap <String, Object> infoMap = Helper.stringToMap(studentInfo);  //Creating HashMap of data sent in request
-
-        CourseData courseData = SystemData.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
-
-        long studentID = Long.valueOf((Integer) infoMap.get("studentID"));
-
-        User user = SystemData.users.get(studentID); //Retrieving User (The Student Registering) From List of Users
-
-        Student student = (Student) user; //Casting the User object to student
-
-        if (student.canStudentWithdraw(s.date, s.deadline)) {
-            courseData.detach(student);//Detach student from course
-            student.update("deleteCourse", courseData.getCourseCode());
-            System.out.println(student.getCourses());
-            String jsonReturn = "{success:'Student has successfully withdrawn from the course " + courseData.getCourseCode() + "'}";
-            return jsonReturn;
+        //If date is past course registration date then do not let student register and let them know registration has closed
+        else if (s.date.compareTo(s.lastRegistrationDate) >= 0) {
+            return "Student could not be registered in course as course registration has closed";
         }
         else {
-            courseData.attach(student);
-            String jsonReturn = "{error:'Student cannot withdraw as the withdraw deadline has past " + courseData.getCourseCode() + "'}";
-            return jsonReturn;
+            courseData.attach(student);//Attaching Student to CourseData
+            return studentInfo + " registered in course " + courseData.getCourseCode();
         }
+
+    }
+
+    @PostMapping(value ="/api/course-withdrawal", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String courseWithdrawal(@RequestBody String studentInfo) throws IOException {
+        System.out.println("From '/api/course-withdrawl': " + studentInfo);
+
+        HashMap <String, String> infoMap = new ObjectMapper().readValue(studentInfo, HashMap.class);  //Creating HashMap of data sent in request
+
+        CourseData courseData = SystemData.courses.get(infoMap.get("courseCode")); //Retrieving Course from list of courses
+
+        User user = SystemData.users.get(infoMap.get("studentID")); //Retrieving User (The Student Registering) From List of Users
+
+        Student student = (Student) user; //Casting the User object to student
+
+        student.removeCourse(infoMap.get("courseCode")); //Removing course in list of courses in the student
+
+        courseData.detach(student);//Detach student from course
+
+        return studentInfo + " has been deleted";
     }
 
     /*
@@ -329,6 +298,75 @@ public class Routes {
         }
 
         return Helper.objectToJSONString(contentStrings);
+    }
+
+    @PostMapping(value="/api/get-user-courses-minimal", consumes=MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String getUserCoursesMinimal(@RequestBody String userInfo) {
+        HashMap<String, Object> userMap = Helper.stringToMap(userInfo);
+        //get the user in SystemData with this information
+        User curUser = null;
+        for(User u : SystemData.users.values()) {
+            if(userMap.get("username").equals(u.getName()) && userMap.get("id").equals(u.getUserId())) {
+                //we know this is the user we are interested in for their courses
+                curUser = u;
+            }
+        }
+        //if curUser is still null, we need to see if the information matches the admin's
+        if(curUser == null) {
+            if(userMap.get("username").equals(SystemData.admin.getName())) {
+                //we know this is the admin.
+                curUser = SystemData.admin;
+            }
+        }
+        if(curUser == null) {
+            //if the current user is still null, we need to return an error as we could not find this user
+            HashMap<String, String> errMap = new HashMap<>();
+            errMap.put("error", "unable to find the provided user");
+            return Helper.objectToJSONString(errMap);
+        }
+        //we now have the user, and must collect all of their courses. if it is the admin, return a list of all courses in the system
+        ArrayList<HashMap<String, String>> courseInfo = new ArrayList<>();
+        if(curUser instanceof Admin) {
+            System.out.println();
+            // return a list of all courses' information
+            for(CourseData c : SystemData.courses.values()) {
+                //append a string with courseCode, courseName and id to the courseInfo string
+                HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
+                thisCourseInfo.put("code", c.getCourseCode());
+                thisCourseInfo.put("name", c.getCourseName());
+                thisCourseInfo.put("id", String.valueOf(c.getCourseID()));
+                courseInfo.add(thisCourseInfo);
+            }
+            return Helper.objectToJSONString(courseInfo);
+        } else if(curUser instanceof Student) {
+            //casting this into a student to access their courses attribute
+            Student s = (Student) curUser;
+            //getting relevant information about the courses for this user
+            for(CourseData c : s.getCourses().values()) {
+                HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
+                thisCourseInfo.put("code", c.getCourseCode());
+                thisCourseInfo.put("name", c.getCourseName());
+                thisCourseInfo.put("id", String.valueOf(c.getCourseID()));
+                courseInfo.add(thisCourseInfo);
+            }
+            return Helper.objectToJSONString(courseInfo);
+        } else if(curUser instanceof Professor) {
+            //casting this into a professor to access their courses attribute
+            Professor p = (Professor) curUser;
+            //getting relevant information about the courses for this user
+            for(CourseData c : p.getCourses().values()) {
+                HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
+                thisCourseInfo.put("code", c.getCourseCode());
+                thisCourseInfo.put("name", c.getCourseName());
+                thisCourseInfo.put("id", String.valueOf(c.getCourseID()));
+                courseInfo.add(thisCourseInfo);
+            }
+            return Helper.objectToJSONString(courseInfo);
+        }
+        //if we have not returned at this point, we must return an error message
+        HashMap<String, String> errMsg = new HashMap<>();
+        errMsg.put("error", "unable to query this users' courses");
+        return Helper.objectToJSONString(errMsg);
     }
 
     /*
@@ -503,6 +541,9 @@ public class Routes {
                 s.createUserFromApplication(thisApplication);
                 SystemData.admin.getApplications().remove(i);
                 data.updateAll("application", thisApplication);
+                if(appinfo.get("type").equals("professor")) {
+                    data.updateAll("get-professor", null);
+                }
                 return "success";
             }
         }
@@ -532,6 +573,39 @@ public class Routes {
         //if we reach this part of the code, then we were unable to find this application
         return "error";
     }
+
+    @GetMapping(value = "/api/get-all-professors", produces = MediaType.TEXT_HTML_VALUE)
+    public String getAllProfessors() {
+        //return a list of all users that are of type professor in systemdata
+        ArrayList<HashMap<String, String>> profs = new ArrayList<>();
+        for(User u : SystemData.users.values()) {
+            if(u instanceof Professor) {
+//                profs.add((Professor) u);
+                HashMap<String, String> profInfo = new HashMap<>();
+                profInfo.put("name", u.getName());
+                profInfo.put("id", String.valueOf(((Professor) u).getProfessorID()));
+                profs.add(profInfo);
+            }
+        }
+        return Helper.objectToJSONString(profs);
+    }
+    /*
+    TODO:
+        ABSOLUTELY NOTHING. PLEASE DO NOT MODIFY THESE FUNCTIONS FOR ABSOLUTELY ANY REASON. THIS WILL CAUSE SUDDEN HEART FAILURE.
+     */
+    @GetMapping(value="/admin")
+    public RedirectView adminRedirect() {
+        return new RedirectView("/");
+    }
+    @GetMapping(value="/dashboard")
+    public RedirectView dashboardRedirect() {
+        return new RedirectView("/");
+    }
+    @GetMapping(value="/signup")
+    public RedirectView signupRedirect() {
+        return new RedirectView("/");
+    }
+
 }
 
 

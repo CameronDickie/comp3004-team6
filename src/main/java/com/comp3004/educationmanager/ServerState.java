@@ -31,7 +31,6 @@ public class ServerState {
     boolean freezeTime = true;
     Calendar date = Calendar.getInstance();
     Calendar deadline = Calendar.getInstance();
-    public Calendar lastRegistrationDate = Calendar.getInstance();
 
 
 

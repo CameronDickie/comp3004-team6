@@ -161,10 +161,10 @@ public class Routes {
          CourseData courseData = new CourseCreator().createCourse(
                 (String) courseMap.get("courseCode"),
                 (String) courseMap.get("courseName"),
-                (Integer) courseMap.get("maxStudents"),
+                Integer.parseInt((String) courseMap.get("maxStudents")),
                 (ArrayList<String>) courseMap.get("days"),
                 (String) courseMap.get("startTime"),
-                (Double) courseMap.get("classDuration"),
+                Double.valueOf((Integer) courseMap.get("classDuration")),
                 (ArrayList<String>) courseMap.get("prerequisites"));
 
         String courseCode = String.valueOf(courseMap.get("courseCode"));

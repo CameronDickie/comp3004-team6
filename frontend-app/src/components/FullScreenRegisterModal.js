@@ -9,8 +9,6 @@ class FullScreenRegisterModal extends Component{
     }
 
     
-
-    
     render(){
 
         let cards = []

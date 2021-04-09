@@ -160,7 +160,7 @@ class Dashboard extends React.Component {
             method: 'POST',
             headers: {'Content-Type': 'text/html'},
             body: JSON.stringify({
-                corseCode: cid,
+                courseCode: cid,
                 studentID: this.props.getUser().studentID
             })
         }

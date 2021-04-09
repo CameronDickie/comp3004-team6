@@ -20,24 +20,47 @@ class AdminMainSection extends Component{
         this.state = {
             data: this.props.app.state.data,
             modalOpen: false,
-            applications: [
-                {
-                    name: "Jaxson Hood",
-                    type: "Student Application."
-                },
-                {
-                    name: "Cam Dickie",
-                    type: "Student Application."
-                },
-                {
-                    name: "Dr. Snooze Warts",
-                    type: "Professor Application."
-                },
-                {
-                    name: "Professor Blake Walden",
-                    type: "Professor Application."
-                }
-            ]
+        }
+
+        // Get applications from server on creation
+        this.props.updateApplications();
+    }
+
+    processApplication = async (status, name, type) => {
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type':'text/html'},
+            body: JSON.stringify({
+                name: name,
+                type: type
+            })
+        }
+        if(status) {
+            //accept this application
+            await fetch('/api/process-application', requestOptions)
+                .then(response => response.text())
+                .then(res => {
+                    //make admin dashboard update 'get-applications'
+                    if(res == "error") {
+                        console.log('error processing application');
+                    }
+                    //  else this.props.updateApplications();
+                })
+
+        } else if(!status) {
+            //deny this application
+            await fetch ('/api/delete-application', requestOptions)
+                .then(repsonse => repsonse.text())
+                .then(res => {
+                    //make admin dashboard update 'get-applications'
+                    if(res == "error") {
+                        console.log('error deleting this application')
+                    }
+                    //  else this.props.updateApplications()
+                })
+
+        } else {
+            console.log("error with application processing ocurred");
         }
     }
 
@@ -45,7 +68,7 @@ class AdminMainSection extends Component{
         let table = []
 
         for (let i in this.state.data.courses){
-            table.push(makeAdminCourseCard(this.state.data.courses[i]))
+            table.push(this.makeAdminCourseCard(this.state.data.courses[i]))
         }
 
         return table
@@ -54,11 +77,55 @@ class AdminMainSection extends Component{
     createApplicationTable = () => {
         let table = []
 
-        for (let i in this.state.applications){
-            table.push(makeApplicationCard(this.state.applications[i]))
+        for (let i in this.props.applications){
+            table.push(this.makeApplicationCard(this.props.applications[i]))
         }
 
         return table
+    }
+
+
+    makeAdminCourseCard = (course) => {
+        return (
+            <div className="p-2">
+                <div className="p-3 rounded-md h-40 w-72 bg-gray-50 border-2 hover:border-blue-500 flex flex-wrap content-between">
+                     <div className="w-full">
+                         <div className="p-1 pl-2 font-semibold text-xl">{course.code}</div>
+                         <div className="pl-2 text-kg">{course.name}</div>
+                     </div>
+                     <div>
+                         <div class="text-center leading-none flex justify-between w-full">
+                             <span class=" mr-3 inline-flex items-center leading-none text-sm  py-1 ">
+                                 <button className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Edit<FontAwesomeIcon className="ml-2 text-yellow-500" size="lg" icon={faPen}/></button>
+                             </span>
+                             <span class=" inline-flex items-center leading-none text-sm pl-28">
+                                 <button className="text-md font-semibold hover:underline">View</button>
+                             </span>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+        )
+    }
+    
+    makeApplicationCard = (application) => {
+        return (
+            <div class="w-full p-2">
+                <div class="inline-grid lg:flex rounded-lg border-2 hover:border-gray-700 pb-6 lg:pb-0 min-w-full">
+                    <div class="w-full p-4">
+                        <div class="inline-grid">
+                            <p class="work-sans font-semibold text-xl">{application.name}</p>
+                            <p class="raleway text-sm my-2 opacity-75">{application.type}</p>
+                        </div>
+                    </div>
+                    <div className="w-full pl-4 grid-cols-2">
+                        <button onClick={() => this.processApplication(true, application.name, application.type)} className="hover:shadow-md px-3 py-2 text-md font-medium border-2 border-gray-900 rounded-lg">Accept
+                        <span><FontAwesomeIcon className="ml-2 text-pink-500" size="lg" icon={faCheck}/></span></button>
+                        <button onClick={() => this.processApplication(false, application.name, application.type)} className="hover:shadow-md ml-2 px-3 py-2 text-md font-medium border-2 border-gray-900 rounded-lg">Decline <span><FontAwesomeIcon className="ml-2 text-purple-500" size="lg" icon={faTimes}/></span></button>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     toggleCreateCourseModal = () => {
@@ -112,48 +179,6 @@ class AdminMainSection extends Component{
     }
 }
 
-function makeAdminCourseCard(course){
 
-    return (
-        <div className="p-2">
-            <div className="p-3 rounded-md h-40 w-72 bg-gray-50 border-2 hover:border-blue-500 flex flex-wrap content-between">
-                 <div className="w-full">
-                     <div className="p-1 pl-2 font-semibold text-xl">{course.code}</div>
-                     <div className="pl-2 text-kg">{course.name}</div>
-                 </div>
-                 <div>
-                     <div class="text-center leading-none flex justify-between w-full">
-                         <span class=" mr-3 inline-flex items-center leading-none text-sm  py-1 ">
-                             <button className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Edit<FontAwesomeIcon className="ml-2 text-yellow-500" size="lg" icon={faPen}/></button>
-                         </span>
-                         <span class=" inline-flex items-center leading-none text-sm pl-28">
-                             <button className="text-md font-semibold hover:underline">View</button>
-                         </span>
-                     </div>
-                 </div>
-             </div>
-        </div>
-    )
-}
-
-function makeApplicationCard(application){
-    return (
-        <div class="w-full p-2">
-            <div class="inline-grid lg:flex rounded-lg border-2 hover:border-gray-700 pb-6 lg:pb-0 min-w-full">
-                <div class="w-full p-4">
-                    <div class="inline-grid">
-                        <p class="work-sans font-semibold text-xl">{application.name}</p>
-                        <p class="raleway text-sm my-2 opacity-75">{application.type}</p>
-                    </div>
-                </div>
-                <div className="w-full pl-4 grid-cols-2">
-                    <button className="hover:shadow-md px-3 py-2 text-md font-medium border-2 border-gray-900 rounded-lg">Accept
-                    <span><FontAwesomeIcon className="ml-2 text-pink-500" size="lg" icon={faCheck}/></span></button>
-                    <button className="hover:shadow-md ml-2 px-3 py-2 text-md font-medium border-2 border-gray-900 rounded-lg">Decline <span><FontAwesomeIcon className="ml-2 text-purple-500" size="lg" icon={faTimes}/></span></button>
-                </div>
-            </div>
-        </div>
-    )
-}
 
 export default AdminMainSection;

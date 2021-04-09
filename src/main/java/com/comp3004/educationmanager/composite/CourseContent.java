@@ -86,18 +86,19 @@ public class CourseContent implements Component, java.io.Serializable {
             for (int i = 0; i < children.size(); ++i) {
                 children.get(i).executeCommand(command, value);
             }
+            return true;
         } else if(command.equals("findByPath")) {                       // find an item by it's path
-            System.out.println("findByPath: " + (String) getProperty("fullPath") + " | " + (String) value);
             if(((String) getProperty("fullPath")).equals((String) value)) {
+                System.out.println("\t-returning this");
                 return this;
             } else {
                 for(int i = 0; i < children.size(); ++i) {
-                    Component c = (Component) children.get(i).executeCommand(command, value);
-                    if(c != null) {
-                        return c;
-                    }
+                    System.out.print("Child: ");
+                    Component c = (Component) (children.get(i).executeCommand(command, value));
+                    if(c != null) return c;
                 }
             }
+            return null;
         } else if(command.equals("addItem")) {                          // add an item as a descendant (direct child or child of child...)
             Component c = (Component) value;
             String cPath = (String) c.getProperty("path");
@@ -108,12 +109,12 @@ public class CourseContent implements Component, java.io.Serializable {
                     children.get(i).executeCommand(command, value);
                 }
             }
+            return true;
         } else if(command.equals("stringify")) {
             return Helper.objectToJSONString(this);
         } else {
             System.out.println("Command " + command + " not found.");
+            return null;
         }
-
-        return null;
     }
 }

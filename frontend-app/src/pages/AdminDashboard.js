@@ -20,6 +20,24 @@ class AdminDashboard extends Component {
             currentCourse: 0,
             whichModal: 0,
             webSocket: null,
+            applications: [
+                // {
+                //     name: "Jaxson Hood",
+                //     type: "Student Application."
+                // },
+                // {
+                //     name: "Cam Dickie",
+                //     type: "Student Application."
+                // },
+                // {
+                //     name: "Dr. Snooze Warts",
+                //     type: "Professor Application."
+                // },
+                // {
+                //     name: "Professor Blake Walden",
+                //     type: "Professor Application."
+                // }
+            ],
             data: {
                 courses: [
                     {
@@ -46,13 +64,15 @@ class AdminDashboard extends Component {
                         name: "Intro to Web Development",
                         code: "COMP2406"
                     }
-                ]
+                ],
+                
             }
         }
     }
     componentDidMount() {
         this.connect();
     }
+
     connect = () => {
         let ws = new WebSocket('ws://localhost:8080/api/websocket', 'subprotocol.demo.websocket');
         ws.onopen = () => {
@@ -62,9 +82,14 @@ class AdminDashboard extends Component {
             console.log('Extensions: ' + ws.extensions);
             this.sendUser(ws);
         }
+
         ws.onmessage = (event) => {
             console.log('Client received: ' + event.data);
+            if(event.data == 'get-applications') {
+                this.updateApplications();
+            }
         }
+        
         ws.onerror = (event) => {
             console.log('Client error: ' + event.data);
         }
@@ -73,19 +98,20 @@ class AdminDashboard extends Component {
         }
         this.setState({webSocket: ws})
     }
+
     disconnect = () => {
         if(this.state.webSocket != null) {
             this.state.webSocket.close();
             this.state.webSocket = null;
         }
     }
+
+    //Send Socket message
     sendMessage = (msg) => {
         console.log('Client sends ' + msg);
         this.state.webSocket.send(msg);
     }
 
-
-    //Local stuff
 
     sendUser = (ws) => {
 
@@ -98,10 +124,41 @@ class AdminDashboard extends Component {
         ws.send(uString);
     }
 
+    updateApplications = async () => {
+        if(this.state.webSocket == null) {
+            console.log("no socket connection found");
+            return;
+        }
+        const requestOptions = {
+            method: 'GET',
+            headers: {'Content-Type': 'text/html'},
+        };
+
+        await fetch('/api/get-applications', requestOptions)
+            .then(response => response.json())
+            .then(res => {
+
+                //update this.state.data.applictions
+                let formatted = res;
+                
+                //formatting the response to be of type {name, type}
+                for(let i = 0; i < formatted.length; i++) {
+                    delete formatted[i].password;
+                    formatted[i].name = formatted[i].firstname + " " + formatted[i].lastname
+                    delete formatted[i].firstname;
+                    delete formatted[i].lastname;
+                }
+
+                console.log(formatted)
+                
+                //Set local state so render gets called
+                this.setState({applications: formatted})
+            })
+    }
+
     setPage = (pageName) => {
         this.setState({page: pageName});
     }
-
 
     render() {
 
@@ -151,7 +208,7 @@ class AdminDashboard extends Component {
                                 </div>
                             </div>
                             <div className={`${(this.state.page == "dashboard") ? "" : "hidden"}`}>
-                                <AdminMainSection app={this} />
+                                <AdminMainSection app={this} updateApplications={this.updateApplications} applications={this.state.applications} />
                             </div>
                         </div>
                         

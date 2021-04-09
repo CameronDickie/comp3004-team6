@@ -1,5 +1,6 @@
 package com.comp3004.educationmanager.decorator;
 
+import com.comp3004.educationmanager.Helper;
 import com.comp3004.educationmanager.composite.Component;
 import com.comp3004.educationmanager.visitor.*;
 
@@ -44,6 +45,18 @@ public class FileDecorator extends Decorator {
             return file.accept(new FileDownloadVisitor());
         } else if(command.equals("viewAsPDF")) {
             return file.accept(new FileViewVisitor());
+        } else if(command.equals("findByPath")) {
+            Component c = (Component) wrappee.executeCommand(command, value);
+            if(c != null) {
+                if(((String) c.getProperty("fullPath")).equals((String) getProperty("fullPath"))) {
+                    return this;
+                } else if(((String) c.getProperty("fullPath")).equals((String) value)) {
+                    return c;
+                }
+            }
+            return null;
+        } else if(command.equals("stringify")) {
+            return Helper.objectToJSONString(this);
         } else {
             return wrappee.executeCommand(command, value);
         }

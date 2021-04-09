@@ -151,6 +151,31 @@ class Dashboard extends React.Component {
                 });
             })
     }
+    registerInCourse = async (cid) => {
+        if(!this.props.getUser().studentID) {
+            console.log("error getting this user's studentID");
+            return;
+        }
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'text/html'},
+            body: JSON.stringify({
+                corseCode: cid,
+                studentID: this.props.getUser().studentID
+            })
+        }
+        console.log('sending registration request for' + cid);
+        await fetch ('/api/course-registration', requestOptions)
+            .then (response => response.json())
+            .then (res => {
+                if(res.error) {
+                    console.log("error in registration process: " + res.error);
+                    return;
+                }
+                alert(res.success)
+                this.setState({modalOpen: false})
+            })
+    }
 
     render() {
 
@@ -170,7 +195,7 @@ class Dashboard extends React.Component {
                 )
             } else if (this.state.whichModal == 1){
                 return (
-                    <FullScreenRegisterModal dashboard={this} courses={this.props.globalCourses}/>
+                    <FullScreenRegisterModal dashboard={this} registerInCourse={this.registerInCourse} courses={this.state.globalCourses}/>
                 )
             }
         }

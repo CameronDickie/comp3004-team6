@@ -249,7 +249,8 @@ public class Routes {
         //4 = Timetable Conflicts
         if (studentRegistrationStatus == 0) {
             courseData.attach(student);
-            student.update("addCourse", courseData);
+            courseData.updateAll("get-courses", courseData);
+//            student.update("addCourse", courseData);
             jsonReturn = "{success:'";
             jsonReturn+= "Student has successfully registered in course " + courseData.getCourseCode() + "'}";
         }
@@ -265,6 +266,8 @@ public class Routes {
         else if (studentRegistrationStatus == 4) {
             jsonReturn+= "Student could not be registered in course as there are timetable conflicts'}";
         }
+
+
 
         return jsonReturn;
     }

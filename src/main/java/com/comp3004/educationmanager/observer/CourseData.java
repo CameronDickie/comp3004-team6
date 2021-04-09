@@ -40,8 +40,9 @@ public class CourseData extends Subject implements java.io.Serializable {
     static int currStudents = 0;
     ArrayList<String> prerequisites = new ArrayList<>();
 
+    ArrayList<String> days = new ArrayList<>();
     String startTime;
-    int classDuration;
+    double classDuration;
 
 
     /*
@@ -54,11 +55,16 @@ public class CourseData extends Subject implements java.io.Serializable {
         this.content = new CourseContent(this.courseCode, "/", "section");
     }
 
-    public CourseData(String courseCode, String courseName, int maxStudents) {
+    public CourseData(String courseCode, String courseName, int maxStudents, ArrayList<String>days, String startTime, double classDuration, ArrayList<String> prerequisites) {
         this.courseCode = courseCode;
         this.courseName = courseName;
         this.maxStudents = maxStudents;
         this.content = new CourseContent(this.courseCode, "/", "section");
+
+        this.days = days;
+        this.startTime = startTime;
+        this.classDuration = classDuration;
+        this.prerequisites = prerequisites;
     }
 
     /*
@@ -169,4 +175,13 @@ public class CourseData extends Subject implements java.io.Serializable {
         return this.prerequisites;
     }
 
+    public ArrayList<String> getDays() {
+        return this.days;
+    }
+
+    public String getStartTime() {return this.startTime;}
+
+    public double getClassDuration() {
+        return this.classDuration;
+    }
 }

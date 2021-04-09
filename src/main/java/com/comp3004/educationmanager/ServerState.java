@@ -30,7 +30,7 @@ public class ServerState {
 
 
     Calendar date = Calendar.getInstance();
-    Calendar lastRegistrationDate = Calendar.getInstance();
+    Calendar deadline = Calendar.getInstance();
 
 
 
@@ -49,12 +49,12 @@ public class ServerState {
         date.set(Calendar.MILLISECOND, 0);
 
         //Setting last registration date to random date of January 20th
-        lastRegistrationDate.set(Calendar.MONTH, Calendar.JANUARY);
-        lastRegistrationDate.set(Calendar.DAY_OF_MONTH, 20);
-        lastRegistrationDate.set(Calendar.HOUR_OF_DAY , 0);
-        lastRegistrationDate.set(Calendar.MINUTE ,0);
-        lastRegistrationDate.set(Calendar.SECOND ,0);
-        lastRegistrationDate.set(Calendar.MILLISECOND, 0);
+        deadline.set(Calendar.MONTH, Calendar.JANUARY);
+        deadline.set(Calendar.DAY_OF_MONTH, 20);
+        deadline.set(Calendar.HOUR_OF_DAY , 0);
+        deadline.set(Calendar.MINUTE ,0);
+        deadline.set(Calendar.SECOND ,0);
+        deadline.set(Calendar.MILLISECOND, 0);
 
         Timer timer = new Timer();
         TimerTask timerTask = new TimerTask() {

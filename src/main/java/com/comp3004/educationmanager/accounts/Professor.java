@@ -1,9 +1,11 @@
 package com.comp3004.educationmanager.accounts;
 
 import com.comp3004.educationmanager.observer.CourseData;
+import org.springframework.web.socket.TextMessage;
 
 import javax.persistence.Entity;
 import javax.persistence.Transient;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,17 @@ public class Professor extends User {
             courses.remove(courseCode);
         } else if(command.equals("addCourse")) {
             addCourse((CourseData) value);
+        } else if(command.equals("get-courses")) {
+            TextMessage message = new TextMessage("get-courses");
+            try {
+                if(this.getSocketConnection() != null) {
+                    this.getSocketConnection().sendMessage(message);
+                } else {
+                    System.out.println("Unable to connect to professor");
+                }
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
         }
     }
 

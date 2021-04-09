@@ -5,8 +5,12 @@ import React, { Component } from "react";
 class FullScreenRegisterModal extends Component{
     constructor(props) {
         super(props);
+        
     }
 
+    
+
+    
     render(){
 
         let cards = []
@@ -24,7 +28,7 @@ class FullScreenRegisterModal extends Component{
                     <div>
                         <div class="text-center leading-none flex justify-between w-full">
                             <span class=" mr-3 inline-flex items-center leading-none text-sm  py-1 ">
-                                <button className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Register<FontAwesomeIcon className="ml-2 text-green-500" size="lg" icon={faPlus}/></button>
+                                <button onClick={() => {this.props.registerInCourse(c.code)}} className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Register<FontAwesomeIcon className="ml-2 text-green-500" size="lg" icon={faPlus}/></button>
                             </span>
                             <span class=" inline-flex items-center leading-none text-sm pl-28">
                                 <button className="text-md font-semibold hover:underline">View</button>

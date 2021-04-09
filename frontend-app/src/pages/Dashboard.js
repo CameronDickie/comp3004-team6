@@ -25,36 +25,17 @@ class Dashboard extends React.Component {
             whichModal: 0,
             webSocket: null,
             courses: [
-                {
-                    name: "Intro to Computer Science",
-                    code: "COMP1001"
-                },
-                {
-                    name: "Intro to Mathematics 1",
-                    code: "MATH1001"
-                },
-                {
-                    name: "Cognitive Science - Mysteries of the Mind",
-                    code: "CGSC1001"
-                },
-                {
-                    name: "Dinosaurs",
-                    code: "ERTH2401"
-                },
-                {
-                    name: "Intro to Philosophy",
-                    code: "PHIL1001"
-                },
-                {
-                    name: "Intro to Web Development",
-                    code: "COMP2406"
-                }
+               
+            ],
+            globalCourses : [
+
             ]
         }
     }
     componentWillMount() {
         //get this user's courses from the system
         this.updateCourses();
+        this.getGlobalCourses();
         this.connect(); //connecting to the web socket for this user
     }
     connect = () => {
@@ -68,6 +49,11 @@ class Dashboard extends React.Component {
         }
         ws.onmessage = (event) => {
             console.log('Client received: ' + event.data);
+            //User.update commands
+            if(event.data == "get-courses") {
+                this.updateCourses(); //updating this user's list of courses
+                this.getGlobalCourses(); //updating this user's list of total courses
+            }
         }
         ws.onerror = (event) => {
             console.log('Client error: ' + event.data);
@@ -131,16 +117,63 @@ class Dashboard extends React.Component {
             headers: {'Content-Type':'text/html'},
             body: JSON.stringify(this.props.getUser())
         }
-
         await fetch('/api/get-user-courses-minimal', requestOptions)
             .then(response => response.json())
             .then(res => {
                 //update our list of courses to be the response
                 if(res.error) {
-                    console.log("error getting this user's course information");
+                    console.log("error getting this user's course information: " + res.error);
                     return;
                 }
-                this.setState({courses:res})
+                this.setState({courses:res}, () => {
+                    console.log(this.state.courses);
+                })
+            })
+    }
+    getGlobalCourses = async () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'text/html'},
+            body: JSON.stringify(this.props.getUser())
+        }
+
+        await fetch('/api/get-global-courses', requestOptions)
+            .then(response => response.json())
+            .then(res => {
+                if(res.error) {
+                    console.log("unable to update the list of courses in the system");
+                    return;
+                }
+                
+                this.setState({globalCourses: res}, () => {
+                    console.log(this.state.globalCourses);
+
+                });
+            })
+    }
+    registerInCourse = async (cid) => {
+        if(!this.props.getUser().studentID) {
+            console.log("error getting this user's studentID");
+            return;
+        }
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'text/html'},
+            body: JSON.stringify({
+                corseCode: cid,
+                studentID: this.props.getUser().studentID
+            })
+        }
+        console.log('sending registration request for' + cid);
+        await fetch ('/api/course-registration', requestOptions)
+            .then (response => response.json())
+            .then (res => {
+                if(res.error) {
+                    console.log("error in registration process: " + res.error);
+                    return;
+                }
+                alert(res.success)
+                this.setState({modalOpen: false})
             })
     }
 
@@ -162,7 +195,7 @@ class Dashboard extends React.Component {
                 )
             } else if (this.state.whichModal == 1){
                 return (
-                    <FullScreenRegisterModal dashboard={this} courses={this.state.courses} />
+                    <FullScreenRegisterModal dashboard={this} registerInCourse={this.registerInCourse} courses={this.state.globalCourses}/>
                 )
             }
         }
@@ -262,7 +295,7 @@ function makeCourseSection(app){
                 </div>
                 <div className="col-start-10 col-end-13 mt-8">
                     <div className="flex justify-end p-1 pr-4">
-                        <button onClick={() => app.showModalRegister()} className="bg-white border-gray-800 ml-1 px-3 py-3 border-2 rounded-md font-bold shadow-md hover:shadow-lg">Add Course(s)
+                        <button onClick={() => app.showModalRegister()} className={(app.props.getUser().type=="Student") ? "bg-white border-gray-800 ml-1 px-3 py-3 border-2 rounded-md font-bold shadow-md hover:shadow-lg" : "hidden"}>Add Course(s)
                         <FontAwesomeIcon className="ml-2 text-green-500" size="lg" icon={faPlus}/></button>
                     </div>
                 </div>

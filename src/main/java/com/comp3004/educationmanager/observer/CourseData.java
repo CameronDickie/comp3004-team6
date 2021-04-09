@@ -37,7 +37,7 @@ public class CourseData extends Subject implements java.io.Serializable {
     @Transient
     Strategy strategy;
 
-    static int currStudents = 0;
+    int currStudents = 0;
     ArrayList<String> prerequisites = new ArrayList<>();
 
     ArrayList<String> days = new ArrayList<>();

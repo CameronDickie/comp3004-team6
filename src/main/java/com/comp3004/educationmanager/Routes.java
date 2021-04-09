@@ -150,7 +150,8 @@ public class Routes {
 
         Map<String, Object> courseMap = Helper.stringToMap(courseInfo);
 
-        CourseData courseData = new CourseCreator().createCourse((String) courseMap.get("courseCode"), (String) courseMap.get("courseName") , Integer.parseInt((String) courseMap.get("maxStudents")));
+
+        CourseData courseData = new CourseCreator().createCourse((String) courseMap.get("courseCode"), (String) courseMap.get("courseName") , Integer.parseInt((String) courseMap.get("maxStudents")), (ArrayList<String>) courseMap.get("days"), (String) courseMap.get("startTime"), Double.valueOf((Integer) courseMap.get("classDuration")), (ArrayList<String>) courseMap.get("prerequisites"));
 
         String courseCode = String.valueOf(courseMap.get("courseCode"));
 
@@ -158,16 +159,6 @@ public class Routes {
 
 
         User user = SystemData.users.get(professorID); //Retrieving User (The Professor) from List of Users
-        //Removing [ and ] from String of coursecodes and converting that String to array
-//        ArrayList<String> coursePrerequisitesArray = (ArrayList<String>) courseMap.get("prerequisites");
-//
-//        //Making sure to not add empty strings to prerequisite array (Only add if String has data)
-//        if (coursePrerequisitesArray.size() > 0) {
-//            for (String prerequisite : coursePrerequisitesArray) {
-//                courseData.addPrerequisite(prerequisite);
-//            }
-//        }
-
 
         Professor professor = (Professor) user; //Casting Professor to User
         courseData.attach(professor); //Attaching Professor to CourseData

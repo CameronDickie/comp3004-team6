@@ -12,7 +12,7 @@ class CreateCourseModal extends Component{
             course_name: "",
             num_of_students: 1,
             professor_name: "",
-            professor_id: ""
+            professor_id: "",
         }
     }
 
@@ -36,7 +36,10 @@ class CreateCourseModal extends Component{
                     maxStudents: this.state.num_of_students,
                     professorID: this.state.professor_id,
                     prerequisites: [],
-                    professorName: this.state.professor_name
+                    professorName: this.state.professor_name,
+                    days: [],
+                    startTime: "",
+                    classDuration: 0,
                 })
             };
             console.log(requestOptions.body);

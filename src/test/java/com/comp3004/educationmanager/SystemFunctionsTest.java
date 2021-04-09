@@ -168,19 +168,19 @@ public class SystemFunctionsTest {
 
         int studentRegistrationStatus = student.canStudentRegisterInCourse(courseData, date, deadline);
 
-        assert (studentRegistrationStatus == 0);
+        assertEquals(studentRegistrationStatus, 0);
 
-        assert (student.getCourses().size() == 0);
+        assertEquals(student.getCourses().size(),0);
 
         student.update("addCourse", courseData);
 
-        assert (student.getCourses().size() == 1);
+        assertEquals(student.getCourses().size(), 1);
 
-        assert (courseData.getCurrStudents() == 0);
+        assertEquals(courseData.getCurrStudents(), 0);
 
         courseData.attach(student);
 
-        assert (courseData.getCurrStudents() == 1);
+        assertEquals(courseData.getCurrStudents(), 1);
     }
 
     //Test to verify that student cannot register past deadline
@@ -223,7 +223,7 @@ public class SystemFunctionsTest {
 
         assertNotNull(courseData);
 
-        assert (studentRegistrationStatus == 1);
+        assertEquals(studentRegistrationStatus, 1);
     }
 
     //Test to verify that student cannot register in course when it is full
@@ -261,7 +261,7 @@ public class SystemFunctionsTest {
 
         int maxStudents = 3;
 
-        CourseData courseData = new CourseData("COMP3004A", "Design Patterns", maxStudents, days, "12:30", 1.5, prerequisites);
+        CourseData courseData = cc.createCourse("COMP3004A", "Design Patterns", maxStudents, days, "12:30", 1.5, prerequisites);
 
         System.out.println(courseData.getCurrStudents());
 
@@ -271,17 +271,17 @@ public class SystemFunctionsTest {
 
         courseData.attach(professor);
 
-        assert (student.canStudentRegisterInCourse(courseData, date, deadline) == 0);
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 0);
         student.update("addCourse", courseData);
         courseData.attach(student);
-        assert (student2.canStudentRegisterInCourse(courseData, date, deadline) == 0);
+        assertEquals(student2.canStudentRegisterInCourse(courseData, date, deadline),0);
         student2.update("addCourse", courseData);
         courseData.attach(student2);
         System.out.println(student3.canStudentRegisterInCourse(courseData, date, deadline));
-        assert (student3.canStudentRegisterInCourse(courseData, date, deadline) == 0);
+        assertEquals(student3.canStudentRegisterInCourse(courseData, date, deadline), 0);
         student3.update("addCourse", courseData);
         courseData.attach(student3);
-        assert (student4.canStudentRegisterInCourse(courseData, date, deadline) == 2);
+        assertEquals(student4.canStudentRegisterInCourse(courseData, date, deadline), 2);
     }
 
     //Test to verify that student cannot register in course when they do not have the prerequisite courses
@@ -323,7 +323,7 @@ public class SystemFunctionsTest {
 
         courseData.attach(professor);
 
-        assert (student.canStudentRegisterInCourse(courseData, date, deadline) == 3);
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 3);
     }
 
     //Test to verify that student can register in a course they have the prerequisites for
@@ -366,7 +366,7 @@ public class SystemFunctionsTest {
 
         courseData.attach(professor);
 
-        assert (student.canStudentRegisterInCourse(courseData, date, deadline) == 0);
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 0);
     }
 
     //Test to verify that student cannot register in a course that would cause timetable conflicts
@@ -409,7 +409,7 @@ public class SystemFunctionsTest {
 
         courseData.attach(professor);
 
-        assert (student.canStudentRegisterInCourse(courseData, date, deadline) == 0);
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 0);
 
         student.update("addCourse", courseData);
         courseData.attach(student);
@@ -423,11 +423,11 @@ public class SystemFunctionsTest {
         CourseData courseData5 = cc.createCourse("COMP3005B", "Databases", 100, days, "9:00", 1.5, prerequisites);
 
 
-        assert (student.canStudentRegisterInCourse(courseData2, date, deadline) == 4);
-        assert (student.canStudentRegisterInCourse(courseData3, date, deadline) == 4);
-        assert (student.canStudentRegisterInCourse(courseData4, date, deadline) == 0);
-        assert (student.canStudentRegisterInCourse(courseData4, date, deadline) == 0);
-        assert (student.canStudentRegisterInCourse(courseData5, date, deadline) == 0);
+        assertEquals(student.canStudentRegisterInCourse(courseData2, date, deadline), 4);
+        assertEquals(student.canStudentRegisterInCourse(courseData3, date, deadline), 4);
+        assertEquals(student.canStudentRegisterInCourse(courseData4, date, deadline), 0);
+        assertEquals(student.canStudentRegisterInCourse(courseData4, date, deadline),0);
+        assertEquals(student.canStudentRegisterInCourse(courseData5, date, deadline), 0);
     }
 
     //Test to verify that student can withdraw from a course when it is before the deadline
@@ -471,7 +471,7 @@ public class SystemFunctionsTest {
 
         courseData.attach(professor);
 
-        assert (student.canStudentRegisterInCourse(courseData, date, deadline) == 0);
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 0);
 
         student.update("addCourse", courseData);
         courseData.attach(student);
@@ -481,14 +481,14 @@ public class SystemFunctionsTest {
 
         assertEquals(courseData.getCurrStudents(), 1);
 
-        assert (student.canStudentWithdraw(date, deadline));
+        assertTrue(student.canStudentWithdraw(date, deadline));
 
         student.update("deleteCourse", courseData.getCourseCode());
         courseData.detach(student);
 
-        assert (student.getCourses().size() == 0);
+        assertEquals(student.getCourses().size(), 0);
 
-        assert (courseData.getCurrStudents() == 0);
+        assertEquals(courseData.getCurrStudents(), 0);
     }
 
     //Test to verify that student cannot withdraw from a course when it is past the deadline
@@ -531,18 +531,18 @@ public class SystemFunctionsTest {
 
         courseData.attach(professor);
 
-        assert (student.canStudentRegisterInCourse(courseData, date, deadline) == 0);
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 0);
 
         student.update("addCourse", courseData);
         courseData.attach(student);
 
-        assert (student.getCourses().size() == 1);
+        assertEquals(student.getCourses().size(),1);
 
-        assert (courseData.getCurrStudents() == 1);
+        assertEquals(courseData.getCurrStudents(), 1);
 
         date.set(Calendar.DAY_OF_MONTH, 20);
 
-        assert (!student.canStudentWithdraw(date, deadline));
+        assertTrue(!student.canStudentWithdraw(date, deadline));
     }
 
 }

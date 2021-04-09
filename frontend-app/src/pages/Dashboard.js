@@ -158,7 +158,7 @@ class Dashboard extends React.Component {
         if (this.state.modalOpen){
             if (this.state.whichModal == 0){
                 return (
-                    <FullScreenCourseModal course={this.state.data.courses[this.state.currentCourse]} dashboard={this} />
+                    <FullScreenCourseModal course={this.state.courses[this.state.currentCourse]} dashboard={this} />
                 )
             } else if (this.state.whichModal == 1){
                 return (
@@ -246,8 +246,8 @@ function makeCourseSection(app){
     const createCourseTable = () => {
         let table = []
 
-        for (let i in app.state.data.courses){
-            table.push(makeCourseCard(i, app.state.data.courses[i], app))
+        for (let i in app.state.courses){
+            table.push(makeCourseCard(i, app.state.courses[i], app))
         }
 
         return table

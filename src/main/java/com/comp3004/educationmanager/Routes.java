@@ -164,7 +164,7 @@ public class Routes {
                 Integer.parseInt((String) courseMap.get("maxStudents")),
                 (ArrayList<String>) courseMap.get("days"),
                 (String) courseMap.get("startTime"),
-                Double.valueOf((Integer) courseMap.get("classDuration")),
+                Double.parseDouble((String) courseMap.get("classDuration")),
                 (ArrayList<String>) courseMap.get("prerequisites"));
 
         String courseCode = String.valueOf(courseMap.get("courseCode"));

@@ -39,7 +39,7 @@ class CreateCourseModal extends Component{
                     professorName: this.state.professor_name,
                     days: [],
                     startTime: "",
-                    classDuration: 0,
+                    classDuration: "0.0",
                 })
             };
             console.log(requestOptions.body);

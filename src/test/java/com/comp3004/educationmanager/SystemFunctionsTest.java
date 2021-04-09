@@ -22,7 +22,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.testng.annotations.BeforeMethod;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

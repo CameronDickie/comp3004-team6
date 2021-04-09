@@ -162,7 +162,7 @@ class Dashboard extends React.Component {
                 )
             } else if (this.state.whichModal == 1){
                 return (
-                    <FullScreenRegisterModal dashboard={this} />
+                    <FullScreenRegisterModal dashboard={this} courses={this.state.courses} />
                 )
             }
         }

@@ -11,8 +11,8 @@ class FullScreenRegisterModal extends Component{
 
         let cards = []
 
-        for (let i in this.props.dashboard.state.data.courses){
-            let c = this.props.dashboard.state.data.courses[i]
+        for (let i in this.props.courses){
+            let c = this.props.courses[i]
 
             cards.push(
                <div className="p-2">

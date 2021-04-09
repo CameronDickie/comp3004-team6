@@ -38,6 +38,28 @@ public class SystemData extends Subject {
             } catch (IOException e) {
                 e.printStackTrace(System.out);
             }
+        } else if(command.equals("get-professor")) {
+            TextMessage message = new TextMessage("get-professor");
+            try {
+                if(admin == null || admin.getSocketConnection() == null) {
+                    System.out.println("Unable to connect to admin");
+                    return;
+                }
+                admin.getSocketConnection().sendMessage(message);
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
+        } else if(command.equals("get-courses")) {
+            TextMessage message = new TextMessage("get-course");
+            try {
+                if(admin == null || admin.getSocketConnection() == null) {
+                    System.out.println("Unable to connect to admin");
+                    return;
+                }
+                admin.getSocketConnection().sendMessage(message);
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
         }
     }
 }

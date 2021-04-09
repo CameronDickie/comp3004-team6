@@ -4,15 +4,15 @@ import React, { Component } from "react";
 
 
 class CreateCourseModal extends Component{
-
     constructor(props) {
         super(props);
         this.state = {
             cool: true,
             course_code: "",
             course_name: "",
-            num_of_students: "",
-            professor_name: ""
+            num_of_students: 1,
+            professor_name: "",
+            professor_id: ""
         }
     }
 
@@ -22,23 +22,31 @@ class CreateCourseModal extends Component{
     }
 
     doSubmit = async () => {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/html' },
-            body: JSON.stringify({
-                courseCode: this.state.course_code,
-                courseName: this.state.course_name,
-                maxStudents: this.state.num_of_students,
-                professorID: 0,
-                professorName: this.state.professor_name
+        if(this.state.professor_name == "") {
+            this.setState({professor_name: this.props.professors[0].name, professor_id: this.props.professors[0].id}, () => {
+                this.doSubmit();
             })
-        };
+        } else {
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/html' },
+                body: JSON.stringify({
+                    courseCode: this.state.course_code,
+                    courseName: this.state.course_name,
+                    maxStudents: this.state.num_of_students,
+                    professorID: this.state.professor_id,
+                    prerequisites: [],
+                    professorName: this.state.professor_name
+                })
+            };
+            console.log(requestOptions.body);
+            await fetch('/api/create-course', requestOptions)
+                .then(response => response.text())
+                .then(res => {
+                    console.log(res)
+                });
+        }
         
-        await fetch('/api/create-course', requestOptions)
-            .then(response => response.text())
-            .then(res => {
-                console.log(res)
-            });
     };
 
     buildMaxStudentOptions = () => {
@@ -54,16 +62,15 @@ class CreateCourseModal extends Component{
     }
 
     buildProfessorDropDown = () => {
-        let pdl = [
-            <option>Dr. Oz</option>, 
-            <option>Professor Meatball</option>, 
-            <option>Dr. Big Canoe</option>]
-
+        let pdl = [];
+        for(let i in this.props.professors) {
+            pdl.push(<option>{this.props.professors[i].name}</option>)
+        }
         return pdl;
     }
-
-
     render(){
+        //check to see if default professor_name and professor_id has changed
+        
         return (
             <div className={`flex items-center justify-center fixed left-0 bottom-0 w-full h-full bg-gray-300 bg-opacity-60 z-50 ${(this.props.show == true) ? "" : "hidden"}`}>
                 <div class="bg-white rounded-lg w-5/12 h-7/12 border border-gray-300 p-4">
@@ -106,7 +113,7 @@ class CreateCourseModal extends Component{
                                     <label class="block pt-2 pb-2 text-sm text-gray-600 dark:text-gray-400 uppercase">Assigned Professor</label>
                                     <div class="relative inline-flex">
                                         <svg class="w-2 h-2 absolute top-0 right-0 m-4 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 412 232"><path d="M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z" fill="#648299" fill-rule="nonzero"/></svg>
-                                        <select id="professor_name" onChange={this.handleChange.bind(this)} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
+                                        <select id="professor_name" name="professor_name" onChange={this.handleChange.bind(this)} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
                                             {this.buildProfessorDropDown()}
                                         </select>
                                     </div>

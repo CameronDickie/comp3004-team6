@@ -113,6 +113,8 @@ public class CourseData extends Subject implements java.io.Serializable {
     Getters
      */
 
+    public Long getCourseID() { return this.id; }
+
     public String getCourseCode() {
         return this.courseCode;
     }
@@ -124,6 +126,8 @@ public class CourseData extends Subject implements java.io.Serializable {
     public Component getContent() {
         return this.content;
     }
+
+    public String getCourseName() { return this.courseName; }
 
     public byte[] getObject() { return object; }
 

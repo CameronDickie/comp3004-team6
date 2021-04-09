@@ -17,12 +17,12 @@ import com.comp3004.educationmanager.strategy.CourseContentStrategy;
 import com.comp3004.educationmanager.strategy.SubmitDeliverableStrategy;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.annotation.PostConstruct;
 import javax.print.attribute.standard.Media;
@@ -150,23 +150,23 @@ public class Routes {
 
         Map<String, Object> courseMap = Helper.stringToMap(courseInfo);
 
-        CourseData courseData = new CourseCreator().createCourse((String) courseMap.get("courseCode"), (String) courseMap.get("courseName") , (Integer) courseMap.get("maxStudents"));
+        CourseData courseData = new CourseCreator().createCourse((String) courseMap.get("courseCode"), (String) courseMap.get("courseName") , Integer.parseInt((String) courseMap.get("maxStudents")));
 
         String courseCode = String.valueOf(courseMap.get("courseCode"));
 
-        long professorID =Long.valueOf((Integer) courseMap.get("professorID")).longValue();
+        long professorID =Long.parseLong((String) courseMap.get("professorID"));
 
 
         User user = SystemData.users.get(professorID); //Retrieving User (The Professor) from List of Users
         //Removing [ and ] from String of coursecodes and converting that String to array
-        ArrayList<String> coursePrerequisitesArray = (ArrayList<String>) courseMap.get("prerequisites");
-
-        //Making sure to not add empty strings to prerequisite array (Only add if String has data)
-        if (coursePrerequisitesArray.size() > 0) {
-            for (String prerequisite : coursePrerequisitesArray) {
-                courseData.addPrerequisite(prerequisite);
-            }
-        }
+//        ArrayList<String> coursePrerequisitesArray = (ArrayList<String>) courseMap.get("prerequisites");
+//
+//        //Making sure to not add empty strings to prerequisite array (Only add if String has data)
+//        if (coursePrerequisitesArray.size() > 0) {
+//            for (String prerequisite : coursePrerequisitesArray) {
+//                courseData.addPrerequisite(prerequisite);
+//            }
+//        }
 
 
         Professor professor = (Professor) user; //Casting Professor to User
@@ -174,6 +174,9 @@ public class Routes {
 
 
         SystemData.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
+
+        //call SystemData.updateAll
+        data.updateAll("get-courses", courseData);
 
         return courseInfo + " has been created";
     }
@@ -304,6 +307,75 @@ public class Routes {
         }
 
         return Helper.objectToJSONString(contentStrings);
+    }
+
+    @PostMapping(value="/api/get-user-courses-minimal", consumes=MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String getUserCoursesMinimal(@RequestBody String userInfo) {
+        HashMap<String, Object> userMap = Helper.stringToMap(userInfo);
+        //get the user in SystemData with this information
+        User curUser = null;
+        for(User u : SystemData.users.values()) {
+            if(userMap.get("username").equals(u.getName()) && userMap.get("id").equals(u.getUserId())) {
+                //we know this is the user we are interested in for their courses
+                curUser = u;
+            }
+        }
+        //if curUser is still null, we need to see if the information matches the admin's
+        if(curUser == null) {
+            if(userMap.get("username").equals(SystemData.admin.getName())) {
+                //we know this is the admin.
+                curUser = SystemData.admin;
+            }
+        }
+        if(curUser == null) {
+            //if the current user is still null, we need to return an error as we could not find this user
+            HashMap<String, String> errMap = new HashMap<>();
+            errMap.put("error", "unable to find the provided user");
+            return Helper.objectToJSONString(errMap);
+        }
+        //we now have the user, and must collect all of their courses. if it is the admin, return a list of all courses in the system
+        ArrayList<HashMap<String, String>> courseInfo = new ArrayList<>();
+        if(curUser instanceof Admin) {
+            System.out.println();
+            // return a list of all courses' information
+            for(CourseData c : SystemData.courses.values()) {
+                //append a string with courseCode, courseName and id to the courseInfo string
+                HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
+                thisCourseInfo.put("code", c.getCourseCode());
+                thisCourseInfo.put("name", c.getCourseName());
+                thisCourseInfo.put("id", String.valueOf(c.getCourseID()));
+                courseInfo.add(thisCourseInfo);
+            }
+            return Helper.objectToJSONString(courseInfo);
+        } else if(curUser instanceof Student) {
+            //casting this into a student to access their courses attribute
+            Student s = (Student) curUser;
+            //getting relevant information about the courses for this user
+            for(CourseData c : s.getCourses().values()) {
+                HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
+                thisCourseInfo.put("code", c.getCourseCode());
+                thisCourseInfo.put("name", c.getCourseName());
+                thisCourseInfo.put("id", String.valueOf(c.getCourseID()));
+                courseInfo.add(thisCourseInfo);
+            }
+            return Helper.objectToJSONString(courseInfo);
+        } else if(curUser instanceof Professor) {
+            //casting this into a professor to access their courses attribute
+            Professor p = (Professor) curUser;
+            //getting relevant information about the courses for this user
+            for(CourseData c : p.getCourses().values()) {
+                HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
+                thisCourseInfo.put("code", c.getCourseCode());
+                thisCourseInfo.put("name", c.getCourseName());
+                thisCourseInfo.put("id", String.valueOf(c.getCourseID()));
+                courseInfo.add(thisCourseInfo);
+            }
+            return Helper.objectToJSONString(courseInfo);
+        }
+        //if we have not returned at this point, we must return an error message
+        HashMap<String, String> errMsg = new HashMap<>();
+        errMsg.put("error", "unable to query this users' courses");
+        return Helper.objectToJSONString(errMsg);
     }
 
     /*
@@ -478,6 +550,9 @@ public class Routes {
                 s.createUserFromApplication(thisApplication);
                 SystemData.admin.getApplications().remove(i);
                 data.updateAll("application", thisApplication);
+                if(appinfo.get("type").equals("professor")) {
+                    data.updateAll("get-professor", null);
+                }
                 return "success";
             }
         }
@@ -507,6 +582,39 @@ public class Routes {
         //if we reach this part of the code, then we were unable to find this application
         return "error";
     }
+
+    @GetMapping(value = "/api/get-all-professors", produces = MediaType.TEXT_HTML_VALUE)
+    public String getAllProfessors() {
+        //return a list of all users that are of type professor in systemdata
+        ArrayList<HashMap<String, String>> profs = new ArrayList<>();
+        for(User u : SystemData.users.values()) {
+            if(u instanceof Professor) {
+//                profs.add((Professor) u);
+                HashMap<String, String> profInfo = new HashMap<>();
+                profInfo.put("name", u.getName());
+                profInfo.put("id", String.valueOf(((Professor) u).getProfessorID()));
+                profs.add(profInfo);
+            }
+        }
+        return Helper.objectToJSONString(profs);
+    }
+    /*
+    TODO:
+        ABSOLUTELY NOTHING. PLEASE DO NOT MODIFY THESE FUNCTIONS FOR ABSOLUTELY ANY REASON. THIS WILL CAUSE SUDDEN HEART FAILURE.
+     */
+    @GetMapping(value="/admin")
+    public RedirectView adminRedirect() {
+        return new RedirectView("/");
+    }
+    @GetMapping(value="/dashboard")
+    public RedirectView dashboardRedirect() {
+        return new RedirectView("/");
+    }
+    @GetMapping(value="/signup")
+    public RedirectView signupRedirect() {
+        return new RedirectView("/");
+    }
+
 }
 
 

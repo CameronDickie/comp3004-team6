@@ -14,18 +14,25 @@ import com.comp3004.educationmanager.observer.CourseData;
 import com.comp3004.educationmanager.observer.SystemData;
 import com.comp3004.educationmanager.strategy.AddDocumentStrategy;
 import com.comp3004.educationmanager.strategy.CourseContentStrategy;
+import org.aspectj.lang.annotation.After;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Calendar;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+//@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+//@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class SystemFunctionsTest {
     CourseCreator cc = new CourseCreator();
     ProfessorCreator pc = new ProfessorCreator();
@@ -116,4 +123,425 @@ public class SystemFunctionsTest {
         assertNotNull(downloadBytes);
         assertNotNull(viewBytes);
     }
+
+
+//-------------------------------------------------------------------------------------------
+
+    //Test to make sure student can register
+    @Test
+    public void testCourseRegistrationNew() {
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Tuesday");
+        days.add("Thursday");
+
+        Calendar date = Calendar.getInstance();
+        Calendar deadline = Calendar.getInstance();
+
+        //Setting date to January 1st 2021 at 0:00
+        date.set(Calendar.MONTH, Calendar.JANUARY);
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        //Setting last registration date to random date of January 20th
+        deadline.set(Calendar.MONTH, Calendar.JANUARY);
+        deadline.set(Calendar.DAY_OF_MONTH, 20);
+        deadline.set(Calendar.HOUR_OF_DAY, 0);
+        deadline.set(Calendar.MINUTE, 0);
+        deadline.set(Calendar.SECOND, 0);
+        deadline.set(Calendar.MILLISECOND, 0);
+
+        Student student = (Student) sc.createUser("cameronrolfe", "password");
+
+        ArrayList<String> prerequisites = new ArrayList<>();
+
+        CourseData courseData = cc.createCourse("COMP3004A", "Design Patterns", 100, days, "12:30", 1.5, prerequisites);
+
+        assertNotNull(courseData);
+
+        Professor professor = (Professor) pc.createUser("johnsmith", "password");
+
+        courseData.attach(professor);
+
+        int studentRegistrationStatus = student.canStudentRegisterInCourse(courseData, date, deadline);
+
+        assertEquals(studentRegistrationStatus, 0);
+
+        assertEquals(student.getCourses().size(),0);
+
+        student.update("addCourse", courseData);
+
+        assertEquals(student.getCourses().size(), 1);
+
+        assertEquals(courseData.getCurrStudents(), 0);
+
+        courseData.attach(student);
+
+        assertEquals(courseData.getCurrStudents(), 1);
+    }
+
+    //Test to verify that student cannot register past deadline
+    @Test
+    public void testCourseRegistrationPastDeadline() {
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Tuesday");
+        days.add("Thursday");
+
+        Calendar date = Calendar.getInstance();
+        Calendar deadline = Calendar.getInstance();
+
+        //Setting date to January 21st 2021 at 0:00
+        date.set(Calendar.MONTH, Calendar.JANUARY);
+        date.set(Calendar.DAY_OF_MONTH, 21);
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        //Setting last registration date to random date of January 20th
+        deadline.set(Calendar.MONTH, Calendar.JANUARY);
+        deadline.set(Calendar.DAY_OF_MONTH, 20);
+        deadline.set(Calendar.HOUR_OF_DAY, 0);
+        deadline.set(Calendar.MINUTE, 0);
+        deadline.set(Calendar.SECOND, 0);
+        deadline.set(Calendar.MILLISECOND, 0);
+
+        Student student = (Student) sc.createUser("cameronrolfe", "password");
+
+        ArrayList<String> prerequisites = new ArrayList<>();
+
+        CourseData courseData = new CourseData("COMP3004A", "Design Patterns", 100, days, "12:30", 1.5, prerequisites);
+
+        Professor professor = (Professor) pc.createUser("johnsmith", "password");
+
+        courseData.attach(professor);
+
+        int studentRegistrationStatus = student.canStudentRegisterInCourse(courseData, date, deadline);
+
+        assertNotNull(courseData);
+
+        assertEquals(studentRegistrationStatus, 1);
+    }
+
+    //Test to verify that student cannot register in course when it is full
+    @Test
+    public void testCourseRegistrationCourseFull() {
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Tuesday");
+        days.add("Thursday");
+
+        Calendar date = Calendar.getInstance();
+        Calendar deadline = Calendar.getInstance();
+
+        //Setting date to January 1st 2021 at 0:00
+        date.set(Calendar.MONTH, Calendar.JANUARY);
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        //Setting last registration date to random date of January 20th
+        deadline.set(Calendar.MONTH, Calendar.JANUARY);
+        deadline.set(Calendar.DAY_OF_MONTH, 20);
+        deadline.set(Calendar.HOUR_OF_DAY, 0);
+        deadline.set(Calendar.MINUTE, 0);
+        deadline.set(Calendar.SECOND, 0);
+        deadline.set(Calendar.MILLISECOND, 0);
+
+        Student student = (Student) sc.createUser("cameronrolfe", "password");
+        Student student2 = (Student) sc.createUser("cameronrolfe2", "password");
+        Student student3 = (Student) sc.createUser("cameronrolfe3", "password");
+        Student student4 = (Student) sc.createUser("cameronrolfe4", "password");
+
+        ArrayList<String> prerequisites = new ArrayList<>();
+
+        int maxStudents = 3;
+
+        CourseData courseData = cc.createCourse("COMP3004A", "Design Patterns", maxStudents, days, "12:30", 1.5, prerequisites);
+
+        System.out.println(courseData.getCurrStudents());
+
+        assertNotNull(courseData);
+
+        Professor professor = (Professor) pc.createUser("johnsmith", "password");
+
+        courseData.attach(professor);
+
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 0);
+        student.update("addCourse", courseData);
+        courseData.attach(student);
+        assertEquals(student2.canStudentRegisterInCourse(courseData, date, deadline),0);
+        student2.update("addCourse", courseData);
+        courseData.attach(student2);
+        System.out.println(student3.canStudentRegisterInCourse(courseData, date, deadline));
+        assertEquals(student3.canStudentRegisterInCourse(courseData, date, deadline), 0);
+        student3.update("addCourse", courseData);
+        courseData.attach(student3);
+        assertEquals(student4.canStudentRegisterInCourse(courseData, date, deadline), 2);
+    }
+
+    //Test to verify that student cannot register in course when they do not have the prerequisite courses
+    @Test
+    public void testCourseRegistrationStudentDoesNotHavePrerequisites() {
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Tuesday");
+        days.add("Thursday");
+
+        Calendar date = Calendar.getInstance();
+        Calendar deadline = Calendar.getInstance();
+
+        //Setting date to January 1st 2021 at 0:00
+        date.set(Calendar.MONTH, Calendar.JANUARY);
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        //Setting last registration date to random date of January 20th
+        deadline.set(Calendar.MONTH, Calendar.JANUARY);
+        deadline.set(Calendar.DAY_OF_MONTH, 20);
+        deadline.set(Calendar.HOUR_OF_DAY, 0);
+        deadline.set(Calendar.MINUTE, 0);
+        deadline.set(Calendar.SECOND, 0);
+        deadline.set(Calendar.MILLISECOND, 0);
+
+        Student student = (Student) sc.createUser("cameronrolfe", "password");
+
+        ArrayList<String> prerequisites = new ArrayList<>();
+        prerequisites.add("COMP2804");
+
+        CourseData courseData = cc.createCourse("COMP3004A", "Design Patterns", 100, days, "12:30", 1.5, prerequisites);
+
+        assertNotNull(courseData);
+
+        Professor professor = (Professor) pc.createUser("johnsmith", "password");
+
+        courseData.attach(professor);
+
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 3);
+    }
+
+    //Test to verify that student can register in a course they have the prerequisites for
+    @Test
+    public void testCourseRegistrationStudentDoesHavePrerequisites() {
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Tuesday");
+        days.add("Thursday");
+
+        Calendar date = Calendar.getInstance();
+        Calendar deadline = Calendar.getInstance();
+
+        //Setting date to January 1st 2021 at 0:00
+        date.set(Calendar.MONTH, Calendar.JANUARY);
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        //Setting last registration date to random date of January 20th
+        deadline.set(Calendar.MONTH, Calendar.JANUARY);
+        deadline.set(Calendar.DAY_OF_MONTH, 20);
+        deadline.set(Calendar.HOUR_OF_DAY, 0);
+        deadline.set(Calendar.MINUTE, 0);
+        deadline.set(Calendar.SECOND, 0);
+        deadline.set(Calendar.MILLISECOND, 0);
+
+        Student student = (Student) sc.createUser("cameronrolfe", "password");
+        student.addPastCourse("COMP2804");
+
+        ArrayList<String> prerequisites = new ArrayList<>();
+        prerequisites.add("COMP2804");
+
+        CourseData courseData = cc.createCourse("COMP3004A", "Design Patterns", 100, days, "12:30", 1.5, prerequisites);
+
+        assertNotNull(courseData);
+
+        Professor professor = (Professor) pc.createUser("johnsmith", "password");
+
+        courseData.attach(professor);
+
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 0);
+    }
+
+    //Test to verify that student cannot register in a course that would cause timetable conflicts
+    @Test
+    public void testCourseRegistrationTimetableConflict() {
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Tuesday");
+        days.add("Thursday");
+
+        Calendar date = Calendar.getInstance();
+        Calendar deadline = Calendar.getInstance();
+
+        //Setting date to January 1st 2021 at 0:00
+        date.set(Calendar.MONTH, Calendar.JANUARY);
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        //Setting last registration date to random date of January 20th
+        deadline.set(Calendar.MONTH, Calendar.JANUARY);
+        deadline.set(Calendar.DAY_OF_MONTH, 20);
+        deadline.set(Calendar.HOUR_OF_DAY, 0);
+        deadline.set(Calendar.MINUTE, 0);
+        deadline.set(Calendar.SECOND, 0);
+        deadline.set(Calendar.MILLISECOND, 0);
+
+        Student student = (Student) sc.createUser("cameronrolfe", "password");
+        student.addPastCourse("COMP2804");
+
+        ArrayList<String> prerequisites = new ArrayList<>();
+        prerequisites.add("COMP2804");
+
+        CourseData courseData = cc.createCourse("COMP3004A", "Design Patterns", 100, days, "12:30", 1.5, prerequisites);
+
+        assertNotNull(courseData);
+
+        Professor professor = (Professor) pc.createUser("johnsmith", "password");
+
+        courseData.attach(professor);
+
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 0);
+
+        student.update("addCourse", courseData);
+        courseData.attach(student);
+
+        CourseData courseData2 = cc.createCourse("COMP3203A", "Networking", 100, days, "13:00", 1.5, prerequisites);
+
+        CourseData courseData3 = cc.createCourse("COMP3005A", "Databases", 100, days, "11:30", 1.5, prerequisites);
+
+        CourseData courseData4 = cc.createCourse("COMP3203A", "Networking", 100, days, "16:00", 1.5, prerequisites);
+
+        CourseData courseData5 = cc.createCourse("COMP3005B", "Databases", 100, days, "9:00", 1.5, prerequisites);
+
+
+        assertEquals(student.canStudentRegisterInCourse(courseData2, date, deadline), 4);
+        assertEquals(student.canStudentRegisterInCourse(courseData3, date, deadline), 4);
+        assertEquals(student.canStudentRegisterInCourse(courseData4, date, deadline), 0);
+        assertEquals(student.canStudentRegisterInCourse(courseData4, date, deadline),0);
+        assertEquals(student.canStudentRegisterInCourse(courseData5, date, deadline), 0);
+    }
+
+    //Test to verify that student can withdraw from a course when it is before the deadline
+    @Test
+    @Transactional
+    public void testCourseWithdrawal() {
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Tuesday");
+        days.add("Thursday");
+
+        Calendar date = Calendar.getInstance();
+        Calendar deadline = Calendar.getInstance();
+
+        //Setting date to January 1st 2021 at 0:00
+        date.set(Calendar.MONTH, Calendar.JANUARY);
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        //Setting last registration date to random date of January 20th
+        deadline.set(Calendar.MONTH, Calendar.JANUARY);
+        deadline.set(Calendar.DAY_OF_MONTH, 20);
+        deadline.set(Calendar.HOUR_OF_DAY, 0);
+        deadline.set(Calendar.MINUTE, 0);
+        deadline.set(Calendar.SECOND, 0);
+        deadline.set(Calendar.MILLISECOND, 0);
+
+        Student student = (Student) sc.createUser("cameronrolfe", "password");
+        student.addPastCourse("COMP2804");
+
+        ArrayList<String> prerequisites = new ArrayList<>();
+        prerequisites.add("COMP2804");
+
+        CourseData courseData = cc.createCourse("COMP3004A", "Design Patterns", 100, days, "12:30", 1.5, prerequisites);
+
+        assertNotNull(courseData);
+
+        Professor professor = (Professor) pc.createUser("johnsmith", "password");
+
+        courseData.attach(professor);
+
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 0);
+
+        student.update("addCourse", courseData);
+        courseData.attach(student);
+
+        assertEquals(student.getCourses().size(), 1);
+
+
+        assertEquals(courseData.getCurrStudents(), 1);
+
+        assertTrue(student.canStudentWithdraw(date, deadline));
+
+        student.update("deleteCourse", courseData.getCourseCode());
+        courseData.detach(student);
+
+        assertEquals(student.getCourses().size(), 0);
+
+        assertEquals(courseData.getCurrStudents(), 0);
+    }
+
+    //Test to verify that student cannot withdraw from a course when it is past the deadline
+    @Test
+    public void testCourseWithdrawalPastDeadline() {
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Tuesday");
+        days.add("Thursday");
+
+        Calendar date = Calendar.getInstance();
+        Calendar deadline = Calendar.getInstance();
+
+        //Setting date to January 1st 2021 at 0:00
+        date.set(Calendar.MONTH, Calendar.JANUARY);
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        //Setting last registration date to random date of January 20th
+        deadline.set(Calendar.MONTH, Calendar.JANUARY);
+        deadline.set(Calendar.DAY_OF_MONTH, 20);
+        deadline.set(Calendar.HOUR_OF_DAY, 0);
+        deadline.set(Calendar.MINUTE, 0);
+        deadline.set(Calendar.SECOND, 0);
+        deadline.set(Calendar.MILLISECOND, 0);
+
+        Student student = (Student) sc.createUser("cameronrolfe", "password");
+        student.addPastCourse("COMP2804");
+
+        ArrayList<String> prerequisites = new ArrayList<>();
+        prerequisites.add("COMP2804");
+
+        CourseData courseData = cc.createCourse("COMP3004A", "Design Patterns", 100, days, "12:30", 1.5, prerequisites);
+
+        assertNotNull(courseData);
+
+        Professor professor = (Professor) pc.createUser("johnsmith", "password");
+
+        courseData.attach(professor);
+
+        assertEquals(student.canStudentRegisterInCourse(courseData, date, deadline), 0);
+
+        student.update("addCourse", courseData);
+        courseData.attach(student);
+
+        assertEquals(student.getCourses().size(),1);
+
+        assertEquals(courseData.getCurrStudents(), 1);
+
+        date.set(Calendar.DAY_OF_MONTH, 20);
+
+        assertTrue(!student.canStudentWithdraw(date, deadline));
+    }
+
 }

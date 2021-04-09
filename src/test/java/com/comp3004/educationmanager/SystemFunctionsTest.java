@@ -58,13 +58,16 @@ public class SystemFunctionsTest {
     @Test
     @Order(3)
     public void testCourseCreation() {
-//        course = cc.createCourse("COMP3004B", "Design Patterns", 150);
-//        assertNotNull(course);
-//
-//        course.attach(professor);
-//
-//        assertTrue(course.getObservers().size() > 0);
-//        assertTrue(professor.getCourses().size() > 0);
+        ArrayList<String> prereqs = new ArrayList<String>();
+        ArrayList<String> days = new ArrayList<String>();
+        days.add("Monday");
+        course = cc.createCourse("COMP3004B", "Design Patterns", 150, days, "12:00", 1, prereqs);
+        assertNotNull(course);
+
+        course.attach(professor);
+
+        assertTrue(course.getObservers().size() > 0);
+        assertTrue(professor.getCourses().size() > 0);
     }
 
     @Test

@@ -24,38 +24,38 @@ class Dashboard extends React.Component {
             currentCourse: 0,
             whichModal: 0,
             webSocket: null,
-            data: {
-                courses: [
-                    {
-                        name: "Intro to Computer Science",
-                        code: "COMP1001"
-                    },
-                    {
-                        name: "Intro to Mathematics 1",
-                        code: "MATH1001"
-                    },
-                    {
-                        name: "Cognitive Science - Mysteries of the Mind",
-                        code: "CGSC1001"
-                    },
-                    {
-                        name: "Dinosaurs",
-                        code: "ERTH2401"
-                    },
-                    {
-                        name: "Intro to Philosophy",
-                        code: "PHIL1001"
-                    },
-                    {
-                        name: "Intro to Web Development",
-                        code: "COMP2406"
-                    }
-                ]
-            }
+            courses: [
+                {
+                    name: "Intro to Computer Science",
+                    code: "COMP1001"
+                },
+                {
+                    name: "Intro to Mathematics 1",
+                    code: "MATH1001"
+                },
+                {
+                    name: "Cognitive Science - Mysteries of the Mind",
+                    code: "CGSC1001"
+                },
+                {
+                    name: "Dinosaurs",
+                    code: "ERTH2401"
+                },
+                {
+                    name: "Intro to Philosophy",
+                    code: "PHIL1001"
+                },
+                {
+                    name: "Intro to Web Development",
+                    code: "COMP2406"
+                }
+            ]
         }
     }
     componentWillMount() {
-        this.connect();
+        //get this user's courses from the system
+        this.updateCourses();
+        this.connect(); //connecting to the web socket for this user
     }
     connect = () => {
         let ws = new WebSocket('ws://localhost:8080/api/websocket', 'subprotocol.demo.websocket');
@@ -122,6 +122,26 @@ class Dashboard extends React.Component {
     closeModal = () => {
         this.setState({modalOpen: false})
         document.getElementById('myModal').hidden = true
+    }
+    updateCourses = async () => {
+        //make a request to /api/get-user-courses-minimal
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type':'text/html'},
+            body: JSON.stringify(this.props.getUser())
+        }
+
+        await fetch('/api/get-user-courses-minimal', requestOptions)
+            .then(response => response.json())
+            .then(res => {
+                //update our list of courses to be the response
+                if(res.error) {
+                    console.log("error getting this user's course information");
+                    return;
+                }
+                this.setState({courses:res})
+            })
     }
 
     render() {

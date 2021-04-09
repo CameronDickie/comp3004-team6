@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -107,6 +108,10 @@ public class SystemFunctionsTest {
         byte[] viewBytes = (byte[]) test.executeCommand("viewAsPDF", null);
 
         System.out.println("Download: " + downloadBytes + " | View: " + viewBytes);
+
+        //System.out.println(new String(downloadBytes));
+        String encode = Base64.getEncoder().encodeToString(viewBytes);
+        System.out.println(encode);
 
         assertNotNull(downloadBytes);
         assertNotNull(viewBytes);

@@ -21,56 +21,42 @@ class AdminDashboard extends Component {
             whichModal: 0,
             webSocket: null,
             applications: [
+
+            ],
+            courses: [
                 // {
-                //     name: "Jaxson Hood",
-                //     type: "Student Application."
+                //     name: "Intro to Computer Science",
+                //     code: "COMP1001"
                 // },
                 // {
-                //     name: "Cam Dickie",
-                //     type: "Student Application."
+                //     name: "Intro to Mathematics 1",
+                //     code: "MATH1001"
                 // },
                 // {
-                //     name: "Dr. Snooze Warts",
-                //     type: "Professor Application."
+                //     name: "Cognitive Science - Mysteries of the Mind",
+                //     code: "CGSC1001"
                 // },
                 // {
-                //     name: "Professor Blake Walden",
-                //     type: "Professor Application."
+                //     name: "Dinosaurs",
+                //     code: "ERTH2401"
+                // },
+                // {
+                //     name: "Intro to Philosophy",
+                //     code: "PHIL1001"
+                // },
+                // {
+                //     name: "Intro to Web Development",
+                //     code: "COMP2406"
                 // }
             ],
-            data: {
-                courses: [
-                    {
-                        name: "Intro to Computer Science",
-                        code: "COMP1001"
-                    },
-                    {
-                        name: "Intro to Mathematics 1",
-                        code: "MATH1001"
-                    },
-                    {
-                        name: "Cognitive Science - Mysteries of the Mind",
-                        code: "CGSC1001"
-                    },
-                    {
-                        name: "Dinosaurs",
-                        code: "ERTH2401"
-                    },
-                    {
-                        name: "Intro to Philosophy",
-                        code: "PHIL1001"
-                    },
-                    {
-                        name: "Intro to Web Development",
-                        code: "COMP2406"
-                    }
-                ],
-                
-            }
+            professors: [
+
+            ]
         }
     }
     componentDidMount() {
         this.connect();
+
     }
 
     connect = () => {
@@ -81,12 +67,21 @@ class AdminDashboard extends Component {
             console.log('Subprotocol: ' + ws.protocol);
             console.log('Extensions: ' + ws.extensions);
             this.sendUser(ws);
+            this.updateApplications();
+            this.updateCourses();
+            this.updateProfessors();
         }
 
         ws.onmessage = (event) => {
             console.log('Client received: ' + event.data);
             if(event.data == 'get-applications') {
                 this.updateApplications();
+            }
+            if(event.data == 'get-professor') {
+                this.updateProfessors();
+            }
+            if(event.data == 'get-course') {
+                this.updateCourses();
             }
         }
         
@@ -123,7 +118,30 @@ class AdminDashboard extends Component {
         console.log('Client sends: ' + uString);
         ws.send(uString);
     }
+    updateProfessors = async () => {
+        const requestOptions = {
+            method: 'GET',
+            headers: {'Content-Type': 'text/html'},
+        }
 
+        await fetch('/api/get-all-professors', requestOptions)
+            .then(response => response.json())
+            .then(res => {
+                if(res.error) {
+                    console.log("unable to update the list of professors");
+                    return;
+                }
+                console.log(res);
+                let formattedList = [];
+                for(let i in res) {
+                    let formatted = {};
+                    formatted.name = res[i].name;
+                    formatted.id = res[i].id;
+                    formattedList.push(formatted);
+                }
+                this.setState({professors: formattedList});
+            })
+    }
     updateApplications = async () => {
         if(this.state.webSocket == null) {
             console.log("no socket connection found");
@@ -147,10 +165,7 @@ class AdminDashboard extends Component {
                     formatted[i].name = formatted[i].firstname + " " + formatted[i].lastname
                     delete formatted[i].firstname;
                     delete formatted[i].lastname;
-                }
-
-                console.log(formatted)
-                
+                }                
                 //Set local state so render gets called
                 this.setState({applications: formatted})
             })
@@ -160,15 +175,32 @@ class AdminDashboard extends Component {
         this.setState({page: pageName});
     }
 
+    updateCourses = async () => {
+        //make a request to /api/get-user-courses-minimal
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type':'text/html'},
+            body: JSON.stringify(this.props.getUser())
+        }
+
+        await fetch('/api/get-user-courses-minimal', requestOptions)
+            .then(response => response.json())
+            .then(res => {
+                //update our list of courses to be the response
+                if(res.error) {
+                    console.log("error getting this user's course information");
+                    return;
+                }
+                console.log(res);
+                this.setState({courses:res})
+            })
+    }
+
+
     render() {
 
         let u = this.props.getUser();
-
-        // if (u.username == null){
-        //     return (
-        //         <Redirect to="/"></Redirect>
-        //     )
-        // }
 
         if (this.state.page == "logout"){
 
@@ -208,7 +240,14 @@ class AdminDashboard extends Component {
                                 </div>
                             </div>
                             <div className={`${(this.state.page == "dashboard") ? "" : "hidden"}`}>
-                                <AdminMainSection app={this} updateApplications={this.updateApplications} applications={this.state.applications} />
+                                <AdminMainSection 
+                                    app={this} 
+                                    updateApplications={this.updateApplications} 
+                                    updateCourses={this.updateCourses} 
+                                    updateProfessors={this.updateProfessors} 
+                                    courses={this.state.courses} 
+                                    applications={this.state.applications} 
+                                    professors={this.state.professors} />
                             </div>
                         </div>
                         

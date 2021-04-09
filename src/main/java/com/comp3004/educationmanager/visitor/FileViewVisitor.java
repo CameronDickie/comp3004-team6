@@ -33,9 +33,9 @@ public class FileViewVisitor implements FileVisitor {
             InputStream docStream = new ByteArrayInputStream(file.getBytes());
             XWPFDocument doc = new XWPFDocument(docStream);
             PdfOptions options = PdfOptions.getDefault();
-            ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+            OutputStream byteStream = new ByteArrayOutputStream();
             PdfConverter.getInstance().convert(doc, byteStream, options);
-            return byteStream.toByteArray();
+            return ((ByteArrayOutputStream) byteStream).toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
             return null;

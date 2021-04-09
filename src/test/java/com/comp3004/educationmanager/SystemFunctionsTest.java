@@ -31,8 +31,7 @@ import java.util.Calendar;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@Transactional(propagation = Propagation.REQUIRES_NEW)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SystemFunctionsTest {
     CourseCreator cc = new CourseCreator();
     ProfessorCreator pc = new ProfessorCreator();

@@ -39,17 +39,12 @@ public class EditableDecorator extends Decorator {
 
     @Override
     public Object executeCommand(String command, Object value) {
-        System.out.println("Editable: " + getProperty("fullPath") + " | " + command + " | " + value);
-        // System.out.println("Executing command (editable): " + command);
         if(command.equals("findByPath")) {
             Component c = (Component) wrappee.executeCommand(command, value);
             if(c != null) {
-                System.out.println("EDITABLE: " + c.getProperty("fullPath") + " | " + getProperty("fullPath"));
                 if(((String) c.getProperty("fullPath")).equals((String) getProperty("fullPath"))) {
-                    System.out.println("returning decorator");
                     return this;
                 } else if(((String) c.getProperty("fullPath")).equals((String) value)) {
-                    System.out.println("returning wrappee return");
                     return c;
                 }
             }

@@ -1,5 +1,4 @@
 package com.comp3004.educationmanager.visitor;
-
 public class PDF implements FileInterface {
     private byte[] bytes;
 
@@ -18,3 +17,4 @@ public class PDF implements FileInterface {
         return bytes;
     }
 }
+

@@ -41,8 +41,6 @@ public class FileDecorator extends Decorator {
 
     @Override
     public Object executeCommand(String command, Object value) {
-        System.out.println("File: " + getProperty("fullPath") + " | " + command + " | " + value);
-        // System.out.println("Executing command (file): " + command);
         if(command.equals("download")) {
             return file.accept(new FileDownloadVisitor());
         } else if(command.equals("viewAsPDF")) {
@@ -50,12 +48,9 @@ public class FileDecorator extends Decorator {
         } else if(command.equals("findByPath")) {
             Component c = (Component) wrappee.executeCommand(command, value);
             if(c != null) {
-                System.out.println("FILE: " + c.getProperty("fullPath") + " | " + getProperty("fullPath"));
                 if(((String) c.getProperty("fullPath")).equals((String) getProperty("fullPath"))) {
-                    System.out.println("returning decorator");
                     return this;
                 } else if(((String) c.getProperty("fullPath")).equals((String) value)) {
-                    System.out.println("returning wrappee return");
                     return c;
                 }
             }

@@ -82,7 +82,7 @@ public class ServerState {
         }
         return res;
     }
-    public boolean createUserFromApplication(Application a) {
+    public User createUserFromApplication(Application a) {
         User newUser;
         if(a.getType().equals("student")) {
             newUser = new StudentCreator().createUser(a.getFirstname().toLowerCase() + a.getLastname().toLowerCase(), a.getPassword());
@@ -91,9 +91,14 @@ public class ServerState {
         } else {
             newUser = null;
             System.out.println("Failed to make user from application form");
-            return false;
+            return null;
         }
-        return createUser(newUser);
+        boolean res = createUser(newUser);
+        if(res) {
+            return newUser;
+        } else {
+            return null;
+        }
     }
     public void print() {
         db.print();

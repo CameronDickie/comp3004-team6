@@ -39,6 +39,17 @@ public class Student extends User {
 //            }
         } else if(command.equals("addCourse")) {
             addCourse((CourseData) value);
+        } else if(command.equals("get-courses")) {
+            TextMessage message = new TextMessage("get-courses");
+            try {
+                if(this.getSocketConnection() != null) {
+                    this.getSocketConnection().sendMessage(message);
+                } else {
+                    System.out.println("Unable to connect to student");
+                }
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
         }
         //session.sendMessage(); //get new courses
     }

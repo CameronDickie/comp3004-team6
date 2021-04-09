@@ -5,14 +5,18 @@ import React, { Component } from "react";
 class FullScreenRegisterModal extends Component{
     constructor(props) {
         super(props);
+        
     }
 
+    
+
+    
     render(){
 
         let cards = []
 
-        for (let i in this.props.dashboard.state.data.courses){
-            let c = this.props.dashboard.state.data.courses[i]
+        for (let i in this.props.globalCourses){
+            let c = this.props.globalCourses[i]
 
             cards.push(
                <div className="p-2">

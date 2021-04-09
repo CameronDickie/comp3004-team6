@@ -24,30 +24,7 @@ class AdminDashboard extends Component {
 
             ],
             courses: [
-                // {
-                //     name: "Intro to Computer Science",
-                //     code: "COMP1001"
-                // },
-                // {
-                //     name: "Intro to Mathematics 1",
-                //     code: "MATH1001"
-                // },
-                // {
-                //     name: "Cognitive Science - Mysteries of the Mind",
-                //     code: "CGSC1001"
-                // },
-                // {
-                //     name: "Dinosaurs",
-                //     code: "ERTH2401"
-                // },
-                // {
-                //     name: "Intro to Philosophy",
-                //     code: "PHIL1001"
-                // },
-                // {
-                //     name: "Intro to Web Development",
-                //     code: "COMP2406"
-                // }
+                
             ],
             professors: [
 

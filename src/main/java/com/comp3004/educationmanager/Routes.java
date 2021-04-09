@@ -176,8 +176,11 @@ public class Routes {
 
         SystemData.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
 
-        //call SystemData.updateAll
+        professor.addCourse(courseData); //giving this professor the course in their list of courses
+        //inform the admin user that their list of courses must be updated
         data.updateAll("get-courses", courseData);
+        //inform all users associated with this course (currently just the professor) that they need to update their courses
+        courseData.updateAll("get-courses", courseData);
 
          String jsonReturn = "{success:'";
         jsonReturn+= courseCode + " has been created'}";
@@ -346,9 +349,10 @@ public class Routes {
         //get the user in SystemData with this information
         User curUser = null;
         for(User u : SystemData.users.values()) {
-            if(userMap.get("username").equals(u.getName()) && userMap.get("id").equals(u.getUserId())) {
+            if(userMap.get("username").equals(u.getName()) && Long.valueOf((Integer)userMap.get("id"))==u.getUserId()) {
                 //we know this is the user we are interested in for their courses
                 curUser = u;
+                break;
             }
         }
         //if curUser is still null, we need to see if the information matches the admin's
@@ -367,7 +371,6 @@ public class Routes {
         //we now have the user, and must collect all of their courses. if it is the admin, return a list of all courses in the system
         ArrayList<HashMap<String, String>> courseInfo = new ArrayList<>();
         if(curUser instanceof Admin) {
-            System.out.println();
             // return a list of all courses' information
             for(CourseData c : SystemData.courses.values()) {
                 //append a string with courseCode, courseName and id to the courseInfo string
@@ -407,6 +410,69 @@ public class Routes {
         HashMap<String, String> errMsg = new HashMap<>();
         errMsg.put("error", "unable to query this users' courses");
         return Helper.objectToJSONString(errMsg);
+    }
+
+    @PostMapping(value="/api/get-global-courses", consumes=MediaType.TEXT_HTML_VALUE, produces=MediaType.TEXT_HTML_VALUE)
+    public String getGlobalCourses(@RequestBody String userInfo) {
+        //this function is meant to provide a student with a list of courses from which they can register in
+        //we must filter the list of global courses with courses that they are already registered in
+
+        HashMap<String, Object> userMap = Helper.stringToMap(userInfo);
+        User curUser = null;
+        //find the user with this information
+        for(User u : SystemData.users.values()) {
+            if(userMap.get("username").equals(u.getName()) && Long.valueOf((Integer)userMap.get("id"))==u.getUserId()) {
+                //this is the student we are looking for
+                curUser = u;
+                break;
+            }
+        }
+        if(curUser == null) {
+            System.out.println("Error finding the user with this information");
+            HashMap<String, String> err = new HashMap<>();
+            err.put("error", "Could not find the user with this information");
+            return Helper.objectToJSONString(err);
+        }
+        if(curUser instanceof Student) {
+            Student curStudent = (Student) curUser;
+            ArrayList<HashMap<String, String>> global = new ArrayList<>();
+            //search through all of the available courses and if curStudent.courses does not contain this, add it to a new hashmap
+            for(CourseData c : SystemData.courses.values()) {
+                boolean alreadyRegistered = false;
+                for(CourseData sc: curStudent.getCourses().values()) {
+                    if(c.getCourseID() == sc.getCourseID()) {
+                        alreadyRegistered = true;
+                    }
+                }
+                if(!alreadyRegistered) {
+                    HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
+                    thisCourseInfo.put("code", c.getCourseCode());
+                    thisCourseInfo.put("name", c.getCourseName());
+                    thisCourseInfo.put("id", String.valueOf(c.getCourseID()));
+                    global.add(thisCourseInfo);
+                }
+            }
+            return Helper.objectToJSONString(global);
+        } else if(curUser instanceof Professor) {
+            //we do not need to see if this professor is registed in a course, as they will not be registering from here
+            ArrayList<HashMap<String, String>> global = new ArrayList<>();
+
+            for(CourseData c : SystemData.courses.values()) {
+                HashMap<String, String> thisCourseInfo = new HashMap<>();
+                thisCourseInfo.put("code", c.getCourseCode());
+                thisCourseInfo.put("name", c.getCourseName());
+                thisCourseInfo.put("id", String.valueOf(c.getCourseID()));
+                global.add(thisCourseInfo);
+            }
+
+            return Helper.objectToJSONString(global);
+        } else {
+            //this user is not a student or a professor... return an error
+            HashMap<String, String> err = new HashMap<>();
+            err.put("error", "Could not recognize the type of user sending the information");
+            return Helper.objectToJSONString(err);
+        }
+
     }
 
     /*
@@ -578,8 +644,24 @@ public class Routes {
             if(names[0].equals(pending.get(i).getFirstname()) && names[1].equals(pending.get(i).getLastname()) && appinfo.get("type").equals(pending.get(i).getType())) {
                 //this is the application we are looking for. Create a user from this application, and end the request
                 Application thisApplication = SystemData.admin.getApplications().get(i);
-                s.createUserFromApplication(thisApplication);
+                User newUser = s.createUserFromApplication(thisApplication);
                 SystemData.admin.getApplications().remove(i);
+                if(newUser == null) {
+                    System.out.println("error creating user");
+                    HashMap<String, String> err = new HashMap<>();
+                    err.put("error", "unable to create the user from this application");
+                    return Helper.objectToJSONString(err);
+                }
+                if(newUser instanceof Student) {
+                    SystemData.users.put(((Student) newUser).getStudentID(), newUser);
+                } else if(newUser instanceof Professor) {
+                    SystemData.users.put(((Professor) newUser).getProfessorID(), newUser);
+                } else {
+                    System.out.println("error inserting user");
+                    HashMap<String, String> err = new HashMap<>();
+                    err.put("error", "unable to create the user from this application and put them in the list of users... maybe this user already exists?");
+                    return Helper.objectToJSONString(err);
+                }
                 data.updateAll("application", thisApplication);
                 if(appinfo.get("type").equals("professor")) {
                     data.updateAll("get-professor", null);

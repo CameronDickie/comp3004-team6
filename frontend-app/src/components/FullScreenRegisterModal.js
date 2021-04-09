@@ -14,9 +14,8 @@ class FullScreenRegisterModal extends Component{
     render(){
 
         let cards = []
-        console.log(this.props.courses)
+
         for (let i in this.props.courses){
-            
             let c = this.props.courses[i]
 
             cards.push(

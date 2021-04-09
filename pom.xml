@@ -56,7 +56,6 @@
         </dependency>
 
 
-
         <!-- https://mvnrepository.com/artifact/fr.opensagres.xdocreport/org.apache.poi.xwpf.converter.pdf -->
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>

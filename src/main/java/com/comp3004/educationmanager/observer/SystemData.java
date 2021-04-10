@@ -50,7 +50,7 @@ public class SystemData extends Subject {
                 e.printStackTrace(System.out);
             }
         } else if(command.equals("get-courses")) {
-            TextMessage message = new TextMessage("get-course");
+            TextMessage message = new TextMessage("get-courses");
             try {
                 if(admin == null || admin.getSocketConnection() == null || !admin.getSocketConnection().isOpen()) {
                     System.out.println("Unable to connect to admin");

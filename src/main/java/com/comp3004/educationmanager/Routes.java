@@ -303,13 +303,15 @@ public class Routes {
 
         if (student.canStudentWithdraw(s.date, s.deadline)) {
             courseData.detach(student);//Detach student from course
+//            courseData.updateAll("get-courses", student.getStudentID()); //inform all other users that they need to
             student.update("deleteCourse", courseData.getCourseCode());
+            student.update("get-courses", student.getStudentID());
             System.out.println(student.getCourses());
             String jsonReturn = "{success:'Student has successfully withdrawn from the course " + courseData.getCourseCode() + "'}";
             return jsonReturn;
         }
         else {
-            courseData.attach(student);
+//            courseData.attach(student);
             String jsonReturn = "{error:'Student cannot withdraw as the withdraw deadline has past " + courseData.getCourseCode() + "'}";
             return jsonReturn;
         }
@@ -462,7 +464,6 @@ public class Routes {
                     }
                 }
                 if(!alreadyRegistered) {
-                    System.out.println(c.getCourseCode());
                     HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
                     thisCourseInfo.put("code", c.getCourseCode());
                     thisCourseInfo.put("name", c.getCourseName());

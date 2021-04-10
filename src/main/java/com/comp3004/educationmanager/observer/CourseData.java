@@ -12,29 +12,21 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 public class CourseData extends Subject implements java.io.Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    protected long id;
+    protected static long id = 0;
 
-    @Column(name = "courseCode")
+    long localID;
+
     String courseCode;
 
-    @Column(name = "courseName")
     String courseName;
 
-    @Column(name = "maxStudents")
     int maxStudents;
 
-    @Column(name = "object")
-    @Lob
     byte[] object;
 
-    @Transient
     Component content;
 
-    @Transient
     Strategy strategy;
 
     int currStudents = 0;
@@ -53,6 +45,8 @@ public class CourseData extends Subject implements java.io.Serializable {
         this.courseName = "Course Placeholder";
         this.maxStudents = 0;
         this.content = new CourseContent(this.courseCode, "/", "section");
+        this.localID = id;
+        id++;
     }
 
     public CourseData(String courseCode, String courseName, int maxStudents, ArrayList<String>days, String startTime, double classDuration, ArrayList<String> prerequisites) {
@@ -65,6 +59,8 @@ public class CourseData extends Subject implements java.io.Serializable {
         this.startTime = startTime;
         this.classDuration = classDuration;
         this.prerequisites = prerequisites;
+        this.localID = id;
+        id++;
     }
 
     /*
@@ -119,7 +115,7 @@ public class CourseData extends Subject implements java.io.Serializable {
     Getters
      */
 
-    public Long getCourseID() { return this.id; }
+    public Long getCourseID() { return this.localID; }
 
     public String getCourseCode() {
         return this.courseCode;

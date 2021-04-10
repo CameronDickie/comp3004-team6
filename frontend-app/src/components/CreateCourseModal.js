@@ -10,11 +10,11 @@ class CreateCourseModal extends Component{
             cool: true,
             course_code: "",
             course_name: "",
-            num_of_students: 1,
+            num_of_students: "1",
             professor_name: "",
             professor_id: "",
-            start_time: "",
-            class_duration: 0,
+            start_time: "8:00",
+            class_duration: "1",
             daysChoosen: {
                 'monday': false,
                 'tuesday': false,
@@ -38,12 +38,27 @@ class CreateCourseModal extends Component{
                 this.doSubmit();
             })
         } else {
+            //checking if a course code has been provided
+            if(this.state.course_code == "") {
+                alert("You must provide a course code for this course");
+                return;
+            }
+            //checking if a course name has been provided
+            if(this.state.course_name == "") {
+                alert("You must provide a name for this course")
+                return;
+            }
             let _choose_days = []
 
             for (let d in this.state.daysChoosen){
                 if (this.state.daysChoosen[d]){
                     _choose_days.push(d);
                 }
+            }
+            //checking if there are days assigned to the course
+            if(_choose_days.length == 0) {
+                alert("You must provide days this course takes place on.");
+                return;
             }
 
             const requestOptions = {
@@ -61,7 +76,6 @@ class CreateCourseModal extends Component{
                     classDuration: this.state.class_duration,
                 })
             };
-            console.log(requestOptions.body);
             await fetch('/api/create-course', requestOptions)
                 .then(response => response.text())
                 .then(res => {

@@ -112,8 +112,6 @@ public class ServerState {
     public void createCourse(CourseData courseData) { SystemData.courses.put(courseData.getCourseCode(), courseData); }
     public CourseData getCourseData(String courseCode) { return SystemData.courses.get(courseCode); }
 
-    public boolean deleteCourse(String courseCode) {return db.deleteCourseData(courseCode);}
-
 
 
 }

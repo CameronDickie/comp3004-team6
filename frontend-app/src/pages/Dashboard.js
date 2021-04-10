@@ -144,11 +144,8 @@ class Dashboard extends React.Component {
                     console.log("unable to update the list of courses in the system");
                     return;
                 }
-                
-                this.setState({globalCourses: res}, () => {
-                    console.log(this.state.globalCourses);
-
-                });
+                console.log("response from global courses: " + res);
+                this.setState({globalCourses: res});
             })
     }
     registerInCourse = async (cid) => {
@@ -166,13 +163,9 @@ class Dashboard extends React.Component {
         }
         console.log('sending registration request for' + cid);
         await fetch ('/api/course-registration', requestOptions)
-            .then (response => response.json())
+            .then (response => response.text())
             .then (res => {
-                if(res.error) {
-                    console.log("error in registration process: " + res.error);
-                    return;
-                }
-                alert(res.success)
+                alert(res)
                 this.setState({modalOpen: false})
             })
     }

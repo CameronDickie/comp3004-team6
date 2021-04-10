@@ -30,7 +30,7 @@ public class SystemData extends Subject {
             //send the message via web socket to the front-end
             TextMessage message = new TextMessage("get-applications");
             try {
-                if(admin == null || admin.getSocketConnection() == null) {
+                if(admin == null || admin.getSocketConnection() == null || !admin.getSocketConnection().isOpen()) {
                     System.out.println("Unable to connect to admin");
                     return;
                 }
@@ -41,7 +41,7 @@ public class SystemData extends Subject {
         } else if(command.equals("get-professor")) {
             TextMessage message = new TextMessage("get-professor");
             try {
-                if(admin == null || admin.getSocketConnection() == null) {
+                if(admin == null || admin.getSocketConnection() == null || !admin.getSocketConnection().isOpen()) {
                     System.out.println("Unable to connect to admin");
                     return;
                 }
@@ -52,7 +52,7 @@ public class SystemData extends Subject {
         } else if(command.equals("get-courses")) {
             TextMessage message = new TextMessage("get-course");
             try {
-                if(admin == null || admin.getSocketConnection() == null) {
+                if(admin == null || admin.getSocketConnection() == null || !admin.getSocketConnection().isOpen()) {
                     System.out.println("Unable to connect to admin");
                     return;
                 }

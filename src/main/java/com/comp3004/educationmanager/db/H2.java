@@ -27,25 +27,8 @@ public class H2 implements Database {
     @Autowired
     ProfessorRepository pr;
 
-    @Autowired
-    CourseRepository cr;
-
     public H2() {
 
-    }
-    @PostConstruct
-    @Override
-    public void initialize() {
-        //create the admin user and add them to the database
-//        AdminCreator factory = new AdminCreator();
-//        Admin admin = (Admin) factory.createUser("admin", "pass");
-//        if (addUser(admin)) {
-//            System.out.println("admin user added to the db");
-//            SystemData.admin = admin;
-//        } else {
-//            System.out.println("admin has failed to be created");
-//        }
-//        this.printAdmin();
     }
 
     @Override
@@ -77,6 +60,7 @@ public class H2 implements Database {
         printProfessors();
 
     }
+
     public void printAdmin() {
         List<Admin> admins = ar.findAll();
         for(Admin a : admins)
@@ -91,32 +75,6 @@ public class H2 implements Database {
         List<Professor> profs = pr.findAll();
         for(Professor p : profs)
             System.out.println(p.getUserId() + " | " + p.getName() + " | " + p.getPassword());
-    }
-
-    @Override
-    public boolean addCourseData(CourseData courseData) {
-
-        cr.save(courseData);
-        return true;
-    }
-
-    @Override
-    public boolean deleteCourseData(String courseCode) {
-
-        CourseData courseData = cr.findByCourseCode(courseCode);
-
-        System.out.println(courseData.getMaxStudents());
-
-        System.out.println("Max Students: " + courseData.getMaxStudents());
-
-        cr.delete(courseData);
-        return true;
-    }
-
-    @Override
-    public CourseData getCourseData(String courseCode) {
-        CourseData data = cr.findByCourseCode(courseCode);
-        return data;
     }
 
     public User getUser(String username){

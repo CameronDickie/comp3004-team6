@@ -31,7 +31,7 @@ public class Professor extends User {
         } else if(command.equals("get-courses")) {
             TextMessage message = new TextMessage("get-courses");
             try {
-                if(this.getSocketConnection() != null) {
+                if(this.getSocketConnection() != null && this.getSocketConnection().isOpen()) {
                     this.getSocketConnection().sendMessage(message);
                 } else {
                     System.out.println("Unable to connect to professor");

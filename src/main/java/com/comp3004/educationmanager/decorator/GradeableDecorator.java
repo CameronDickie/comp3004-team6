@@ -1,5 +1,6 @@
 package com.comp3004.educationmanager.decorator;
 
+import com.comp3004.educationmanager.Helper;
 import com.comp3004.educationmanager.composite.Component;
 
 /*
@@ -25,9 +26,6 @@ public class GradeableDecorator extends Decorator {
         if(property.equals("grade")) {
             grade = (Float) value;
             return true;
-        } else if(property.equals("visible")) {
-            visible = (Boolean) value;
-            return true;
         } else {
             return wrappee.setProperty(property, value);
         }
@@ -37,8 +35,6 @@ public class GradeableDecorator extends Decorator {
     public Object getProperty(String property) {
         if(property.equals("grade")) {
             return grade;
-        } else if(property.equals("visible")) {
-            return visible;
         } else {
             return wrappee.getProperty(property);
         }
@@ -46,6 +42,20 @@ public class GradeableDecorator extends Decorator {
 
     @Override
     public Object executeCommand(String command, Object value) {
-        return wrappee.executeCommand(command, value);
+        if(command.equals("findByPath")) {
+            Component c = (Component) wrappee.executeCommand(command, value);
+            if(c != null) {
+                if(((String) c.getProperty("fullPath")).equals((String) getProperty("fullPath"))) {
+                    return this;
+                } else if(((String) c.getProperty("fullPath")).equals((String) value)) {
+                    return c;
+                }
+            }
+            return null;
+        }  else if(command.equals("stringify")) {
+            return Helper.objectToJSONString(this);
+        } else {
+            return wrappee.executeCommand(command, value);
+        }
     }
 }

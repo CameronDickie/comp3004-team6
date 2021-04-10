@@ -7,16 +7,8 @@ import com.comp3004.educationmanager.decorator.FileDecorator;
 
 public class AddDocumentStrategy implements Strategy {
     @Override
-    public Component createCourseItem(String name, String path, String type) {
-        Component content = new CourseItem(name, path, type);
-        content = new FileDecorator(content);
-        content = new EditableDecorator(content);
-        return content;
-    }
-
-    @Override
-    public Component createCourseItem(String name, String path, String type, boolean visible) {
-        Component content = new CourseItem(name, path, type, visible);
+    public Component createCourseItem(String name, String path, String type, long userID, String userType, boolean visible) {
+        Component content = new CourseItem(name, path, type, userID, userType, visible);
         content = new FileDecorator(content);
         content = new EditableDecorator(content);
         return content;

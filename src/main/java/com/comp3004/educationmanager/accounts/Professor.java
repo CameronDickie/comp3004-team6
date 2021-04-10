@@ -26,6 +26,16 @@ public class Professor extends User {
         if (command.equals("deleteCourse")) {
             String courseCode = (String) value;
             courses.remove(courseCode);
+            try {
+                TextMessage change = new TextMessage("get-courses");
+                if(this.getSocketConnection() == null || !this.getSocketConnection().isOpen()) {
+                    System.out.println("Unable to connect to the professor");
+                    return;
+                }
+                this.socketConnection.sendMessage(change); //change should consist of courses
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
         } else if(command.equals("addCourse")) {
             addCourse((CourseData) value);
         } else if(command.equals("get-courses")) {

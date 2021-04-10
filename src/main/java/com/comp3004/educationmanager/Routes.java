@@ -81,6 +81,48 @@ public class Routes {
         return info + " has attempted to be registered... waiting for permission from the admin";
     }
 
+    /*
+    Allows the admin to force the creation of a new user with provided prerequisites
+    Parameters
+        (String) firstname: The first name of the new user,
+        (String) lastname: The last name of the new user,
+        (String) password: The password to be used by this new user,
+        (ArrayList<String>): A list of the courseCodes that will be the past courses of this user
+     */
+    @PostMapping(value="/api/register-user-prerequisites", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String registerWithPrerequisites(@RequestBody String userInfo) {
+
+        HashMap<String, Object> userMap = Helper.stringToMap(userInfo);
+        if(userMap.get("firstname") == null || userMap.get("lastname") == null || userMap.get("password") == null) {
+            HashMap<String, String> response = new HashMap<>();
+            response.put("error", "user is missing required fields");
+            return Helper.objectToJSONString(response);
+        }
+        Student st = (Student) studentCreator.createUser(((String) userMap.get("firstname")).toLowerCase() + ((String) userMap.get("lastname")).toLowerCase(), (String) userMap.get("password"));
+        ArrayList<String> thisUserPastCourses = (ArrayList<String>) userMap.get("prerequisites");
+
+        if(thisUserPastCourses.size() > 0) {
+            //add all of the past courses courseCode to this student
+            for(String cid : thisUserPastCourses) {
+                //ensure that the course indeed exists
+                if(!SystemData.courses.containsKey(cid)) {
+                    System.out.println("Unable to add the course " + cid + " as we could not find it in the system");
+                } else {
+                    st.addPastCourse(cid);
+                }
+            }
+        }
+        //attach this new user to the placeholder course
+        CourseData placeholder = SystemData.courses.get("COUR1234A");
+        placeholder.attach(st);
+
+        //add this user to the system
+        s.createUser(st);
+        HashMap<String, String> response = new HashMap<>();
+        response.put("success", "user has been added");
+        System.out.println(SystemData.users);
+        return Helper.objectToJSONString(response);
+    }
 
     @PostMapping(value = "/api/login", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String login(@RequestBody String userinfo) {
@@ -193,7 +235,7 @@ public class Routes {
         //Calling updateAll with command deleteCourse on all observers for courseData
         //This will remove the course from the course list stored within the class
         SystemData.courses.get(courseCode).updateAll("deleteCourse", courseCode);
-
+        data.updateAll("get-courses", courseCode);
         //Removing course from list of courses
         SystemData.courses.remove(courseCode);
 

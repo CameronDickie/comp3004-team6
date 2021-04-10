@@ -8,9 +8,11 @@ import {
     faHome, 
     faPen,
     faCheck,
-    faTimes,} from '@fortawesome/free-solid-svg-icons'
+    faTimes,
+    faTrash,} from '@fortawesome/free-solid-svg-icons'
 
 import CreateCourseModal from "../components/CreateCourseModal";
+import AdminCreateUserModal from "../components/AdminCreateUserModal";
 
 class AdminMainSection extends Component{
 
@@ -20,6 +22,7 @@ class AdminMainSection extends Component{
         this.state = {
             data: this.props.app.state.data,
             modalOpen: false,
+            userModalOpen: false
         }
     }
 
@@ -90,14 +93,19 @@ class AdminMainSection extends Component{
                          <div className="p-1 pl-2 font-semibold text-xl">{course.code}</div>
                          <div className="pl-2 text-kg">{course.name}</div>
                      </div>
+                     
                      <div>
                          <div class="text-center leading-none flex justify-between w-full">
                              <span class=" mr-3 inline-flex items-center leading-none text-sm  py-1 ">
                                  <button className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Edit<FontAwesomeIcon className="ml-2 text-yellow-500" size="lg" icon={faPen}/></button>
                              </span>
-                             <span class=" inline-flex items-center leading-none text-sm pl-28">
+                             <span class="mr-3 inline-flex items-center leading-none text-sm  py-1">
+                                <button onClick={() => {this.props.deleteCourse(course.code)}} className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Delete<FontAwesomeIcon className="ml-2 text-red-500" size="lg" icon={faTrash}/></button>
+                             </span>
+                             <span class=" inline-flex items-center leading-none text-sm pl-16">
                                  <button className="text-md font-semibold hover:underline">View</button>
                              </span>
+                             
                          </div>
                      </div>
                  </div>
@@ -133,6 +141,9 @@ class AdminMainSection extends Component{
         this.setState({modalOpen: !this.state.modalOpen})
     }
 
+    toggleCreateUserModal = () => {
+        this.setState({userModalOpen: !this.state.userModalOpen})
+    }
     render() {
         return (
             <div class="flex flex-col mx-20 mt-12 max-w-8xl h-full">
@@ -145,8 +156,12 @@ class AdminMainSection extends Component{
                                         <div className="text-5xl font-semibold font-mono text-gray-900 italic">COURSES:</div>
                                     </div>
                                     <div className="col-start-9 col-end-13">
+                                    <div className="flex justify-end pr-4">
+                                            <button onClick={this.toggleCreateUserModal} className="bg-white border-gray-800 ml-1 px-3 py-3 border-2 rounded-md font-bold shadow-md hover:shadow-lg">Create User
+                                            <FontAwesomeIcon className="ml-2 text-green-500" size="lg" icon={faPlus}/></button>
+                                        </div>
                                         <div className="flex justify-end pr-4">
-                                            <button onClick={this.toggleCreateCourseModal} className="bg-white border-gray-800 ml-1 px-3 py-3 border-2 rounded-md font-bold shadow-md hover:shadow-lg">Create Course
+                                            <button onClick={this.toggleCreateUserModal} className="bg-white border-gray-800 ml-1 px-3 py-3 border-2 rounded-md font-bold shadow-md hover:shadow-lg">Create Course
                                             <FontAwesomeIcon className="ml-2 text-green-500" size="lg" icon={faPlus}/></button>
                                         </div>
                                     </div>
@@ -175,6 +190,7 @@ class AdminMainSection extends Component{
                     </div>
 
                     <CreateCourseModal show={this.state.modalOpen} professors={this.props.professors} hide={this.toggleCreateCourseModal} courses={this.props.courses}/>
+                    <AdminCreateUserModal show={this.state.userModalOpen} hide={this.toggleCreateUserModal} courses={this.props.courses}/>
             </div>
             )
     }

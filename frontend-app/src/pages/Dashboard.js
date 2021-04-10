@@ -144,11 +144,8 @@ class Dashboard extends React.Component {
                     console.log("unable to update the list of courses in the system");
                     return;
                 }
-                
-                this.setState({globalCourses: res}, () => {
-                    console.log(this.state.globalCourses);
-
-                });
+                console.log("response from global courses: " + res);
+                this.setState({globalCourses: res});
             })
     }
     registerInCourse = async (cid) => {

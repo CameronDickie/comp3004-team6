@@ -254,7 +254,6 @@ public class Routes {
         if (studentRegistrationStatus == 0) {
             courseData.attach(student);
             courseData.updateAll("get-courses", courseData);
-//            student.update("addCourse", courseData);
             jsonReturn = "{success:'";
             jsonReturn+= "Student has successfully registered in course " + courseData.getCourseCode() + "'}";
         }
@@ -458,11 +457,12 @@ public class Routes {
             for(CourseData c : SystemData.courses.values()) {
                 boolean alreadyRegistered = false;
                 for(CourseData sc: curStudent.getCourses().values()) {
-                    if(c.getCourseID() == sc.getCourseID()) {
+                    if(c.getCourseID().equals(sc.getCourseID())) {
                         alreadyRegistered = true;
                     }
                 }
                 if(!alreadyRegistered) {
+                    System.out.println(c.getCourseCode());
                     HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
                     thisCourseInfo.put("code", c.getCourseCode());
                     thisCourseInfo.put("name", c.getCourseName());

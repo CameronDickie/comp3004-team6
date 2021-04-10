@@ -46,9 +46,9 @@
 									{
 										"wrappee": {
 											"wrappee": {
-												"name": "Document 2",
+												"name": "PowerPoint 1",
 												"path": "/COMP3004B/Week 1/Lecture 1/",
-												"type": "PDF",
+												"type": "PPTX",
 												"visible": true
 											},
 											"bytes": "ASDSDFASD"
@@ -95,15 +95,15 @@
 												"name": "Student Submissions",
 												"path": "/COMP3004B/Week 2/Assignment 1/",
 												"type": "default",
-												"visible": false,
+												"visible": true,
 												"children": [
 													{
 														"wrappee": {
 															"wrappee": {
-																"name": "Student Submission 1",
+																"name": "Jaxson Hood",
 																"path": "/COMP3004B/Week 2/Assignment 1/Student Submissions/",
 																"type": "submission",
-																"visible": false,
+																"visible": true,
 																"children": [
 																	{
 																		"wrappee": {
@@ -126,10 +126,10 @@
 													{
 														"wrappee": {
 															"wrappee": {
-																"name": "Student Submission 2",
+																"name": "Cam Dickie",
 																"path": "/COMP3004B/Week 2/Assignment 1/Student Submissions/",
 																"type": "submission",
-																"visible": false,
+																"visible": true,
 																"children": [
 																	{
 																		"wrappee": {
@@ -148,7 +148,19 @@
 																			"wrappee": {
 																				"name": "Assignment Doc 2",
 																				"path": "/COMP3004B/Week 2/Assignment 1/Student Submissions/Student Submission 2/",
-																				"type": "PDF",
+																				"type": "DOCX",
+																				"visible": true
+																			},
+																			"bytes": "ASDDFfgdshgf"
+																		},
+																		"editable": true
+																	},
+																	{
+																		"wrappee": {
+																			"wrappee": {
+																				"name": "PowerPoint 1",
+																				"path": "/COMP3004B/Week 2/Assignment 1/Student Submissions/Student Submission 2/",
+																				"type": "PPTX",
 																				"visible": true
 																			},
 																			"bytes": "ASDDFfgdshgf"

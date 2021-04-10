@@ -25,7 +25,7 @@ class Dashboard extends React.Component {
             whichModal: 0,
             webSocket: null,
             courses: [
-                
+
             ],
             globalCourses : [
 

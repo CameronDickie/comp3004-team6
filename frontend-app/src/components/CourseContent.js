@@ -1,10 +1,12 @@
+import { faMarkdown } from "@fortawesome/free-brands-svg-icons";
 import { faFilePdf, faFilePowerpoint, faFileWord } from "@fortawesome/free-regular-svg-icons";
-import { faAngleDown, faAngleUp, faPenAlt} from "@fortawesome/free-solid-svg-icons";
+import { faAlignRight, faAngleDown, faAngleUp, faDatabase, faPaperPlane, faPenAlt, faPencilAlt, faPercent, faPercentage, faPlus, faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { Component } from "react";
 
 //TEST DATA
 import cData from "../course-example.json"
+import AddCourseContentModal from "./AddCourseContentModal";
 
 class CourseContent extends Component {
 
@@ -12,7 +14,11 @@ class CourseContent extends Component {
         super(props)
 
         this.state = {
-            data: cData.wrappee.children
+            name: cData.wrappee.name,
+            path: cData.wrappee.path,
+            data: cData.wrappee.children,
+            addContentModalOpen: false,
+            cur_path: "/COMP3004/",
         }
     }
 
@@ -21,21 +27,44 @@ class CourseContent extends Component {
 
         for (let i in this.state.data){
             if (this.state.data[i].wrappee.wrappee){
-                trees.push(<BuildArticle data={this.state.data[i].wrappee.wrappee} editable={this.state.data[i].editable} bytes={this.state.data[i].wrappee.bytes} />)
-            } else trees.push(<BuildArticle data={this.state.data[i].wrappee} editable={false} bytes={null} />)
+                if (this.state.data[i].wrappee.wrappee.visible){
+                    trees.push(<BuildArticle data={this.state.data[i].wrappee.wrappee} editable={this.state.data[i].editable} bytes={this.state.data[i].wrappee.bytes} openAddContent={this.toggleCourseContentModal} />)
+                }
+            } else if (this.state.data[i].wrappee.visible) trees.push(<BuildArticle data={this.state.data[i].wrappee} editable={this.state.data[i].editable} bytes={null} openAddContent={this.toggleCourseContentModal} />)
         }
 
         return trees;
     }
 
+    toggleCourseContentModal = (new_path) => {
+        if (new_path != null){
+            this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: new_path})
+        } else this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: this.state.path})
+    }
+
     render(){
 
         return(
-            <section class="mt-16 ml-10">
-                <div className="pl-6">
-                    <div className="text-4xl font-bold italic text-gray-300">Course Content:</div>
+            <section class="mt-10 ml-16">
+                <div className="pl-6 w-full">
+                    <div className="flex justify-between">
+                        <div className="col-span-1">
+                            <div className="text-5xl font-semibold italic text-gray-200">Course Content:</div>
+                        </div>
+                        <div className="">
+                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold border-yellow-500 hover:shadow-md"
+                            onClick={()=>this.toggleCourseContentModal()}>
+                                    Add Content
+                                    <span className="ml-2">
+                                        <FontAwesomeIcon className="text-gray-800 hover:text-yellow-500" size="lg" icon={faPlusCircle}/>
+                                    </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 {this.buildArticleTrees()}
+                <AddCourseContentModal show={this.state.addContentModalOpen} hide={this.toggleCourseContentModal} 
+                cPath={this.state.cur_path} courseCode={this.props.courseCode}/>
             </section>
         )
     }
@@ -57,8 +86,10 @@ class BuildArticle extends Component {
 
         for (let i in this.props.data.children){
             if (this.props.data.children[i].wrappee.wrappee){
-                list.push(<BuildArticle data={this.props.data.children[i].wrappee.wrappee} editable={this.props.data.children[i].editable} bytes={this.props.data.children[i].wrappee.bytes} />)
-            } else list.push(<BuildArticle data={this.props.data.children[i].wrappee} editable={this.props.data.children[i].editable} bytes={null} />)
+                if (this.props.data.children[i].wrappee.wrappee.visible){
+                    list.push(<BuildArticle data={this.props.data.children[i].wrappee.wrappee} editable={this.props.data.children[i].editable} bytes={this.props.data.children[i].wrappee.bytes} openAddContent={this.props.openAddContent} />)
+                }
+            } else if (this.props.data.children[i].wrappee.visible) list.push(<BuildArticle data={this.props.data.children[i].wrappee} editable={this.props.data.children[i].editable} bytes={null} openAddContent={this.props.openAddContent} />)
         }
 
         return list;
@@ -75,7 +106,8 @@ class BuildArticle extends Component {
         let isContent = (article.type == "content");
         let isDefault = (article.type == "default");
         let isSubmission = (article.type == "submission");
-        let editable = this.props.editable
+        let isDeliverable = (article.type == "deliverable");
+        let isLecture = (article.type == "lecture");
 
         // If it is a file show different UI
         if(article.type == "PPTX" || article.type == "PDF" || article.type == "DOCX"){
@@ -94,11 +126,25 @@ class BuildArticle extends Component {
             }
 
             return (
-                <article className="m-4"> 
-                    <button class="hover:border-gray-400 w-48 border-b-2 flex flex-col items-center px-4 py-6 bg-white text-blue tracking-wide uppercase cursor-pointer">
-                        <FontAwesomeIcon className={color} size="3x" icon={icon}/>
-                        <span class="mt-3 text-sm leading-normal">{article.name}</span>
-                    </button>
+                <article class="m-4">
+                <div className={`pt-1 pb-1 border-b-2 ${this.state.expanded ? "border-gray-500" : ""}`}>
+                    <header class="flex h-16 justify-between items-center p-2 pl-6 pr-6 cursor-pointer select-none">
+                        <span className={`text-grey-600 text-xl font-normal`}>
+                            <FontAwesomeIcon className={color} size="2x" icon={icon}/>
+                            <span className="pl-6 hover:text-gray-800 hover:underline">
+                                {article.name}
+                            </span>
+                        </span>
+                        <span className={`pl-4 ${this.props.editable ? "" : "hidden"}`}>
+                                <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono hover:border-gray-700 hover:shadow-md">
+                                    Edit
+                                    <span className="ml-2">
+                                        <FontAwesomeIcon className="text-gray-800 hover:text-purple-500" size="lg" icon={faPencilAlt}/>
+                                    </span>
+                                </button>
+                        </span>
+                    </header>
+                </div>
                 </article>
             )
         }
@@ -136,10 +182,13 @@ class BuildArticle extends Component {
         if (isSection) pillClass = `h-1.5 w-1.5 rounded-full bg-gray-500`
         if (isDefault) pillClass = `h-1.5 w-1.5 rounded-full bg-pink-500`;
         if (isSubmission) pillClass = `h-1.5 w-1.5 rounded-full bg-green-500`;
+        if (isDeliverable) pillClass = `h-1.5 w-1.5 rounded-full bg-blue-500`;
+
+        console.log(article.name + ": " + this.props.editable)
 
         return(
-        <article class="m-4">
-            <div className={`pt-1 pb-1 border-2 rounded-lg ${this.state.expanded ? "border-gray-600" : ""}`}>
+        <article class="m-6">
+            <div className={`pt-1 pb-1 border-2 rounded-lg ${this.state.expanded ? "border-gray-500" : ""}`}>
                 <header class="flex justify-between items-center p-2 pl-6 pr-6 cursor-pointer select-none">
                     <span className={`text-grey-darkest text-xl ${this.state.expanded ? "font-bold underline" : "font-semibold"}`}>
                         {article.name}
@@ -152,14 +201,40 @@ class BuildArticle extends Component {
                             </a>
                         </span>
                     </span>
-                    <span className={`pl-4 ${this.props.editable ? "" : "hidden"}`}>
-                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono hover:border-gray-700 hover:shadow-md">
+                    <span className={`pl-4 ${(this.props.editable && !isDefault) ? "" : "hidden"}`}>
+                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold hover:border-gray-700 hover:shadow-md">
                                 Edit
                                 <span className="ml-2">
-                                    <FontAwesomeIcon className="text-indigo-500" size="lg" icon={faPenAlt}/>
+                                    <FontAwesomeIcon className="text-gray-800 hover:text-purple-500" size="lg" icon={faPencilAlt}/>
                                 </span>
                             </button>
-                        </span>
+                    </span>
+                    <span className={`pl-4 ${isDeliverable ? "" : "hidden"}`}>
+                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono border-green-500 hover:shadow-md">
+                                Add Submission
+                                <span className="ml-2">
+                                    <FontAwesomeIcon className="text-gray-800 hover:text-green-500" size="lg" icon={faPlus}/>
+                                </span>
+                            </button>
+                    </span>
+                    <span className={`pl-4 ${isSubmission ? "" : "hidden"}`}>
+                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono border-yellow-500 hover:shadow-md">
+                                Add Grade
+                                <span className="ml-2">
+                                    <FontAwesomeIcon className="text-gray-800 hover:text-yellow-500" size="lg" icon={faPercent}/>
+                                </span>
+                            </button>
+                    </span>
+
+                    <span className={`pl-4 ${(isSection || isLecture) ? "" : "hidden"}`}>      
+                        <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold border-yellow-500 hover:shadow-md"
+                        onClick={() => this.props.openAddContent(article.path + article.name + "/")}>
+                                Add Content
+                                <span className="ml-2">
+                                    <FontAwesomeIcon className="text-gray-800 hover:text-yellow-500" size="lg" icon={faPlusCircle}/>
+                                </span>
+                        </button>
+                    </span>
                     {expandButton}
                 </header>
                 {expandedContent}

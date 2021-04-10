@@ -1,5 +1,5 @@
 import { faFilePdf, faFilePowerpoint } from "@fortawesome/free-regular-svg-icons";
-import { faAngleDown, faAngleUp, faChevronCircleLeft, faFile, faGraduationCap, faPlus} from "@fortawesome/free-solid-svg-icons";
+import { faChevronCircleLeft} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { Component } from "react";
 import CourseContent from "./CourseContent";
@@ -33,9 +33,9 @@ class FullScreenCourseModal extends Component{
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-3 ml-16">
-                            <div className="col-span-2">
-                                <CourseContent />
+                        <div className="grid grid-cols-4 ml-16">
+                            <div className="col-span-3">
+                                <CourseContent courseCode={this.props.course.code} />
                             </div>
                         </div>
                     </div>

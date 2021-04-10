@@ -133,6 +133,14 @@ public class CourseData extends Subject implements java.io.Serializable {
 
     public byte[] getObject() { return object; }
 
+    public Professor getProfessor() {
+        if(!(this.observers.get(0) instanceof Professor)) {
+            System.out.println("Could not find the professor for this course");
+            return null;
+        }
+        return (Professor) this.observers.get(0);
+    }
+
     /*
     Setters
      */

@@ -304,6 +304,7 @@ public class Routes {
                 SystemData.users.remove(student.getStudentID());
                 student.update("removal-from-system", student);
             }
+
             String jsonReturn = "{success:'Student has successfully withdrawn from the course " + courseData.getCourseCode() + "'}";
             return jsonReturn;
         }

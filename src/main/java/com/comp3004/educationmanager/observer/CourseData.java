@@ -45,8 +45,7 @@ public class CourseData extends Subject implements java.io.Serializable {
         this.courseCode = "COUR1234A";
         this.courseName = "Course Placeholder";
         this.maxStudents = 0;
-        this.setStrategy(new CourseContentStrategy());
-        addContent(courseCode, "/", "default", -1, "system", true);
+        this.content = new CourseContentStrategy().createCourseItem(courseCode, "/", "default", -1, "system", true);
         this.localID = id;
         id++;
     }
@@ -55,8 +54,7 @@ public class CourseData extends Subject implements java.io.Serializable {
         this.courseCode = courseCode;
         this.courseName = courseName;
         this.maxStudents = maxStudents;
-        this.setStrategy(new CourseContentStrategy());
-        addContent(courseCode, "/", "default", -1, "system", true);
+        this.content = new CourseContentStrategy().createCourseItem(courseCode, "/", "default", -1, "system", true);
 
         this.days = days;
         this.startTime = startTime;

@@ -173,6 +173,20 @@ class AdminDashboard extends Component {
                 this.setState({courses:res})
             })
     }
+    deleteCourse = async(cid) => {
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type':'text/html'},
+            body: JSON.stringify({courseCode: cid})
+        }
+
+        await fetch('/api/delete-course', requestOptions)
+            .then(response => response.text())
+            .then(res => {
+                alert(res);
+            })
+    }
 
 
     render() {
@@ -224,7 +238,8 @@ class AdminDashboard extends Component {
                                     updateProfessors={this.updateProfessors} 
                                     courses={this.state.courses} 
                                     applications={this.state.applications} 
-                                    professors={this.state.professors} />
+                                    professors={this.state.professors}
+                                    deleteCourse={this.deleteCourse} />
                             </div>
                         </div>
                         

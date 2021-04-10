@@ -10,23 +10,19 @@ public class CourseItem implements Component, java.io.Serializable {
     private String name;
     private String path;
     private String type;
+    private long userID;
+    private String userType;
     private boolean visible;
 
     /*
     Constructor
      */
-
-    public CourseItem(String name, String path, String type) {
-       this.name = name;
-       this.path = path;
-       this.type = type;
-       this.visible = true;
-    }
-
-    public CourseItem(String name, String path, String type, boolean visible) {
+    public CourseItem(String name, String path, String type, long userID, String userType, boolean visible) {
         this.name = name;
         this.path = path;
         this.type = type;
+        this.userID = userID;
+        this.userType = userType;
         this.visible = visible;
     }
 

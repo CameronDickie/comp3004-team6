@@ -12,6 +12,8 @@ public class CourseContent implements Component, java.io.Serializable {
     private String name;
     private String path;
     private String type;
+    private long userID;
+    private String userType;
     private boolean visible;
 
     private ArrayList<Component> children = new ArrayList();
@@ -19,17 +21,12 @@ public class CourseContent implements Component, java.io.Serializable {
     /*
     Constructor
      */
-    public CourseContent(String name, String path, String type) {
+    public CourseContent(String name, String path, String type, long userID, String userType, boolean visible) {
         this.name = name;
         this.path = path;
         this.type = type;
-        this.visible = true;
-    }
-
-    public CourseContent(String name, String path, String type, boolean visible) {
-        this.name = name;
-        this.path = path;
-        this.type = type;
+        this.userID = userID;
+        this.userType = userType;
         this.visible = visible;
     }
 
@@ -82,11 +79,15 @@ public class CourseContent implements Component, java.io.Serializable {
 
     @Override
     public Object executeCommand(String command, Object value) {
-        if(command.equals("delete")) {                                  // delete all children
+        if(command.equals("delete-item")) {                                  // delete all children
             for (int i = 0; i < children.size(); ++i) {
+                if(((String) children.get(i).getProperty("fullPath")).equals((String) value)) {
+                    children.remove(i);
+                    return true;
+                }
                 children.get(i).executeCommand(command, value);
             }
-            return true;
+            return false;
         } else if(command.equals("findByPath")) {                       // find an item by it's path
             if(((String) getProperty("fullPath")).equals((String) value)) {
                 System.out.println("\t-returning this");

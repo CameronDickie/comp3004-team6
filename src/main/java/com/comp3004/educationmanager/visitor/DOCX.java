@@ -1,21 +1,28 @@
 package com.comp3004.educationmanager.visitor;
 
+import java.util.Base64;
+
 public class DOCX implements FileInterface {
+    private String byteString;
     private byte[] bytes;
 
     @Override
-    public byte[] accept(FileVisitor v) {
+    public String accept(FileVisitor v) {
         return v.visitDOCX(this);
     }
 
     @Override
-    public void setFile(byte[] bytes) {
-        this.bytes = bytes;
+    public void setFile(String bytes) {
+        this.bytes = Base64.getDecoder().decode(bytes);
+        this.byteString = bytes;
     }
 
     @Override
-    public byte[] getBytes() {
-        return bytes;
+    public String getByteString() {
+        return byteString;
     }
+
+    @Override
+    public byte[] getBytes() { return bytes; }
 }
 

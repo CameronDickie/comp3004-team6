@@ -33,54 +33,9 @@ class FullScreenCourseModal extends Component{
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2">
-                            <div>
+                        <div className="grid grid-cols-3 ml-16">
+                            <div className="col-span-2">
                                 <CourseContent />
-                            </div>
-                            <div className="pt-10">
-                            <div class="w-5/6 mx-auto">
-                                <div class="bg-white shadow-sm rounded-lg border-2 my-6">
-                                    <table class="text-left w-full border-collapse">
-                                    <thead>
-                                        <tr>
-                                        <th class="py-4 px-8 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">DELIVERABLES</th>
-                                        <th class="py-4 px-8 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">Actions</th>
-                                        <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">Due Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-               
-                                        <tr class="hover:bg-grey-lighter">
-                                            <td class="py-4 px-6 border-b border-grey-light underline">Assignment #1</td>
-                                            <td class="py-4 px-6 border-b border-grey-light">
-                                                <button className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Get Outline
-                                                <FontAwesomeIcon className="ml-2 text-red-500" size="lg" icon={faFile}/></button>
-
-                                                <button className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">View Grade
-                                                <FontAwesomeIcon className="ml-2 text-yellow-500" size="lg" icon={faGraduationCap}/></button>
-
-                                                {/* <button className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Download
-                                                <FontAwesomeIcon className="ml-2 text-blue-500" size="lg" icon={faDownload}/></button> */}
-                                            </td>
-                                            <td class="py-4 px-6 border-b border-grey-light font-mono underline">05/08/19</td>
-                                        </tr>
-                                        <tr class="hover:bg-grey-lighter">
-                                            <td class="py-4 px-6 border-b border-grey-light underline">Assignment #2</td>
-                                            <td class="py-4 px-6 border-b border-grey-light">
-
-                                                <button className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Get Outline
-                                                <FontAwesomeIcon className="ml-2 text-red-500" size="lg" icon={faFile}/></button>
-
-                                                <button onClick={this.toggleFileSubmissionModal} className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Add Submission
-                                                <FontAwesomeIcon className="ml-2 text-green-500" size="lg" icon={faPlus}/></button>
-                                            </td>
-                                            <td class="py-4 px-6 border-b border-grey-light font-mono underline">05/08/19</td>
-                                        </tr>
-                                    </tbody>
-                                    </table>
-                                </div>
-                                </div>
-
                             </div>
                         </div>
                     </div>

@@ -1,7 +1,10 @@
-import { faFilePdf, faFilePowerpoint } from "@fortawesome/free-regular-svg-icons";
-import { faAngleDown, faAngleUp} from "@fortawesome/free-solid-svg-icons";
+import { faFilePdf, faFilePowerpoint, faFileWord } from "@fortawesome/free-regular-svg-icons";
+import { faAngleDown, faAngleUp, faPenAlt} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { Component } from "react";
+
+//TEST DATA
+import cData from "../course-example.json"
 
 class CourseContent extends Component {
 
@@ -9,52 +12,7 @@ class CourseContent extends Component {
         super(props)
 
         this.state = {
-            data: [
-                {
-                    name: "Week 1",
-                    path: "/COMP3004/",
-                    type: "section",
-                    children: []
-                },
-                {
-                    name: "Week 2",
-                    path: "/COMP3004/",
-                    type: "section",
-                    children: [
-                        {
-                            name: "Intro to OO Design",
-                            path: "/COMP3004/Week 2/",
-                            type: "content",
-                            children: []
-                        },
-                        {
-                            name: "UML Review From Last Year",
-                            path: "/COMP3004/Week 2/",
-                            type: "content",
-                            children: [
-                                {
-                                    name: "UML Slide Show.pptx",
-                                    path: "/COMP3004/Week 2/UML Review From Last Year/",
-                                    type: "PPTX",
-                                    bytes: []
-                                },
-                                {
-                                    name: "UML Diagrams.pdf",
-                                    path: "/COMP3004/Week 2/UML Review From Last Year/",
-                                    type: "PDF",
-                                    bytes: []
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    name: "Week 3",
-                    path: "/COMP3004/",
-                    type: "section",
-                    children: []
-                }
-            ]
+            data: cData.wrappee.children
         }
     }
 
@@ -62,7 +20,9 @@ class CourseContent extends Component {
         let trees = []
 
         for (let i in this.state.data){
-            trees.push(<BuildArticle data={this.state.data[i]} />)
+            if (this.state.data[i].wrappee.wrappee){
+                trees.push(<BuildArticle data={this.state.data[i].wrappee.wrappee} editable={this.state.data[i].editable} bytes={this.state.data[i].wrappee.bytes} />)
+            } else trees.push(<BuildArticle data={this.state.data[i].wrappee} editable={false} bytes={null} />)
         }
 
         return trees;
@@ -72,6 +32,9 @@ class CourseContent extends Component {
 
         return(
             <section class="mt-16 ml-10">
+                <div className="pl-6">
+                    <div className="text-4xl font-bold italic text-gray-300">Course Content:</div>
+                </div>
                 {this.buildArticleTrees()}
             </section>
         )
@@ -93,7 +56,9 @@ class BuildArticle extends Component {
         let list = []
 
         for (let i in this.props.data.children){
-            list.push(<BuildArticle data={this.props.data.children[i]} />)
+            if (this.props.data.children[i].wrappee.wrappee){
+                list.push(<BuildArticle data={this.props.data.children[i].wrappee.wrappee} editable={this.props.data.children[i].editable} bytes={this.props.data.children[i].wrappee.bytes} />)
+            } else list.push(<BuildArticle data={this.props.data.children[i].wrappee} editable={this.props.data.children[i].editable} bytes={null} />)
         }
 
         return list;
@@ -105,11 +70,15 @@ class BuildArticle extends Component {
 
     render() {
         let article = this.props.data;
+
         let isSection = (article.type == "section");
         let isContent = (article.type == "content");
+        let isDefault = (article.type == "default");
+        let isSubmission = (article.type == "submission");
+        let editable = this.props.editable
 
         // If it is a file show different UI
-        if(article.type == "PPTX" || article.type == "PDF"){
+        if(article.type == "PPTX" || article.type == "PDF" || article.type == "DOCX"){
 
             let icon = faFilePowerpoint;
             let color = "text-purple-500";
@@ -119,10 +88,15 @@ class BuildArticle extends Component {
                 color = "text-red-500";
             }
 
+            if (article.type == "DOCX"){
+                icon = faFileWord
+                color = "text-blue-500";
+            }
+
             return (
-                <article className="m-2"> 
-                    <button class="hover:border-gray-400 w-56 border-b-2 flex flex-col items-center px-4 py-6 bg-white text-blue tracking-wide uppercase cursor-pointer">
-                        <FontAwesomeIcon className={color} size="4x" icon={icon}/>
+                <article className="m-4"> 
+                    <button class="hover:border-gray-400 w-48 border-b-2 flex flex-col items-center px-4 py-6 bg-white text-blue tracking-wide uppercase cursor-pointer">
+                        <FontAwesomeIcon className={color} size="3x" icon={icon}/>
                         <span class="mt-3 text-sm leading-normal">{article.name}</span>
                     </button>
                 </article>
@@ -157,6 +131,12 @@ class BuildArticle extends Component {
             </button>
         }
 
+        let pillClass = `h-1.5 w-1.5 rounded-full bg-yellow-500`
+
+        if (isSection) pillClass = `h-1.5 w-1.5 rounded-full bg-gray-500`
+        if (isDefault) pillClass = `h-1.5 w-1.5 rounded-full bg-pink-500`;
+        if (isSubmission) pillClass = `h-1.5 w-1.5 rounded-full bg-green-500`;
+
         return(
         <article class="m-4">
             <div className={`pt-1 pb-1 border-2 rounded-lg ${this.state.expanded ? "border-gray-600" : ""}`}>
@@ -166,12 +146,20 @@ class BuildArticle extends Component {
                         <span className="pl-4">
                             <a href="#" class="my-0.5 relative inline-flex items-center bg-white rounded-full border border-gray-300 px-3 py-0.5 text-sm">
                                 <div class="absolute flex-shrink-0 flex items-center justify-center">
-                                <span className={`h-1.5 w-1.5 rounded-full ${isSection ? "bg-gray-500" : "bg-yellow-500"}`} aria-hidden="true"></span>
+                                <span className={pillClass} aria-hidden="true"></span>
                                 </div>
                                 <div class="ml-3.5 font-medium text-gray-900">{article.type}</div>
                             </a>
                         </span>
                     </span>
+                    <span className={`pl-4 ${this.props.editable ? "" : "hidden"}`}>
+                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono hover:border-gray-700 hover:shadow-md">
+                                Edit
+                                <span className="ml-2">
+                                    <FontAwesomeIcon className="text-indigo-500" size="lg" icon={faPenAlt}/>
+                                </span>
+                            </button>
+                        </span>
                     {expandButton}
                 </header>
                 {expandedContent}

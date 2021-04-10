@@ -161,7 +161,7 @@ class AdminMainSection extends Component{
                                             <FontAwesomeIcon className="ml-2 text-green-500" size="lg" icon={faPlus}/></button>
                                         </div>
                                         <div className="flex justify-end pr-4">
-                                            <button onClick={this.toggleCreateUserModal} className="bg-white border-gray-800 ml-1 px-3 py-3 border-2 rounded-md font-bold shadow-md hover:shadow-lg">Create Course
+                                            <button onClick={this.toggleCreateCourseModal} className="bg-white border-gray-800 ml-1 px-3 py-3 border-2 rounded-md font-bold shadow-md hover:shadow-lg">Create Course
                                             <FontAwesomeIcon className="ml-2 text-green-500" size="lg" icon={faPlus}/></button>
                                         </div>
                                     </div>

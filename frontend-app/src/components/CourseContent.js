@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { Component } from "react";
 
 //TEST DATA
-import cData from "../course-example.json"
 import AddCourseContentModal from "./AddCourseContentModal";
 
 class CourseContent extends Component {
@@ -14,12 +13,14 @@ class CourseContent extends Component {
         super(props)
 
         this.state = {
-            name: cData.wrappee.name,
-            path: cData.wrappee.path,
-            data: cData.wrappee.children,
+            name: this.props.course.name,
+            path: this.props.course.path,
+            data: this.props.course.children,
             addContentModalOpen: false,
             cur_path: "/COMP3004/",
         }
+
+        console.log(this.props.course);
     }
 
     buildArticleTrees = () => {
@@ -28,9 +29,9 @@ class CourseContent extends Component {
         for (let i in this.state.data){
             if (this.state.data[i].wrappee.wrappee){
                 if (this.state.data[i].wrappee.wrappee.visible){
-                    trees.push(<BuildArticle data={this.state.data[i].wrappee.wrappee} editable={this.state.data[i].editable} bytes={this.state.data[i].wrappee.bytes} openAddContent={this.toggleCourseContentModal} />)
+                    trees.push(<BuildArticle data={this.state.data[i].wrappee.wrappee} editable={this.state.data[i].editable} bytes={this.state.data[i].wrappee.bytes} openAddContent={this.toggleCourseContentModal} deadline={this.state.data[i].wrappee.deadline} grade={this.state.data[i].wrappee.grade} />)
                 }
-            } else if (this.state.data[i].wrappee.visible) trees.push(<BuildArticle data={this.state.data[i].wrappee} editable={this.state.data[i].editable} bytes={null} openAddContent={this.toggleCourseContentModal} />)
+            } else if (this.state.data[i].wrappee.visible) trees.push(<BuildArticle data={this.state.data[i].wrappee} editable={this.state.data[i].editable} bytes={null} openAddContent={this.toggleCourseContentModal} deadline={this.state.data[i].wrappee.deadline} grade={this.state.data[i].wrappee.grade} />)
         }
 
         return trees;
@@ -87,9 +88,23 @@ class BuildArticle extends Component {
         for (let i in this.props.data.children){
             if (this.props.data.children[i].wrappee.wrappee){
                 if (this.props.data.children[i].wrappee.wrappee.visible){
-                    list.push(<BuildArticle data={this.props.data.children[i].wrappee.wrappee} editable={this.props.data.children[i].editable} bytes={this.props.data.children[i].wrappee.bytes} openAddContent={this.props.openAddContent} />)
+                    list.push(
+                    <BuildArticle 
+                        data={this.props.data.children[i].wrappee.wrappee} 
+                        editable={this.props.data.children[i].editable} 
+                        bytes={this.props.data.children[i].wrappee.bytes} 
+                        deadline={this.props.data.children[i].wrappee.deadline} 
+                        grade={this.props.data.children[i].wrappee.grade} 
+                        openAddContent={this.props.openAddContent} />)
                 }
-            } else if (this.props.data.children[i].wrappee.visible) list.push(<BuildArticle data={this.props.data.children[i].wrappee} editable={this.props.data.children[i].editable} bytes={null} openAddContent={this.props.openAddContent} />)
+            } else if (this.props.data.children[i].wrappee.visible) list.push(
+            <BuildArticle 
+                data={this.props.data.children[i].wrappee} 
+                editable={this.props.data.children[i].editable} 
+                bytes={null} 
+                deadline={this.props.data.children[i].wrappee.deadline} 
+                grade={this.props.data.children[i].wrappee.grade} 
+                openAddContent={this.props.openAddContent} />)
         }
 
         return list;
@@ -108,6 +123,8 @@ class BuildArticle extends Component {
         let isSubmission = (article.type == "submission");
         let isDeliverable = (article.type == "deliverable");
         let isLecture = (article.type == "lecture");
+        let hasGrade =  (this.props.grade != null)
+
 
         // If it is a file show different UI
         if(article.type == "PPTX" || article.type == "PDF" || article.type == "DOCX"){
@@ -201,6 +218,11 @@ class BuildArticle extends Component {
                             </a>
                         </span>
                     </span>
+                    <span className={`pl-4 ${hasGrade ? "" : "hidden"}`}>
+                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold">
+                                Grade={this.props.grade}
+                            </button>
+                    </span>
                     <span className={`pl-4 ${(this.props.editable && !isDefault) ? "" : "hidden"}`}>
                             <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold hover:border-gray-700 hover:shadow-md">
                                 Edit
@@ -217,7 +239,7 @@ class BuildArticle extends Component {
                                 </span>
                             </button>
                     </span>
-                    <span className={`pl-4 ${isSubmission ? "" : "hidden"}`}>
+                    <span className={`pl-4 ${(isSubmission && !hasGrade) ? "" : "hidden"}`}>
                             <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono border-yellow-500 hover:shadow-md">
                                 Add Grade
                                 <span className="ml-2">
@@ -237,6 +259,9 @@ class BuildArticle extends Component {
                     </span>
                     {expandButton}
                 </header>
+                <div className="p-5" className={`p-5 ${isDeliverable ? "" : "hidden"}`}>
+                    DUE AT: {this.props.deadline}
+                </div>
                 {expandedContent}
             </div>
         </article>

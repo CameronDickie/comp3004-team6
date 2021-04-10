@@ -16,29 +16,48 @@ import {
 import FullScreenCourseModal from "../components/FullScreenCourseModal";
 import FullScreenRegisterModal from "../components/FullScreenRegisterModal";
 
+import cData from "../course-example.json"
+
 class Dashboard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             page: "dashboard",
             modalOpen: false,
-            currentCourse: 0,
+            currentCourse: "",
             whichModal: 0,
             webSocket: null,
-            courses: [
+            courses: [{code:"COMP3004", name:"OOSE"}],
+            globalCourses : [],
 
-            ],
-            globalCourses : [
-
-            ]
+            currentCourseData: cData.wrappee,
+            currentCourseName: ""
         }
     }
+
     componentWillMount() {
         //get this user's courses from the system
         this.updateCourses();
         this.getGlobalCourses();
         this.connect(); //connecting to the web socket for this user
     }
+
+    getCourseContentData = async (code) => {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/html' },
+            body: JSON.stringify({
+                courseCode: code
+            })
+        };
+        await fetch('/api/get-course', requestOptions)
+            .then(response => response.json())
+            .then(res => {
+                this.setState({currentCourseData: res.wrappee})
+                console.log(res)
+            });
+    };
+
     connect = () => {
         let ws = new WebSocket('ws://localhost:8080/api/websocket', 'subprotocol.demo.websocket');
         ws.onopen = () => {
@@ -71,6 +90,7 @@ class Dashboard extends React.Component {
         }
         this.setState({webSocket: ws})
     }
+
     disconnect = () => {
         if(this.state.webSocket != null) {
             this.state.webSocket.close();
@@ -99,8 +119,18 @@ class Dashboard extends React.Component {
         this.setState({page: pageName});
     }
 
-    showModalCourse = (index) => {
-        this.setState({modalOpen: true, currentCourse: index, whichModal: 0})
+    showModalCourse = (code, name) => {
+        // -- UNCOMMENT ONCE HOOKED UP
+
+        // this.getCourseContentData(code)
+        //     .then(() => {
+        //         this.setState({modalOpen: true, currentCourse: code, whichModal: 0})
+        //         if (document.getElementById('myModal') != null){
+        //             document.getElementById('myModal').showModal()
+        //         }
+        //     })
+
+        this.setState({modalOpen: true, currentCourse: code, whichModal: 0, currentCourseName: name})
         if (document.getElementById('myModal') != null){
             document.getElementById('myModal').showModal()
         }
@@ -214,8 +244,9 @@ class Dashboard extends React.Component {
         // If model open than return this instead
         if (this.state.modalOpen){
             if (this.state.whichModal == 0){
+                console.log(this.state.currentCourseData);
                 return (
-                    <FullScreenCourseModal course={this.state.courses[this.state.currentCourse]} dashboard={this} />
+                    <FullScreenCourseModal course={this.state.currentCourseData} dashboard={this} name={this.state.currentCourseName} />
                 )
             } else if (this.state.whichModal == 1){
                 return (
@@ -290,7 +321,7 @@ function makeCourseCard(i, course, app){
                     <button onClick={() => {app.dropCourse(course.code)}} className={(app.props.getUser().type == "Student") ? "bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md" : "hidden"}>Drop<FontAwesomeIcon className="ml-2 text-red-500" size="lg" icon={faTrash}/></button>
                     </span>
                     <span class=" inline-flex items-center leading-none text-sm">
-                        <button onClick={() => app.showModalCourse(i)} className="text-lg font-semibold hover:underline">View</button>
+                        <button onClick={() => app.showModalCourse(course.code, course.name)} className="text-lg font-semibold hover:underline">View</button>
                     </span>
                 </div>
             </div>

@@ -10,6 +10,7 @@ class FullScreenCourseModal extends Component{
         super(props);
         this.state = {
             fileUpload: false,
+            data: {}
         }
     }
 
@@ -28,14 +29,14 @@ class FullScreenCourseModal extends Component{
                                 <FontAwesomeIcon className="cursor-pointer text-gray-500 hover:text-gray-900" size="3x" icon={faChevronCircleLeft} 
                                 onClick={() => this.props.dashboard.closeModal()} /></div>
                             <div className="text-5xl">
-                                <span className="font-semibold pr-10">{this.props.course.code}<span>  </span> -</span>
-                                <span className="font-semibold text-gray-500">{this.props.course.name}</span>
+                                <span className="font-semibold pr-10">{this.props.course.name}<span>  </span> -</span>
+                                <span className="font-semibold text-gray-500">{this.props.name}</span>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-4 ml-16">
                             <div className="col-span-3">
-                                <CourseContent courseCode={this.props.course.code} />
+                                <CourseContent courseCode={this.props.course.code} course={this.props.course} />
                             </div>
                         </div>
                     </div>

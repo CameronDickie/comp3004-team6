@@ -3,28 +3,24 @@ package com.comp3004.educationmanager.decorator;
 import com.comp3004.educationmanager.Helper;
 import com.comp3004.educationmanager.composite.Component;
 
-/*
-Allows a Component to be graded
- */
-public class GradeableDecorator extends Decorator {
-    private float grade;
+import java.util.Calendar;
 
-    /*
-    Constructor
-     */
-    public GradeableDecorator(Component c) {
+public class DeadlineDecorator extends Decorator {
+    Calendar deadline = Calendar.getInstance();
+
+    public DeadlineDecorator(Component c) {
         super(c);
-        grade = -1;
     }
 
-    /*
-    Functions from Component class
-     */
-
     @Override
-    public boolean setProperty(String property, Object value) {
-        if(property.equals("grade")) {
-            grade = (Float) value;
+    public boolean setProperty(String property, Object value){
+        if(property.equals("deadline")) {
+            String[] date = ((String) value).split("-");
+            deadline.set(Calendar.YEAR, Integer.parseInt(date[0]));
+            deadline.set(Calendar.MONTH, Integer.parseInt(date[1]));
+            deadline.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[2]));
+            deadline.set(Calendar.HOUR_OF_DAY, Integer.parseInt(date[3]));
+            deadline.set(Calendar.MINUTE, Integer.parseInt(date[4]));
             return true;
         } else {
             return wrappee.setProperty(property, value);
@@ -33,8 +29,8 @@ public class GradeableDecorator extends Decorator {
 
     @Override
     public Object getProperty(String property) {
-        if(property.equals("grade")) {
-            return grade;
+        if(property.equals("deadline")) {
+            return deadline;
         } else {
             return wrappee.getProperty(property);
         }
@@ -42,7 +38,9 @@ public class GradeableDecorator extends Decorator {
 
     @Override
     public Object executeCommand(String command, Object value) {
-        if(command.equals("findByPath")) {
+        if(command.equals("isBeforeDeadline")) {
+            return deadline.compareTo((Calendar) value) > 0;
+        } else if(command.equals("findByPath")) {
             Component c = (Component) wrappee.executeCommand(command, value);
             if(c != null) {
                 if(((String) c.getProperty("fullPath")).equals((String) getProperty("fullPath"))) {

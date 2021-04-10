@@ -22,7 +22,7 @@ public class FileDecorator extends Decorator {
     @Override
     public boolean setProperty(String property, Object value) {
         if(property.equals("file")) {
-            file.setFile((byte[]) value);
+            file.setFile((String) value);
         } else {
             return wrappee.setProperty(property, value);
         }
@@ -33,7 +33,7 @@ public class FileDecorator extends Decorator {
     @Override
     public Object getProperty(String property) {
         if(property.equals("file")) {
-            return file.getBytes();
+            return file.getByteString();
         } else {
             return wrappee.getProperty(property);
         }

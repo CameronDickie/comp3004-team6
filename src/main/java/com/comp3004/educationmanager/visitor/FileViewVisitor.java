@@ -5,22 +5,23 @@ import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
 import java.io.*;
+import java.util.Base64;
 
 public class FileViewVisitor implements FileVisitor {
     @Override
-    public byte[] visitPDF(PDF file) {
-        return file.getBytes();
+    public String visitPDF(PDF file) {
+        return file.getByteString();
     }
 
     @Override
-    public byte[] visitDOCX(DOCX file) {
+    public String visitDOCX(DOCX file) {
         try {
             InputStream docStream = new ByteArrayInputStream(file.getBytes());
             XWPFDocument doc = new XWPFDocument(docStream);
             PdfOptions options = PdfOptions.create();
             OutputStream byteStream = new ByteArrayOutputStream();
             PdfConverter.getInstance().convert(doc, byteStream, options);
-            return ((ByteArrayOutputStream) byteStream).toByteArray();
+            return Base64.getEncoder().encodeToString(((ByteArrayOutputStream) byteStream).toByteArray());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -28,14 +29,14 @@ public class FileViewVisitor implements FileVisitor {
     }
 
     @Override
-    public byte[] visitPPTX(PPTX file) {
+    public String visitPPTX(PPTX file) {
         try {
             InputStream docStream = new ByteArrayInputStream(file.getBytes());
             XWPFDocument doc = new XWPFDocument(docStream);
             PdfOptions options = PdfOptions.getDefault();
             OutputStream byteStream = new ByteArrayOutputStream();
             PdfConverter.getInstance().convert(doc, byteStream, options);
-            return ((ByteArrayOutputStream) byteStream).toByteArray();
+            return Base64.getEncoder().encodeToString(((ByteArrayOutputStream) byteStream).toByteArray());
         } catch (Exception e) {
             e.printStackTrace();
             return null;

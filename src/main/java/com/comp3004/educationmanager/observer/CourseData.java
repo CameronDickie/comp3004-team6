@@ -5,6 +5,7 @@ import com.comp3004.educationmanager.accounts.Student;
 import com.comp3004.educationmanager.composite.Component;
 import com.comp3004.educationmanager.composite.CourseContent;
 import com.comp3004.educationmanager.composite.CourseItem;
+import com.comp3004.educationmanager.strategy.CourseContentStrategy;
 import com.comp3004.educationmanager.strategy.Strategy;
 
 import javax.persistence.*;
@@ -44,7 +45,8 @@ public class CourseData extends Subject implements java.io.Serializable {
         this.courseCode = "COUR1234A";
         this.courseName = "Course Placeholder";
         this.maxStudents = 0;
-        this.content = new CourseContent(this.courseCode, "/", "section");
+        this.setStrategy(new CourseContentStrategy());
+        addContent(courseCode, "/", "default", -1, "system", true);
         this.localID = id;
         id++;
     }
@@ -53,7 +55,8 @@ public class CourseData extends Subject implements java.io.Serializable {
         this.courseCode = courseCode;
         this.courseName = courseName;
         this.maxStudents = maxStudents;
-        this.content = new CourseContent(this.courseCode, "/", "section");
+        this.setStrategy(new CourseContentStrategy());
+        addContent(courseCode, "/", "default", -1, "system", true);
 
         this.days = days;
         this.startTime = startTime;
@@ -99,14 +102,8 @@ public class CourseData extends Subject implements java.io.Serializable {
         - Should new component be returned or the entire content structure?
             * currently returning new component, will have a separate method to return whole structure
      */
-    public Component addContent(String name, String path, String type) {
-        Component comp = strategy.createCourseItem(name, path, type);
-        content.executeCommand("addItem", comp);
-        return comp;
-    }
-
-    public Component addContent(String name, String path, String type, boolean visible) {
-        Component comp = strategy.createCourseItem(name, path, type, visible);
+    public Component addContent(String name, String path, String type, long userID, String userType, boolean visible) {
+        Component comp = strategy.createCourseItem(name, path, type, userID, userType, visible);
         content.executeCommand("addItem", comp);
         return comp;
     }

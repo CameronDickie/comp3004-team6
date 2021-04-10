@@ -7,13 +7,13 @@ Allows a Component to be graded
  */
 public class GradeableDecorator extends Decorator {
     private float grade;
-    private boolean visible;
 
     /*
     Constructor
      */
     public GradeableDecorator(Component c) {
         super(c);
+        grade = -1;
     }
 
     /*

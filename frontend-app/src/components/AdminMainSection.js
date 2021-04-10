@@ -174,7 +174,7 @@ class AdminMainSection extends Component{
         
                     </div>
 
-                    <CreateCourseModal show={this.state.modalOpen} professors={this.props.professors} hide={this.toggleCreateCourseModal}/>
+                    <CreateCourseModal show={this.state.modalOpen} professors={this.props.professors} hide={this.toggleCreateCourseModal} courses={this.props.courses}/>
             </div>
             )
     }

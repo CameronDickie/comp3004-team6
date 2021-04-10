@@ -54,6 +54,13 @@ class Dashboard extends React.Component {
             if(event.data == "get-courses") {
                 this.updateCourses(); //updating this user's list of courses
                 this.getGlobalCourses(); //updating this user's list of total courses
+            } else if(event.data == "removal-from-system") {
+                //sign this user out
+                this.disconnect();
+                this.props.logout();
+                alert("You have withdrawn from your last course this semester, as such you have been deleted from the system");
+            } else if(event.data == "get-global-courses") {
+                this.getGlobalCourses();
             }
         }
         ws.onerror = (event) => {

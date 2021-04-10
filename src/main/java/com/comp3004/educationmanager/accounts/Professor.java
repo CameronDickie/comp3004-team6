@@ -39,6 +39,17 @@ public class Professor extends User {
             } catch (IOException e) {
                 e.printStackTrace(System.out);
             }
+        } else if(command.equals("get-global-courses")) {
+            TextMessage message = new TextMessage("get-global-courses");
+            try {
+                if(this.getSocketConnection() != null) {
+                    this.getSocketConnection().sendMessage(message);
+                } else {
+                    System.out.println("Unable to connect to professor");
+                }
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
         }
     }
 

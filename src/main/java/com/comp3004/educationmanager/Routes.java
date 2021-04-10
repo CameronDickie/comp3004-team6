@@ -53,6 +53,10 @@ public class Routes {
         } else {
             System.out.println("admin has failed to be created");
         }
+
+        //initialize a base course that cannot be registered in, but holds all students that have not yet registered in a course
+        CourseData emptyCourse = new CourseData();
+        SystemData.courses.put(emptyCourse.getCourseCode(), emptyCourse);
         s.print();
     }
 
@@ -74,33 +78,9 @@ public class Routes {
         SystemData.admin.addApplication(a);
         //notify the admin
         data.updateAll("application", a);
-
-        //send back that this user needs to wait to be approved
-//        User newUser = studentCreator.createUser((String) map.get("firstname") + map.get("lastname"), (String) map.get("password"));
-//
-//        Student student = (Student) newUser;
-//        student.addPastCourse("COMP2804");
-//        student.addPastCourse("COMP2803");
-//        student.addPastCourse("COMP3203");
-//
-//        s.createUser(newUser);
-//        s.print();
         return info + " has attempted to be registered... waiting for permission from the admin";
     }
 
-//    @PostMapping(value ="/api/register-professor", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
-//    public String registerProfessor(@RequestBody String info) {
-//        System.out.println("From '/api/register': " + info);
-//        HashMap<String, Object> map = Helper.stringToMap(info);
-//        map.replace("firstname", ((String) map.get("firstname")).toLowerCase());
-//        map.replace("lastname", ((String) map.get("lastname")).toLowerCase());
-//        //this is the notification to be added to the admin's list of notifications -- likely to be a part of the database, but for now I just want to get it all working
-//        User newUser = professorCreator.createUser((String) map.get("firstname") + map.get("lastname"), (String) map.get("password"));
-//
-//        s.createUser(newUser);
-//        s.print();
-//        return info + " has attempted to be registered";
-//    }
 
     @PostMapping(value = "/api/login", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String login(@RequestBody String userinfo) {
@@ -182,6 +162,10 @@ public class Routes {
         //inform all users associated with this course (currently just the professor) that they need to update their courses
         courseData.updateAll("get-courses", courseData);
 
+        //inform all users in the system that they need to update their list of global courses (viewed in registration)
+        for(User u : SystemData.users.values()) {
+            u.update("get-global-courses", courseData);
+        }
          String jsonReturn = "{success:'";
         jsonReturn+= courseCode + " has been created'}";
         return jsonReturn;
@@ -254,6 +238,13 @@ public class Routes {
         if (studentRegistrationStatus == 0) {
             courseData.attach(student);
             courseData.updateAll("get-courses", courseData);
+
+            //if this user has the placeholder course, remove it
+            CourseData placeholder = student.getCourses().get("COUR1234A");
+            if(placeholder != null) {
+                //remove this course
+                student.getCourses().remove("COUR1234A");
+            }
             jsonReturn = "{success:'";
             jsonReturn+= "Student has successfully registered in course " + courseData.getCourseCode() + "'}";
         }
@@ -307,6 +298,12 @@ public class Routes {
             student.update("deleteCourse", courseData.getCourseCode());
             student.update("get-courses", student.getStudentID());
             System.out.println(student.getCourses());
+            //if student.getCourses() is null, remove the user
+            if(student.getCourses().size() == 0) {
+                //remove this student
+                SystemData.users.remove(student.getStudentID());
+                student.update("removal-from-system", student);
+            }
             String jsonReturn = "{success:'Student has successfully withdrawn from the course " + courseData.getCourseCode() + "'}";
             return jsonReturn;
         }
@@ -389,6 +386,10 @@ public class Routes {
             // return a list of all courses' information
             for(CourseData c : SystemData.courses.values()) {
                 //append a string with courseCode, courseName and id to the courseInfo string
+                if(c.getCourseCode().equals("COUR1234A")) {
+                    //ignore placeholder course(s)
+                    continue;
+                }
                 HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
                 thisCourseInfo.put("code", c.getCourseCode());
                 thisCourseInfo.put("name", c.getCourseName());
@@ -401,6 +402,10 @@ public class Routes {
             Student s = (Student) curUser;
             //getting relevant information about the courses for this user
             for(CourseData c : s.getCourses().values()) {
+                if(c.getCourseCode().equals("COUR1234A")) {
+                    //ignore placeholder course(s)
+                    continue;
+                }
                 HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
                 thisCourseInfo.put("code", c.getCourseCode());
                 thisCourseInfo.put("name", c.getCourseName());
@@ -413,6 +418,10 @@ public class Routes {
             Professor p = (Professor) curUser;
             //getting relevant information about the courses for this user
             for(CourseData c : p.getCourses().values()) {
+                if(c.getCourseCode().equals("COUR1234A")) {
+                    //ignore placeholder course(s)
+                    continue;
+                }
                 HashMap<String, String> thisCourseInfo = new HashMap<String, String>();
                 thisCourseInfo.put("code", c.getCourseCode());
                 thisCourseInfo.put("name", c.getCourseName());
@@ -457,6 +466,10 @@ public class Routes {
             ArrayList<HashMap<String, String>> global = new ArrayList<>();
             //search through all of the available courses and if curStudent.courses does not contain this, add it to a new hashmap
             for(CourseData c : SystemData.courses.values()) {
+                if(c.getCourseCode().equals("COUR1234A")) {
+                    //ignore placeholder course(s)
+                    continue;
+                }
                 boolean alreadyRegistered = false;
                 for(CourseData sc: curStudent.getCourses().values()) {
                     if(c.getCourseID().equals(sc.getCourseID())) {
@@ -477,6 +490,10 @@ public class Routes {
             ArrayList<HashMap<String, String>> global = new ArrayList<>();
 
             for(CourseData c : SystemData.courses.values()) {
+                if(c.getCourseCode().equals("COUR1234A")) {
+                    //ignore placeholder course(s)
+                    continue;
+                }
                 HashMap<String, String> thisCourseInfo = new HashMap<>();
                 thisCourseInfo.put("code", c.getCourseCode());
                 thisCourseInfo.put("name", c.getCourseName());
@@ -680,8 +697,21 @@ public class Routes {
                 }
                 if(newUser instanceof Student) {
                     SystemData.users.put(((Student) newUser).getStudentID(), newUser);
+
+                    //insert this user into the placeholder course
+                    CourseData placeholder = SystemData.courses.get("COUR1234A");
+                    placeholder.attach((Student) newUser);
+                    ((Student) newUser).addCourse(placeholder);
+                    SystemData.courses.replace("COUR1234A", placeholder);
+
                 } else if(newUser instanceof Professor) {
                     SystemData.users.put(((Professor) newUser).getProfessorID(), newUser);
+
+                    //insert this user into the placeholder course
+                    CourseData placeholder = SystemData.courses.get("COUR1234A");
+                    placeholder.attach((Professor) newUser);
+                    ((Professor) newUser).addCourse(placeholder);
+                    SystemData.courses.replace("COUR1234A", placeholder);
                 } else {
                     System.out.println("error inserting user");
                     HashMap<String, String> err = new HashMap<>();

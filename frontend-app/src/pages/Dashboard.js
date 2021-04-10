@@ -166,13 +166,9 @@ class Dashboard extends React.Component {
         }
         console.log('sending registration request for' + cid);
         await fetch ('/api/course-registration', requestOptions)
-            .then (response => response.json())
+            .then (response => response.text())
             .then (res => {
-                if(res.error) {
-                    console.log("error in registration process: " + res.error);
-                    return;
-                }
-                alert(res.success)
+                alert(res)
                 this.setState({modalOpen: false})
             })
     }

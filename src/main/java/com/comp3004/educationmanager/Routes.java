@@ -88,19 +88,19 @@ public class Routes {
         return info + " has attempted to be registered... waiting for permission from the admin";
     }
 
-    @PostMapping(value ="/api/register-professor", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
-    public String registerProfessor(@RequestBody String info) {
-        System.out.println("From '/api/register': " + info);
-        HashMap<String, Object> map = Helper.stringToMap(info);
-        map.replace("firstname", ((String) map.get("firstname")).toLowerCase());
-        map.replace("lastname", ((String) map.get("lastname")).toLowerCase());
-        //this is the notification to be added to the admin's list of notifications -- likely to be a part of the database, but for now I just want to get it all working
-        User newUser = professorCreator.createUser((String) map.get("firstname") + map.get("lastname"), (String) map.get("password"));
-
-        s.createUser(newUser);
-        s.print();
-        return info + " has attempted to be registered";
-    }
+//    @PostMapping(value ="/api/register-professor", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+//    public String registerProfessor(@RequestBody String info) {
+//        System.out.println("From '/api/register': " + info);
+//        HashMap<String, Object> map = Helper.stringToMap(info);
+//        map.replace("firstname", ((String) map.get("firstname")).toLowerCase());
+//        map.replace("lastname", ((String) map.get("lastname")).toLowerCase());
+//        //this is the notification to be added to the admin's list of notifications -- likely to be a part of the database, but for now I just want to get it all working
+//        User newUser = professorCreator.createUser((String) map.get("firstname") + map.get("lastname"), (String) map.get("password"));
+//
+//        s.createUser(newUser);
+//        s.print();
+//        return info + " has attempted to be registered";
+//    }
 
     @PostMapping(value = "/api/login", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String login(@RequestBody String userinfo) {
@@ -189,6 +189,8 @@ public class Routes {
 
     /*
       Route for deleting a course
+      TODO:
+        Proper integration with the users and have the course be delete if there have been users and no more users exist in the course
       USAGE:
       @param (courseInfo JSON)
           - courseCode: courseCode of course, includes section (Ex. COMP3004B)      (String)
@@ -218,6 +220,8 @@ public class Routes {
 
    /*
      Route for student registering in course
+     TODO:
+        Ensure edge cases of the front end data do not break any of the components
      USAGE:
      @param (courseInfo JSON)
          - courseCode: courseCode of course, includes section (Ex. COMP3004B)   (String)
@@ -274,6 +278,9 @@ public class Routes {
 
     /*
      Route for student withdrawing from course
+     TODO:
+        test this usage on the front-end.
+        Provide users an option to call this route when they open the 'courseContent' page on the front end
      USAGE:
      @param (courseInfo JSON)
          - courseCode: courseCode of course, includes section (Ex. COMP3004B)   (String)
@@ -315,7 +322,7 @@ public class Routes {
         - userId: ID of user to retrieve courses for
     @return an array of course content strings
     TODO:
-        - how to query for user? right now I'm using the "userId" tag?
+        find a use for this lol
     */
     @GetMapping(value = "/api/get-user-courses", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String getUserCourses(@RequestBody String userInfo) {
@@ -346,6 +353,10 @@ public class Routes {
         return Helper.objectToJSONString(contentStrings);
     }
 
+    /*
+    TODO:
+        - literally nothing cause Cameron D. knows how to write routes
+     */
     @PostMapping(value="/api/get-user-courses-minimal", consumes=MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String getUserCoursesMinimal(@RequestBody String userInfo) {
         HashMap<String, Object> userMap = Helper.stringToMap(userInfo);
@@ -415,6 +426,10 @@ public class Routes {
         return Helper.objectToJSONString(errMsg);
     }
 
+    /*
+    TODO:
+        ensure that the user information is being handled properly on every request. So far, no request has broken this.
+     */
     @PostMapping(value="/api/get-global-courses", consumes=MediaType.TEXT_HTML_VALUE, produces=MediaType.TEXT_HTML_VALUE)
     public String getGlobalCourses(@RequestBody String userInfo) {
         //this function is meant to provide a student with a list of courses from which they can register in
@@ -494,6 +509,7 @@ public class Routes {
             - I could implement a method that "stringifies" a component - will just be a long string of all path names
                 and the stucture of how they appear in the course, thereby providing an easy way to pass the whole
                 structure to the front end and get the paths whenever a professor is editing the course
+             - ??? whats going on with this at the moment, does it work as described in the call?
     */
     @PostMapping(value = "/api/add-content", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String addContent(@RequestBody String contentInfo) {
@@ -514,6 +530,7 @@ public class Routes {
     TODO:
         - The path for the student's deliverable should probably be something along the lines of /COMP3004B/BENWILLIAMS/ASSIGNMENTPATH/
             - could we make this only visible to the one student?
+        - ??? is this fully functional?
      */
     @PostMapping(value = "/api/submit-deliverable", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String submitDeliverable(@RequestBody String contentInfo) {
@@ -538,7 +555,7 @@ public class Routes {
         - path: path of where to add document
         - type: one of PDF, DOCX, PPTX
     TODO:
-        -
+        - I really hope this works
      */
     @PostMapping(value = "/api/add-document", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String addDocument(@RequestBody String contentInfo) {
@@ -572,7 +589,7 @@ public class Routes {
     /*
     Route for submitting a deliverable grade(s) for a student(s)
     TODO:
-        -
+        - presumably should wrap the content with stuff, I'm assuming this has been tested
     */
     @PostMapping(value = "/api/add-grade", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String addGrade(@RequestBody String contentInfo) {
@@ -589,6 +606,7 @@ public class Routes {
     TODO:
         - Are we using the visitor pattern for this?
         - How do we want to store the final grades, with the student?
+        - WIP?
      */
     @PostMapping(value = "/api/submit-final-grade", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String addFinalGrade(@RequestBody String contentInfo) {
@@ -600,7 +618,7 @@ public class Routes {
     /*
     Route for downloading a file
     TODO:
-        -
+        - Done? Needs testing
      */
     @GetMapping(value = "/api/download-file", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public byte[] downloadFile(@RequestBody String contentInfo) {
@@ -614,6 +632,7 @@ public class Routes {
     Route for view a file as PDF
     TODO:
         - Must still implement conversion feature within the FileDecorator class
+        - WIP?
      */
     @GetMapping(value = "/api/view-file", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.ALL_VALUE)
     public byte[] viewFile(@RequestBody String contentInfo) {
@@ -623,6 +642,9 @@ public class Routes {
         return (byte[]) c.executeCommand("viewAsPDF", null);
     }
 
+    /*
+    Seems to work so far
+     */
     @GetMapping(value = "/api/get-applications", produces = MediaType.TEXT_HTML_VALUE)
     public String getApplications() {
         String list = Helper.objectToJSONString(SystemData.admin.getApplications());
@@ -630,7 +652,7 @@ public class Routes {
         return list;
     }
     /*
-        This method takes in two fields: name (firstname + " " + lastname) and type: "Student"/"Professor"
+        This method takes in two fields: name (firstname + " " + lastname) and type: "student"/"professor"
         It is meant to create a user from this application information if it can find the application currently pending
         It then removes this application and updates the admin via web socket to get the new list of applications
      */
@@ -680,6 +702,7 @@ public class Routes {
         This method takes in two fields: name (firstname + " " + lastname) and type: "Student"/"Professor"
         It serves to find this application with these parameters and delete them from the list of applications in the admin
         It then tells the admin via web socket that it needs to update its list of applications.
+        Working as expected
      */
     @PostMapping(value = "/api/delete-application", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String deleteApplication(@RequestBody String applicationInfo) {
@@ -699,6 +722,9 @@ public class Routes {
         return "error";
     }
 
+    /*
+    Returns the list of all professors within the system, with attributes {name, id}
+     */
     @GetMapping(value = "/api/get-all-professors", produces = MediaType.TEXT_HTML_VALUE)
     public String getAllProfessors() {
         //return a list of all users that are of type professor in systemdata

@@ -10,7 +10,8 @@ import {
     faHome, 
     faCog, 
     faSignOutAlt, 
-    faSchool,} from '@fortawesome/free-solid-svg-icons'
+    faSchool,
+    faTrash,} from '@fortawesome/free-solid-svg-icons'
 
 import FullScreenCourseModal from "../components/FullScreenCourseModal";
 import FullScreenRegisterModal from "../components/FullScreenRegisterModal";
@@ -53,6 +54,13 @@ class Dashboard extends React.Component {
             if(event.data == "get-courses") {
                 this.updateCourses(); //updating this user's list of courses
                 this.getGlobalCourses(); //updating this user's list of total courses
+            } else if(event.data == "removal-from-system") {
+                //sign this user out
+                this.disconnect();
+                this.props.logout();
+                alert("You have withdrawn from your last course this semester, as such you have been deleted from the system");
+            } else if(event.data == "get-global-courses") {
+                this.getGlobalCourses();
             }
         }
         ws.onerror = (event) => {
@@ -169,6 +177,29 @@ class Dashboard extends React.Component {
                 this.setState({modalOpen: false})
             })
     }
+    dropCourse = async (cid) => {
+        if(!this.props.getUser().studentID) {
+            console.log("error getting this user's studentID");
+            return;
+        }
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'text/html'},
+            body: JSON.stringify({
+                courseCode: cid,
+                studentID: this.props.getUser().studentID
+            })
+        }
+
+        await fetch ('/api/course-withdrawal', requestOptions)
+            .then(response => response.text())
+            .then (res => {
+                //determine if withdrawl was successful
+                alert(res);
+                //reload courses
+                //bring back to home screen
+            })
+    }
 
     render() {
 
@@ -246,7 +277,7 @@ class Dashboard extends React.Component {
 
 function makeCourseCard(i, course, app){
     return(
-        <div class="w-1/3 p-4 cursor-pointer" onClick={() => app.showModalCourse(i)}>
+        <div class="w-1/3 p-4 cursor-pointer" >
             <div class="bg-white hover:bg-gray-50 bg-opacity-40 shadow-sm hover:shadow-xl border-2 border-gray-300 p-6 rounded-md hover:border-blue-600">
                 <div class="w-14 h-14 inline-flex items-center justify-center rounded-full bg-gray-100 text-gray-500 mb-4">
                     <FontAwesomeIcon size="2x" icon={faFolderOpen} />
@@ -256,10 +287,10 @@ function makeCourseCard(i, course, app){
                                         
                 <div class="text-center mt-3 leading-none flex justify-between w-full">
                     <span class=" mr-3 inline-flex items-center leading-none text-sm  py-1 ">
-                        <p>...</p>
+                    <button onClick={() => {app.dropCourse(course.code)}} className={(app.props.getUser().type == "Student") ? "bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md" : "hidden"}>Drop<FontAwesomeIcon className="ml-2 text-red-500" size="lg" icon={faTrash}/></button>
                     </span>
                     <span class=" inline-flex items-center leading-none text-sm">
-                        <button className="text-lg font-semibold hover:underline">View</button>
+                        <button onClick={() => app.showModalCourse(i)} className="text-lg font-semibold hover:underline">View</button>
                     </span>
                 </div>
             </div>

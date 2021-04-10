@@ -57,7 +57,7 @@ class AdminDashboard extends Component {
             if(event.data == 'get-professor') {
                 this.updateProfessors();
             }
-            if(event.data == 'get-course') {
+            if(event.data == 'get-courses') {
                 this.updateCourses();
             }
         }

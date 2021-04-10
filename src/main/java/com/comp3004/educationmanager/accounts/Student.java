@@ -30,17 +30,42 @@ public class Student extends User {
         if (command.equals("deleteCourse")) {
             String courseCode = (String) value;
             courses.remove(courseCode);
-            
-//            try {
-//                TextMessage change = new TextMessage("A course of yours has been deleted");
-//                this.socketConnection.sendMessage(change); //change should consist of courses
-//            } catch (IOException e) {
-//                e.printStackTrace(System.out);
-//            }
+            try {
+                TextMessage change = new TextMessage("get-courses");
+                if(this.getSocketConnection() == null || !this.getSocketConnection().isOpen()) {
+                    System.out.println("Unable to connect to the student");
+                    return;
+                }
+                this.socketConnection.sendMessage(change); //change should consist of courses
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
         } else if(command.equals("addCourse")) {
             addCourse((CourseData) value);
         } else if(command.equals("get-courses")) {
             TextMessage message = new TextMessage("get-courses");
+            try {
+                if(this.getSocketConnection() != null) {
+                    this.getSocketConnection().sendMessage(message);
+                } else {
+                    System.out.println("Unable to connect to student");
+                }
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
+        } else if(command.equals("get-global-courses")) {
+            TextMessage message = new TextMessage("get-global-courses");
+            try {
+                if(this.getSocketConnection() != null) {
+                    this.getSocketConnection().sendMessage(message);
+                } else {
+                    System.out.println("Unable to connect to student");
+                }
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
+        } else if(command.equals("removal-from-system")) {
+            TextMessage message = new TextMessage("removal-from-system");
             try {
                 if(this.getSocketConnection() != null) {
                     this.getSocketConnection().sendMessage(message);

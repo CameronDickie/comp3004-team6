@@ -80,7 +80,7 @@ class CreateCourseModal extends Component{
                 .then(response => response.text())
                 .then(res => {
                     console.log(res)
-                    this.props.hide
+                    this.props.hide()
                 });
         }
         

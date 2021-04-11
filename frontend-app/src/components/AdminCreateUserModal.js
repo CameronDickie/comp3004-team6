@@ -34,7 +34,7 @@ class CreateCourseModal extends Component{
                 .then(response => response.json())
                 .then(res => {
                     console.log(res)
-                    this.props.hide
+                    this.props.hide()
                 });
     };
 

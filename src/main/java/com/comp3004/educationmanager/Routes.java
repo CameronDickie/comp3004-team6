@@ -621,7 +621,7 @@ public class Routes {
 
         String bytes = (String) contentMap.get("bytes");
         comp.setProperty("file", bytes);
-
+        course.updateAll("get-course-content", null);
         return (String) course.getContent().executeCommand("stringify", null);
     }
 
@@ -661,7 +661,7 @@ public class Routes {
         }
 
         comp.setProperty("deadline", (String) contentMap.get("deadline"));
-
+        course.updateAll("get-course-content", null);
         return (String) course.getContent().executeCommand("stringify", null);
     }
 
@@ -726,6 +726,7 @@ public class Routes {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         course.getContent().executeCommand("delete-item", (String) contentMap.get("path"));
+        course.updateAll("get-course-content", null);
         return (String) course.getContent().executeCommand("stringify", null);
     }
 

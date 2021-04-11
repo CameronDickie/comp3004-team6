@@ -369,11 +369,7 @@ public class SystemFunctionsTest {
 
     //Test to verify that student cannot register in a course that would cause timetable conflicts
     @Test
-    public void testCourseRegistrationTimetableConflict() {
-        ArrayList<String> days = new ArrayList<>();
-        days.add("Tuesday");
-        days.add("Thursday");
-
+    public void testStudentCourseRegistrationTimetableConflict() {
         Calendar date = Calendar.getInstance();
         Calendar deadline = Calendar.getInstance();
 
@@ -399,6 +395,14 @@ public class SystemFunctionsTest {
         ArrayList<String> prerequisites = new ArrayList<>();
         prerequisites.add("COMP2804");
 
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Tuesday");
+        days.add("Thursday");
+
+        ArrayList<String> days2 = new ArrayList<>();
+        days2.add("Monday");
+        days2.add("Wednesday");
+
         CourseData courseData = cc.createCourse("COMP3004A", "Design Patterns", 100, days, "12:30", 1.5, prerequisites);
 
         assertNotNull(courseData);
@@ -412,13 +416,17 @@ public class SystemFunctionsTest {
         student.update("addCourse", courseData);
         courseData.attach(student);
 
-        CourseData courseData2 = cc.createCourse("COMP3203A", "Networking", 100, days, "13:00", 1.5, prerequisites);
+        CourseData courseData2 = cc.createCourse("COMP3203A", "Networking", 100, days, "13:00", 3, prerequisites);
 
         CourseData courseData3 = cc.createCourse("COMP3005A", "Databases", 100, days, "11:30", 1.5, prerequisites);
 
-        CourseData courseData4 = cc.createCourse("COMP3203A", "Networking", 100, days, "16:00", 1.5, prerequisites);
+        CourseData courseData4 = cc.createCourse("COMP3203A", "Networking", 100, days, "16:00", 3, prerequisites);
 
         CourseData courseData5 = cc.createCourse("COMP3005B", "Databases", 100, days, "9:00", 1.5, prerequisites);
+
+        CourseData courseData6 = cc.createCourse("COMP3004A", "Object Oriented Software Engineering", 100, days2, "9:00", 2, prerequisites);
+
+        CourseData courseData7 = cc.createCourse("COMP3004B", "Object Oriented Software Engineering", 100, days2, "15:00", 2, prerequisites);
 
 
         assertEquals(student.canStudentRegisterInCourse(courseData2, date, deadline), 4);
@@ -426,6 +434,8 @@ public class SystemFunctionsTest {
         assertEquals(student.canStudentRegisterInCourse(courseData4, date, deadline), 0);
         assertEquals(student.canStudentRegisterInCourse(courseData4, date, deadline),0);
         assertEquals(student.canStudentRegisterInCourse(courseData5, date, deadline), 0);
+        assertEquals(student.canStudentRegisterInCourse(courseData6, date, deadline), 0);
+        assertEquals(student.canStudentRegisterInCourse(courseData7, date, deadline), 0);
     }
 
     //Test to verify that student can withdraw from a course when it is before the deadline
@@ -542,5 +552,74 @@ public class SystemFunctionsTest {
 
         assertTrue(!student.canStudentWithdraw(date, deadline));
     }
+
+    //Test to verify that student cannot register in a course that would cause timetable conflicts
+    @Test
+    public void testCourseProfessorTimetableConflict() {
+        Calendar date = Calendar.getInstance();
+        Calendar deadline = Calendar.getInstance();
+
+        //Setting date to January 1st 2021 at 0:00
+        date.set(Calendar.MONTH, Calendar.JANUARY);
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        //Setting last registration date to random date of January 20th
+        deadline.set(Calendar.MONTH, Calendar.JANUARY);
+        deadline.set(Calendar.DAY_OF_MONTH, 20);
+        deadline.set(Calendar.HOUR_OF_DAY, 0);
+        deadline.set(Calendar.MINUTE, 0);
+        deadline.set(Calendar.SECOND, 0);
+        deadline.set(Calendar.MILLISECOND, 0);
+
+        ArrayList<String> prerequisites = new ArrayList<>();
+        prerequisites.add("COMP2804");
+
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Tuesday");
+        days.add("Thursday");
+
+        ArrayList<String> days2 = new ArrayList<>();
+        days2.add("Monday");
+        days2.add("Wednesday");
+
+        CourseData courseData = cc.createCourse("COMP3004A", "Design Patterns", 100, days, "12:30", 1.5, prerequisites);
+
+        Professor professor = (Professor) pc.createUser("johnsmith", "password");
+
+        assertTrue(professor.canProfessorBeAssignedToCourse(courseData));
+
+        assertNotNull(courseData);
+
+        courseData.attach(professor);
+
+        CourseData courseData2 = cc.createCourse("COMP3203A", "Networking", 100, days, "13:00", 3, prerequisites);
+
+        CourseData courseData3 = cc.createCourse("COMP3005A", "Databases", 100, days, "11:30", 1.5, prerequisites);
+
+        CourseData courseData4 = cc.createCourse("COMP3203A", "Networking", 100, days, "16:00", 3, prerequisites);
+
+        CourseData courseData5 = cc.createCourse("COMP3005B", "Databases", 100, days, "9:00", 1.5, prerequisites);
+
+        CourseData courseData6 = cc.createCourse("COMP3004A", "Object Oriented Software Engineering", 100, days2, "9:00", 2, prerequisites);
+
+        CourseData courseData7 = cc.createCourse("COMP3004B", "Object Oriented Software Engineering", 100, days2, "15:00", 2, prerequisites);
+
+        assertFalse(professor.canProfessorBeAssignedToCourse(courseData2));
+
+        assertFalse(professor.canProfessorBeAssignedToCourse(courseData3));
+
+        assertTrue(professor.canProfessorBeAssignedToCourse(courseData4));
+
+        assertTrue(professor.canProfessorBeAssignedToCourse(courseData5));
+
+        assertTrue(professor.canProfessorBeAssignedToCourse(courseData6));
+
+        assertTrue(professor.canProfessorBeAssignedToCourse(courseData7));
+    }
+
 
 }

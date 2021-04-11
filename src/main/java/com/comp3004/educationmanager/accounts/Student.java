@@ -3,7 +3,8 @@ package com.comp3004.educationmanager.accounts;
 
 
 import com.comp3004.educationmanager.observer.CourseData;
-import jdk.internal.net.http.common.Pair;
+//import jdk.internal.net.http.common.Pair;
+import javafx.util.Pair;
 import org.springframework.web.socket.TextMessage;
 
 import javax.persistence.Entity;
@@ -50,7 +51,7 @@ public class Student extends User {
                 break;
             case "finalGrade":
                 Pair<String, Integer> pair = (Pair) value;
-                finalGrades.put(pair.first, pair.second);
+                finalGrades.put(pair.getKey(), pair.getValue());
                 break;
             case "get-courses": {
                 TextMessage message = new TextMessage("get-courses");

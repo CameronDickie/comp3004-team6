@@ -16,6 +16,7 @@ import com.comp3004.educationmanager.strategy.AddDeliverableStrategy;
 import com.comp3004.educationmanager.strategy.AddDocumentStrategy;
 import com.comp3004.educationmanager.strategy.CourseContentStrategy;
 import com.comp3004.educationmanager.strategy.SubmitDeliverableStrategy;
+import javafx.util.Pair;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -737,7 +738,7 @@ public class Routes {
         - courseCode (String): code of the course where the assignment is held
         - path (String): path to the student submission
         - grade (float): grade to be added
-    TODO:
+    TODO: implement socket updates?
     */
     @PostMapping(value = "/api/add-grade", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String addGrade(@RequestBody String contentInfo) {
@@ -758,16 +759,28 @@ public class Routes {
 
     /*
     Route for submitting the final grade for a student(s)
-    TODO:
-        - Are we using the visitor pattern for this?
-        - How do we want to store the final grades, with the student?
-        - WIP?
+    @param
+        - studentID (long): the student to add the grade to
+        - courseCode (String): the course that the grade relates to
+        - grade (int): the final grade that the student received
+    @return failure/success message
+    TODO: implement socket updates? (already using update method so just add socket stuff to the finalGrade command)
      */
     @PostMapping(value = "/api/submit-final-grade", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
-    public String addFinalGrade(@RequestBody String contentInfo) {
+    public String submitFinalGrade(@RequestBody String contentInfo) {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
+        Student student = (Student) SystemData.users.get((String) contentMap.get("studentID"));
+        if(student != null) {
+            student.update("finalGrade", new Pair<String, Integer>((String) contentMap.get("courseCode"), Integer.parseInt((String) contentMap.get("grade"))));
 
-        return contentInfo + " has been submitted";
+            HashMap<String, String> suc = new HashMap<>();
+            suc.put("success", "Grade added properly");
+            return Helper.objectToJSONString(suc);
+        } else {
+            HashMap<String, String> err = new HashMap<>();
+            err.put("error", "Can't find user");
+            return Helper.objectToJSONString(err);
+        }
     }
 
     /*

@@ -3,6 +3,8 @@ package com.comp3004.educationmanager.accounts;
 
 
 import com.comp3004.educationmanager.observer.CourseData;
+//import jdk.internal.net.http.common.Pair;
+import javafx.util.Pair;
 import org.springframework.web.socket.TextMessage;
 
 import javax.persistence.Entity;
@@ -24,6 +26,8 @@ public class Student extends User {
     ArrayList<String> pastCourses = new ArrayList<>();
     @Transient
     HashMap<String, CourseData> courses = new HashMap<>();
+    @Transient
+    HashMap<String, Integer> finalGrades = new HashMap<>();
 
     @Override
     public void update(String command, Object value) {
@@ -44,6 +48,10 @@ public class Student extends User {
                 break;
             case "addCourse":
                 addCourse((CourseData) value);
+                break;
+            case "finalGrade":
+                Pair<String, Integer> pair = (Pair) value;
+                finalGrades.put(pair.getKey(), pair.getValue());
                 break;
             case "get-courses": {
                 TextMessage message = new TextMessage("get-courses");

@@ -7,6 +7,7 @@ import java.util.Calendar;
 
 public class DeadlineDecorator extends Decorator {
     Calendar deadline = Calendar.getInstance();
+    String dateString;
 
     public DeadlineDecorator(Component c) {
         super(c);
@@ -15,7 +16,8 @@ public class DeadlineDecorator extends Decorator {
     @Override
     public boolean setProperty(String property, Object value){
         if(property.equals("deadline")) {
-            String[] date = ((String) value).split("-");
+            dateString = (String) value;
+            String[] date = dateString.split("-");
             deadline.set(Calendar.YEAR, Integer.parseInt(date[0]));
             deadline.set(Calendar.MONTH, Integer.parseInt(date[1]));
             deadline.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[2]));
@@ -31,6 +33,8 @@ public class DeadlineDecorator extends Decorator {
     public Object getProperty(String property) {
         if(property.equals("deadline")) {
             return deadline;
+        } else if(property.equals("dateString")) {
+            return dateString;
         } else {
             return wrappee.getProperty(property);
         }

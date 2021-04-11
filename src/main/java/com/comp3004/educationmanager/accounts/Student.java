@@ -49,8 +49,8 @@ public class Student extends User {
                 addCourse((CourseData) value);
                 break;
             case "finalGrade":
-//                Pair<String, Integer> pair = (Pair) value;
-//                finalGrades.put(pair.getKey(), pair.getValue());
+                HashMap<String, Integer> pair = (HashMap) value;
+                finalGrades.put((String) pair.keySet().toArray()[0], (Integer) pair.values().toArray()[0]);
                 break;
             case "get-courses": {
                 TextMessage message = new TextMessage("get-courses");

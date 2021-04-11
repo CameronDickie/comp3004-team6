@@ -770,7 +770,9 @@ public class Routes {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
         Student student = (Student) SystemData.users.get((String) contentMap.get("studentID"));
         if(student != null) {
-//            student.update("finalGrade", new Pair<String, Integer>((String) contentMap.get("courseCode"), Integer.parseInt((String) contentMap.get("grade"))));
+            HashMap<String, Integer> gradeMap = new HashMap<>();
+            gradeMap.put((String) contentMap.get("courseCode"), Integer.parseInt((String) contentMap.get("grade")));
+            student.update("finalGrade", gradeMap);
 
             HashMap<String, String> suc = new HashMap<>();
             suc.put("success", "Grade added properly");

@@ -54,7 +54,6 @@ class Dashboard extends React.Component {
             .then(response => response.json())
             .then(res => {
                 this.setState({currentCourseData: res.wrappee})
-                console.log(res)
             });
     };
 
@@ -80,6 +79,8 @@ class Dashboard extends React.Component {
                 alert("You have withdrawn from your last course this semester, as such you have been deleted from the system");
             } else if(event.data == "get-global-courses") {
                 this.getGlobalCourses();
+            } else if(event.data == "get-course-content") {
+                this.getCourseContentData(this.state.currentCourse);
             }
         }
         ws.onerror = (event) => {
@@ -122,18 +123,18 @@ class Dashboard extends React.Component {
     showModalCourse = (code, name) => {
         // -- UNCOMMENT ONCE HOOKED UP
 
-        // this.getCourseContentData(code)
-        //     .then(() => {
-        //         this.setState({modalOpen: true, currentCourse: code, whichModal: 0})
-        //         if (document.getElementById('myModal') != null){
-        //             document.getElementById('myModal').showModal()
-        //         }
-        //     })
+        this.getCourseContentData(code)
+            .then(() => {
+                this.setState({modalOpen: true, currentCourse: code, whichModal: 0, currentCourseName: name})
+            })
+            if (document.getElementById('myModal') != null){
+                document.getElementById('myModal').showModal()
+            }
 
-        this.setState({modalOpen: true, currentCourse: code, whichModal: 0, currentCourseName: name})
-        if (document.getElementById('myModal') != null){
-            document.getElementById('myModal').showModal()
-        }
+        // this.setState({modalOpen: true, currentCourse: code, whichModal: 0, currentCourseName: name})
+        // if (document.getElementById('myModal') != null){
+        //     document.getElementById('myModal').showModal()
+        // }
     }
 
     showModalRegister = () => {
@@ -164,7 +165,6 @@ class Dashboard extends React.Component {
                     return;
                 }
                 this.setState({courses:res}, () => {
-                    console.log(this.state.courses);
                 })
             })
     }
@@ -244,9 +244,8 @@ class Dashboard extends React.Component {
         // If model open than return this instead
         if (this.state.modalOpen){
             if (this.state.whichModal == 0){
-                console.log(this.state.currentCourseData);
                 return (
-                    <FullScreenCourseModal course={this.state.currentCourseData} dashboard={this} name={this.state.currentCourseName} />
+                    <FullScreenCourseModal getUser={this.props.getUser} course={this.state.currentCourseData} dashboard={this} name={this.state.currentCourseName} />
                 )
             } else if (this.state.whichModal == 1){
                 return (

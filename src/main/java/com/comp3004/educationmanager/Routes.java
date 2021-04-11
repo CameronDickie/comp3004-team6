@@ -366,7 +366,7 @@ public class Routes {
     TODO:
         find a use for this lol
     */
-    @GetMapping(value = "/api/get-course", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    @PostMapping(value = "/api/get-course", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String getUserCourses(@RequestBody String courseInfo) {
         System.out.println("From '/api/get-course: " + courseInfo);
         HashMap<String, Object> courseMap = Helper.stringToMap(courseInfo);
@@ -375,8 +375,7 @@ public class Routes {
     }
 
     /*
-    TODO:
-        - literally nothing cause Cameron D. knows how to write routes
+    should be good haven't had issues with it and is being used at every level of admin, student, and professor dashboards
      */
     @PostMapping(value="/api/get-user-courses-minimal", consumes=MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String getUserCoursesMinimal(@RequestBody String userInfo) {
@@ -552,7 +551,8 @@ public class Routes {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         course.setStrategy(new CourseContentStrategy());
-        Component comp = (Component) course.getContent().executeCommand("findByPath", contentMap.get("path"));
+        String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
+        Component comp = (Component) course.getContent().executeCommand("findByPath", info);
         if(comp != null) {
             comp.setProperty("name", contentMap.get("name"));
             comp.setProperty("type", contentMap.get("type"));
@@ -565,7 +565,7 @@ public class Routes {
                     (String) contentMap.get("userType"),
                     Boolean.parseBoolean((String) contentMap.get("visible")));
         }
-
+        course.updateAll("get-course-content", null);
         return (String) course.getContent().executeCommand("stringify", null);
     }
 
@@ -591,8 +591,8 @@ public class Routes {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         course.setStrategy(new AddDocumentStrategy());
-
-        Component comp = (Component) course.getContent().executeCommand("findByPath", contentMap.get("path"));
+        String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
+        Component comp = (Component) course.getContent().executeCommand("findByPath", info);
         if(comp != null) {
             comp.setProperty("name", contentMap.get("name"));
             comp.setProperty("type", contentMap.get("type"));
@@ -632,7 +632,8 @@ public class Routes {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         course.setStrategy(new AddDeliverableStrategy());
-        Component comp = (Component) course.getContent().executeCommand("findByPath", contentMap.get("path"));
+        String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
+        Component comp = (Component) course.getContent().executeCommand("findByPath", info);
         if(comp != null) {
             comp.setProperty("name", contentMap.get("name"));
             comp.setProperty("type", contentMap.get("type"));

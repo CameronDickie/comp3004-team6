@@ -19,19 +19,19 @@ class CourseContent extends Component {
             addContentModalOpen: false,
             cur_path: "/COMP3004/",
         }
-
-        console.log(this.props.course);
     }
 
     buildArticleTrees = () => {
         let trees = []
 
-        for (let i in this.state.data){
-            if (this.state.data[i].wrappee.wrappee){
-                if (this.state.data[i].wrappee.wrappee.visible){
-                    trees.push(<BuildArticle data={this.state.data[i].wrappee.wrappee} editable={this.state.data[i].editable} bytes={this.state.data[i].wrappee.bytes} openAddContent={this.toggleCourseContentModal} deadline={this.state.data[i].wrappee.deadline} grade={this.state.data[i].wrappee.grade} />)
+        let data = this.props.course.children
+
+        for (let i in data){
+            if (data[i].wrappee.wrappee){
+                if (data[i].wrappee.wrappee.visible){
+                    trees.push(<BuildArticle data={data[i].wrappee.wrappee} editable={data[i].editable} bytes={data[i].wrappee.bytes} openAddContent={this.toggleCourseContentModal} deadline={data[i].wrappee.deadline} grade={data[i].wrappee.grade} />)
                 }
-            } else if (this.state.data[i].wrappee.visible) trees.push(<BuildArticle data={this.state.data[i].wrappee} editable={this.state.data[i].editable} bytes={null} openAddContent={this.toggleCourseContentModal} deadline={this.state.data[i].wrappee.deadline} grade={this.state.data[i].wrappee.grade} />)
+            } else if (data[i].wrappee.visible) trees.push(<BuildArticle data={data[i].wrappee} editable={data[i].editable} bytes={null} openAddContent={this.toggleCourseContentModal} deadline={data[i].wrappee.deadline} grade={data[i].wrappee.grade} />)
         }
 
         return trees;
@@ -54,7 +54,7 @@ class CourseContent extends Component {
                         </div>
                         <div className="">
                             <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold border-yellow-500 hover:shadow-md"
-                            onClick={()=>this.toggleCourseContentModal()}>
+                            onClick={()=>this.toggleCourseContentModal("/" + this.props.courseCode + "/")}>
                                     Add Content
                                     <span className="ml-2">
                                         <FontAwesomeIcon className="text-gray-800 hover:text-yellow-500" size="lg" icon={faPlusCircle}/>
@@ -64,7 +64,7 @@ class CourseContent extends Component {
                     </div>
                 </div>
                 {this.buildArticleTrees()}
-                <AddCourseContentModal show={this.state.addContentModalOpen} hide={this.toggleCourseContentModal} 
+                <AddCourseContentModal getUser={this.props.getUser} show={this.state.addContentModalOpen} hide={this.toggleCourseContentModal} 
                 cPath={this.state.cur_path} courseCode={this.props.courseCode}/>
             </section>
         )

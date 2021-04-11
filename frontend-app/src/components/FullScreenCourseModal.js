@@ -36,7 +36,7 @@ class FullScreenCourseModal extends Component{
 
                         <div className="grid grid-cols-4 ml-16">
                             <div className="col-span-3">
-                                <CourseContent courseCode={this.props.course.code} course={this.props.course} />
+                                <CourseContent getUser={this.props.getUser} courseCode={this.props.course.name} course={this.props.course} />
                             </div>
                         </div>
                     </div>

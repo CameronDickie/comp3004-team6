@@ -23,42 +23,62 @@ public class Professor extends User {
 
     @Override
     public void update(String command, Object value) {
-        if (command.equals("deleteCourse")) {
-            String courseCode = (String) value;
-            courses.remove(courseCode);
-            try {
-                TextMessage change = new TextMessage("get-courses");
-                if(this.getSocketConnection() == null || !this.getSocketConnection().isOpen()) {
-                    System.out.println("Unable to connect to the professor");
-                    return;
+        switch (command) {
+            case "deleteCourse":
+                String courseCode = (String) value;
+                courses.remove(courseCode);
+                try {
+                    TextMessage change = new TextMessage("get-courses");
+                    if (this.getSocketConnection() == null || !this.getSocketConnection().isOpen()) {
+                        System.out.println("Unable to connect to the professor");
+                        return;
+                    }
+                    this.socketConnection.sendMessage(change); //change should consist of courses
+                } catch (IOException e) {
+                    e.printStackTrace(System.out);
                 }
-                this.socketConnection.sendMessage(change); //change should consist of courses
-            } catch (IOException e) {
-                e.printStackTrace(System.out);
+                break;
+            case "addCourse":
+                addCourse((CourseData) value);
+                break;
+            case "get-courses": {
+                TextMessage message = new TextMessage("get-courses");
+                try {
+                    if (this.getSocketConnection() != null && this.getSocketConnection().isOpen()) {
+                        this.getSocketConnection().sendMessage(message);
+                    } else {
+                        System.out.println("Unable to connect to professor");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace(System.out);
+                }
+                break;
             }
-        } else if(command.equals("addCourse")) {
-            addCourse((CourseData) value);
-        } else if(command.equals("get-courses")) {
-            TextMessage message = new TextMessage("get-courses");
-            try {
-                if(this.getSocketConnection() != null && this.getSocketConnection().isOpen()) {
-                    this.getSocketConnection().sendMessage(message);
-                } else {
-                    System.out.println("Unable to connect to professor");
+            case "get-global-courses": {
+                TextMessage message = new TextMessage("get-global-courses");
+                try {
+                    if (this.getSocketConnection() != null) {
+                        this.getSocketConnection().sendMessage(message);
+                    } else {
+                        System.out.println("Unable to connect to professor");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace(System.out);
                 }
-            } catch (IOException e) {
-                e.printStackTrace(System.out);
+                break;
             }
-        } else if(command.equals("get-global-courses")) {
-            TextMessage message = new TextMessage("get-global-courses");
-            try {
-                if(this.getSocketConnection() != null) {
-                    this.getSocketConnection().sendMessage(message);
-                } else {
-                    System.out.println("Unable to connect to professor");
+            case "get-course-content": {
+                TextMessage message = new TextMessage("get-course-content");
+                try {
+                    if (this.getSocketConnection() != null && this.getSocketConnection().isOpen()) {
+                        this.getSocketConnection().sendMessage(message);
+                    } else {
+                        System.out.println("Unable to connect to professor");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace(System.out);
                 }
-            } catch (IOException e) {
-                e.printStackTrace(System.out);
+                break;
             }
         }
     }

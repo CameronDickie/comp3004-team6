@@ -25,9 +25,13 @@ class AddCourseContentModal extends Component{
                 name: this.state.name,
                 path: this.props.cPath,
                 type: this.state.type,
+                userID: String((this.props.getUser().type == "Student") ? this.props.getUser().studentID : this.props.getUser().professorID),
+                userType: this.props.getUser().type,
                 courseCode: this.props.courseCode,
+                visible: "true"
             })
         };
+        
         await fetch('/api/add-content', requestOptions)
             .then(response => response.text())
             .then(res => {

@@ -98,4 +98,48 @@ public class Professor extends User {
     public HashMap<String, CourseData> getCourses() {
         return courses;
     }
+
+    public boolean canProfessorBeAssignedToCourse(CourseData courseData) {
+
+        ArrayList<String> days = courseData.getDays();
+
+        HashMap<String, CourseData> studentCourses = courses;
+
+        int timeConflicts = 0;
+
+        //Loop to determine timetable conflicts
+        for (String day : days) {
+            for (CourseData studentCourseData : studentCourses.values()) {
+                for (String day2: studentCourseData.getDays()) {
+                    if (day.equals(day2)) {
+                        //Course is on same day as another course, check if there is time conflict
+                        String startTime = courseData.getStartTime();
+
+                        String startTimeStudentCourse = studentCourseData.getStartTime();
+
+                        String[] startTimeArr = startTime.split(":");
+
+                        int startTimeMinutes = (Integer.parseInt(startTimeArr[0]) * 60 ) + Integer.parseInt(startTimeArr[1]);
+
+                        String[] startTimeStudentCourseArr = startTimeStudentCourse.split(":");
+
+                        int startTimeStudentCourseMinutes = (Integer.parseInt(startTimeStudentCourseArr[0]) * 60 ) + Integer.parseInt(startTimeStudentCourseArr[1]);
+
+                        //Verifying if new course would be before or after current course.
+                        //If the course is neither before or after then there must be a timetable conflict
+                        if (!((startTimeMinutes + (courseData.getClassDuration() * 60) < startTimeStudentCourseMinutes) ||
+                                (startTimeMinutes > startTimeStudentCourseMinutes + (studentCourseData.getClassDuration() * 60)))) {
+                            timeConflicts++;
+                            System.out.println("Conflict for: " + day2 + " " + " at " + startTimeStudentCourse);
+                        }
+                        else {
+                            System.out.println("No conflict for: " + day2 + " " + " at " + startTimeStudentCourse);
+                        }
+                    }
+                }
+            }
+        }
+
+        return timeConflicts == 0;
+    }
 }

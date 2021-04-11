@@ -181,7 +181,7 @@ public class Routes {
         Map<String, Object> courseMap = Helper.stringToMap(courseInfo);
 
 
-         CourseData courseData = new CourseCreator().createCourse(
+        CourseData courseData = new CourseCreator().createCourse(
                 (String) courseMap.get("courseCode"),
                 (String) courseMap.get("courseName"),
                 Integer.parseInt((String) courseMap.get("maxStudents")),
@@ -191,28 +191,41 @@ public class Routes {
                 (ArrayList<String>) courseMap.get("prerequisites"));
 
         String courseCode = String.valueOf(courseMap.get("courseCode"));
-        long professorID =Long.parseLong((String) courseMap.get("professorID"));
+        long professorID = Long.parseLong((String) courseMap.get("professorID"));
+
 
         User user = SystemData.users.get(professorID); //Retrieving User (The Professor) from List of Users
         Professor professor = (Professor) user; //Casting Professor to User
-        courseData.attach(professor); //Attaching Professor to CourseData
 
-        SystemData.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
+        if (professor.canProfessorBeAssignedToCourse(courseData)) {
+            courseData.attach(professor); //Attaching Professor to CourseData
 
-        professor.addCourse(courseData); //giving this professor the course in their list of courses
-        //inform the admin user that their list of courses must be updated
-        data.updateAll("get-courses", courseData);
-        //inform all users associated with this course (currently just the professor) that they need to update their courses
-        courseData.updateAll("get-courses", courseData);
+            SystemData.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
 
-        //inform all users in the system that they need to update their list of global courses (viewed in registration)
-        for(User u : SystemData.users.values()) {
-            u.update("get-global-courses", courseData);
+            professor.addCourse(courseData); //giving this professor the course in their list of courses
+            //inform the admin user that their list of courses must be updated
+            data.updateAll("get-courses", courseData);
+            //inform all users associated with this course (currently just the professor) that they need to update their courses
+            courseData.updateAll("get-courses", courseData);
+
+            //inform all users in the system that they need to update their list of global courses (viewed in registration)
+            for (User u : SystemData.users.values()) {
+                u.update("get-global-courses", courseData);
+            }
+
+            String jsonReturn = "{success:'";
+            jsonReturn += courseCode + " has been created'}";
+            return jsonReturn;
+        } else {
+            String jsonReturn = "{error:'";
+            jsonReturn += courseCode + " could not be created as Professor has timetable conflict'}";
+            return jsonReturn;
         }
-         String jsonReturn = "{success:'";
-        jsonReturn+= courseCode + " has been created'}";
-        return jsonReturn;
+
+
     }
+
+
 
     /*
       Route for deleting a course

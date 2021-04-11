@@ -748,6 +748,7 @@ public class Routes {
             c.setProperty("grade", Float.parseFloat((String) contentMap.get("grade")));
             HashMap<String, String> suc = new HashMap<>();
             suc.put("success", "Grade added properly");
+            course.updateAll("get-course-content", null);
             return Helper.objectToJSONString(suc);
         } else {
             HashMap<String, String> err = new HashMap<>();

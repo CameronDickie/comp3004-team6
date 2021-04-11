@@ -6,6 +6,7 @@ import React, { Component } from "react";
 
 //TEST DATA
 import AddCourseContentModal from "./AddCourseContentModal";
+import AddGradeModal from "./AddGradeModal";
 
 class CourseContent extends Component {
 
@@ -17,6 +18,7 @@ class CourseContent extends Component {
             path: this.props.course.path,
             data: this.props.course.children,
             addContentModalOpen: false,
+            addGradeModal: false,
             isSubmission: false,
             cur_path: "/COMP3004/",
         }
@@ -59,7 +61,8 @@ class CourseContent extends Component {
                     data={data[i].wrappee.wrappee} 
                     editable={data[i].editable} 
                     bytes={byteStream} 
-                    openAddContent={this.toggleCourseContentModal} 
+                    openAddContent={this.toggleCourseContentModal}
+                    openGradeItem={this.toggleGradeModal}
                     deadline={data[i].wrappee.dateString} 
                     grade={data[i].wrappee.grade}
                     deleteContent={this.deleteCourseContent} />)
@@ -71,6 +74,7 @@ class CourseContent extends Component {
                         editable={data[i].editable} 
                         bytes={byteStream} 
                         openAddContent={this.toggleCourseContentModal}
+                        openGradeItem={this.toggleGradeModal}
                         deadline={data[i].wrappee.dateString} 
                         grade={data[i].wrappee.grade}
                         deleteContent={this.deleteCourseContent} />)
@@ -86,6 +90,12 @@ class CourseContent extends Component {
                 this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: new_path, isSubmission: isSub})
             } else this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: new_path})
         } else this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: this.state.path})
+    }
+
+    toggleGradeModal = (new_path) => {
+        if (new_path != null){
+            this.setState({addGradeModal: !this.state.addGradeModal, cur_path: new_path})
+        } else this.setState({addGradeModal: !this.state.addGradeModal, cur_path: this.state.path})
     }
 
     render(){
@@ -109,8 +119,13 @@ class CourseContent extends Component {
                     </div>
                 </div>
                 {this.buildArticleTrees()}
+
                 <AddCourseContentModal getUser={this.props.getUser} show={this.state.addContentModalOpen} hide={this.toggleCourseContentModal} 
                 cPath={this.state.cur_path} courseCode={this.props.courseCode} isSubmission={this.state.isSubmission}/>
+
+                <AddGradeModal getUser={this.props.getUser} show={this.state.addGradeModal} hide={this.toggleGradeModal} 
+                cPath={this.state.cur_path} courseCode={this.props.courseCode}/>
+
             </section>
         )
     }
@@ -149,6 +164,7 @@ class BuildArticle extends Component {
                         deadline={this.props.data.children[i].wrappee.dateString} 
                         grade={this.props.data.children[i].wrappee.grade} 
                         openAddContent={this.props.openAddContent}
+                        openGradeItem={this.props.openGradeItem}
                         deleteContent={this.props.deleteContent} />)
             } else {
                  list.push(
@@ -160,6 +176,7 @@ class BuildArticle extends Component {
                         deadline={this.props.data.children[i].wrappee.dateString} 
                         grade={this.props.data.children[i].wrappee.grade} 
                         openAddContent={this.props.openAddContent}
+                        openGradeItem={this.props.openGradeItem}
                         deleteContent={this.props.deleteContent}  />)
             }
         }
@@ -244,7 +261,8 @@ class BuildArticle extends Component {
                             </span>
 
                             <span className={`pl-4 ${(!hasGrade && !studentViewing && !professorCreated) ? "" : "hidden"}`}>
-                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono border-green-500 hover:shadow-md">
+                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold border-green-500 hover:shadow-md"
+                            onClick={() => this.props.openGradeItem(article.path + article.name + "/")}>
                                 Add Grade
                                 <span className="ml-2">
                                     <FontAwesomeIcon className="text-gray-800 hover:text-green-500" size="lg" icon={faPercent}/>

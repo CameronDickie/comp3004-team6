@@ -554,9 +554,9 @@ public class Routes {
         String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
         Component comp = (Component) course.getContent().executeCommand("findByPath", info);
         if(comp != null) {
-            comp.setProperty("name", contentMap.get("name"));
-            comp.setProperty("type", contentMap.get("type"));
-            comp.setProperty("visible", Boolean.parseBoolean((String) contentMap.get("visible")));
+            for(Map.Entry<String, Object> entry : contentMap.entrySet()) {
+                comp.setProperty(entry.getKey(), entry.getValue());
+            }
         } else {
             comp = course.addContent((String) contentMap.get("name"),
                     (String) contentMap.get("path"),
@@ -594,9 +594,9 @@ public class Routes {
         String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
         Component comp = (Component) course.getContent().executeCommand("findByPath", info);
         if(comp != null) {
-            comp.setProperty("name", contentMap.get("name"));
-            comp.setProperty("type", contentMap.get("type"));
-            comp.setProperty("visible", Boolean.parseBoolean((String) contentMap.get("visible")));
+            for(Map.Entry<String, Object> entry : contentMap.entrySet()) {
+                comp.setProperty(entry.getKey(), entry.getValue());
+            }
         } else {
             comp = course.addContent((String) contentMap.get("name"),
                     (String) contentMap.get("path"),
@@ -635,9 +635,9 @@ public class Routes {
         String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
         Component comp = (Component) course.getContent().executeCommand("findByPath", info);
         if(comp != null) {
-            comp.setProperty("name", contentMap.get("name"));
-            comp.setProperty("type", contentMap.get("type"));
-            comp.setProperty("visible", Boolean.parseBoolean((String) contentMap.get("visible")));
+            for(Map.Entry<String, Object> entry : contentMap.entrySet()) {
+                comp.setProperty(entry.getKey(), entry.getValue());
+            }
         } else {
             comp = course.addContent((String) contentMap.get("name"),
                     (String) contentMap.get("path"),
@@ -677,11 +677,12 @@ public class Routes {
         pathToDeliverable = pathToDeliverable.substring(0, path.lastIndexOf("/"));
         Component deliverable = (Component) course.getContent().executeCommand("findByPath", pathToDeliverable);
         if((boolean) deliverable.executeCommand("isBeforeDeadline", s.date)) {
-            Component comp = (Component) course.getContent().executeCommand("findByPath", contentMap.get("path"));
+            String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
+            Component comp = (Component) course.getContent().executeCommand("findByPath", info);
             if(comp != null) {
-                comp.setProperty("name", contentMap.get("name"));
-                comp.setProperty("type", contentMap.get("type"));
-                comp.setProperty("visible", Boolean.parseBoolean((String) contentMap.get("visible")));
+                for(Map.Entry<String, Object> entry : contentMap.entrySet()) {
+                    comp.setProperty(entry.getKey(), entry.getValue());
+                }
             } else {
                 comp = course.addContent( (String) contentMap.get("name"),
                         (String) contentMap.get("path"),

@@ -10,10 +10,10 @@ class AddCourseContentModal extends Component{
         this.state = {
             name: "",
             type: "section",
-            year: "2020",
-            month: "05",
-            day: "25",
-            hour: "14",
+            year: "2021",
+            month: "01",
+            day: "01",
+            hour: "01",
             minutes: "00",
 
             file: null,
@@ -130,7 +130,7 @@ class AddCourseContentModal extends Component{
     buildYearDropDown = () => {
         let pdl = []
 
-        for (let i = 2020; i < 2034; i++){
+        for (let i = 2021; i < 2034; i++){
             pdl.push(<option>{i}</option>)
         }
 
@@ -166,8 +166,8 @@ class AddCourseContentModal extends Component{
     buildHourDropDown = () => {
         let pdl = []
 
-        let hours = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
-                        "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]
+        let hours = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
+                        "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
 
         for (let h in hours){
             pdl.push(<option>{hours[h]}</option>)
@@ -179,7 +179,7 @@ class AddCourseContentModal extends Component{
     buildMinutesDropDown = () => {
         let pdl = []
 
-        for (let i = 0; i < 61; i++){
+        for (let i = 0; i < 60; i++){
             if (i < 10){
                 pdl.push(<option>0{i}</option>)
             } else pdl.push(<option>{i}</option>)

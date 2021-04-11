@@ -60,7 +60,7 @@ class CourseContent extends Component {
                     editable={data[i].editable} 
                     bytes={byteStream} 
                     openAddContent={this.toggleCourseContentModal} 
-                    deadline={data[i].wrappee.deadline} 
+                    deadline={data[i].wrappee.dateString} 
                     grade={data[i].wrappee.grade}
                     deleteContent={this.deleteCourseContent} />)
             } else {
@@ -71,7 +71,7 @@ class CourseContent extends Component {
                         editable={data[i].editable} 
                         bytes={byteStream} 
                         openAddContent={this.toggleCourseContentModal}
-                        deadline={data[i].wrappee.deadline} 
+                        deadline={data[i].wrappee.dateString} 
                         grade={data[i].wrappee.grade}
                         deleteContent={this.deleteCourseContent} />)
             }
@@ -146,7 +146,7 @@ class BuildArticle extends Component {
                         data={this.props.data.children[i].wrappee.wrappee} 
                         editable={this.props.data.children[i].editable} 
                         bytes={byteStream} 
-                        deadline={this.props.data.children[i].wrappee.deadline} 
+                        deadline={this.props.data.children[i].wrappee.dateString} 
                         grade={this.props.data.children[i].wrappee.grade} 
                         openAddContent={this.props.openAddContent}
                         deleteContent={this.props.deleteContent} />)
@@ -157,7 +157,7 @@ class BuildArticle extends Component {
                         data={this.props.data.children[i].wrappee} 
                         editable={this.props.data.children[i].editable} 
                         bytes={byteStream} 
-                        deadline={this.props.data.children[i].wrappee.deadline} 
+                        deadline={this.props.data.children[i].wrappee.dateString} 
                         grade={this.props.data.children[i].wrappee.grade} 
                         openAddContent={this.props.openAddContent}
                         deleteContent={this.props.deleteContent}  />)

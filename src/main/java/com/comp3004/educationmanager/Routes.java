@@ -16,7 +16,6 @@ import com.comp3004.educationmanager.strategy.AddDeliverableStrategy;
 import com.comp3004.educationmanager.strategy.AddDocumentStrategy;
 import com.comp3004.educationmanager.strategy.CourseContentStrategy;
 import com.comp3004.educationmanager.strategy.SubmitDeliverableStrategy;
-import javafx.util.Pair;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -771,7 +770,7 @@ public class Routes {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
         Student student = (Student) SystemData.users.get((String) contentMap.get("studentID"));
         if(student != null) {
-            student.update("finalGrade", new Pair<String, Integer>((String) contentMap.get("courseCode"), Integer.parseInt((String) contentMap.get("grade"))));
+//            student.update("finalGrade", new Pair<String, Integer>((String) contentMap.get("courseCode"), Integer.parseInt((String) contentMap.get("grade"))));
 
             HashMap<String, String> suc = new HashMap<>();
             suc.put("success", "Grade added properly");

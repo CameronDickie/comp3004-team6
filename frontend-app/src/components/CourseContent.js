@@ -17,6 +17,7 @@ class CourseContent extends Component {
             path: this.props.course.path,
             data: this.props.course.children,
             addContentModalOpen: false,
+            isSubmission: false,
             cur_path: "/COMP3004/",
         }
     }
@@ -44,36 +45,46 @@ class CourseContent extends Component {
         let data = this.props.course.children
 
         for (let i in data){
+            let file = data[i].wrappee.file
+            let byteStream = null
+
+            if (file != null){
+                byteStream = file.byteString
+            }
+
+
             if (data[i].wrappee.wrappee){
-                if (data[i].wrappee.wrappee.visible){
-                    trees.push(<BuildArticle 
-                        getUser={this.props.getUser} 
-                        data={data[i].wrappee.wrappee} 
+                trees.push(<BuildArticle 
+                    getUser={this.props.getUser} 
+                    data={data[i].wrappee.wrappee} 
+                    editable={data[i].editable} 
+                    bytes={byteStream} 
+                    openAddContent={this.toggleCourseContentModal} 
+                    deadline={data[i].wrappee.deadline} 
+                    grade={data[i].wrappee.grade}
+                    deleteContent={this.deleteCourseContent} />)
+            } else {
+                trees.push(
+                    <BuildArticle 
+                        getUser={this.props.getUser}
+                        data={data[i].wrappee} 
                         editable={data[i].editable} 
-                        bytes={data[i].wrappee.bytes} 
-                        openAddContent={this.toggleCourseContentModal} 
+                        bytes={byteStream} 
+                        openAddContent={this.toggleCourseContentModal}
                         deadline={data[i].wrappee.deadline} 
                         grade={data[i].wrappee.grade}
                         deleteContent={this.deleteCourseContent} />)
-                }
-            } else if (data[i].wrappee.visible) trees.push(
-            <BuildArticle 
-                getUser={this.props.getUser}
-                data={data[i].wrappee} 
-                editable={data[i].editable} 
-                bytes={null} 
-                openAddContent={this.toggleCourseContentModal}
-                deadline={data[i].wrappee.deadline} 
-                grade={data[i].wrappee.grade}
-                deleteContent={this.deleteCourseContent} />)
+            }
         }
 
         return trees;
     }
 
-    toggleCourseContentModal = (new_path) => {
+    toggleCourseContentModal = (new_path, isSub) => {
         if (new_path != null){
-            this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: new_path})
+            if (isSub != null){
+                this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: new_path, isSubmission: isSub})
+            } else this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: new_path})
         } else this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: this.state.path})
     }
 
@@ -99,7 +110,7 @@ class CourseContent extends Component {
                 </div>
                 {this.buildArticleTrees()}
                 <AddCourseContentModal getUser={this.props.getUser} show={this.state.addContentModalOpen} hide={this.toggleCourseContentModal} 
-                cPath={this.state.cur_path} courseCode={this.props.courseCode}/>
+                cPath={this.state.cur_path} courseCode={this.props.courseCode} isSubmission={this.state.isSubmission}/>
             </section>
         )
     }
@@ -120,29 +131,37 @@ class BuildArticle extends Component {
         let list = []
 
         for (let i in this.props.data.children){
+
+            let file = this.props.data.children[i].wrappee.file
+            let byteStream = null
+
+            if (file != null){
+                byteStream = file.byteString
+            }
+
             if (this.props.data.children[i].wrappee.wrappee){
-                if (this.props.data.children[i].wrappee.wrappee.visible){
-                    list.push(
+                list.push(
                     <BuildArticle 
                         getUser={this.props.getUser} 
                         data={this.props.data.children[i].wrappee.wrappee} 
                         editable={this.props.data.children[i].editable} 
-                        bytes={this.props.data.children[i].wrappee.bytes} 
+                        bytes={byteStream} 
                         deadline={this.props.data.children[i].wrappee.deadline} 
                         grade={this.props.data.children[i].wrappee.grade} 
                         openAddContent={this.props.openAddContent}
                         deleteContent={this.props.deleteContent} />)
-                }
-            } else if (this.props.data.children[i].wrappee.visible) list.push(
-            <BuildArticle 
-                getUser={this.props.getUser} 
-                data={this.props.data.children[i].wrappee} 
-                editable={this.props.data.children[i].editable} 
-                bytes={null} 
-                deadline={this.props.data.children[i].wrappee.deadline} 
-                grade={this.props.data.children[i].wrappee.grade} 
-                openAddContent={this.props.openAddContent}
-                deleteContent={this.props.deleteContent}  />)
+            } else {
+                 list.push(
+                    <BuildArticle 
+                        getUser={this.props.getUser} 
+                        data={this.props.data.children[i].wrappee} 
+                        editable={this.props.data.children[i].editable} 
+                        bytes={byteStream} 
+                        deadline={this.props.data.children[i].wrappee.deadline} 
+                        grade={this.props.data.children[i].wrappee.grade} 
+                        openAddContent={this.props.openAddContent}
+                        deleteContent={this.props.deleteContent}  />)
+            }
         }
 
         return list;
@@ -158,13 +177,19 @@ class BuildArticle extends Component {
         let isSection = (article.type == "section");
         let isContent = (article.type == "content");
         let isDefault = (article.type == "default");
-        let isSubmission = (article.type == "submission");
         let isDeliverable = (article.type == "deliverable");
         let isLecture = (article.type == "lecture");
-        let hasGrade =  (this.props.grade != null)
+        let hasGrade =  ((this.props.grade != -1.0) && (this.props.grade != null));
 
         let studentViewing = (this.props.getUser().type == "Student");
         let professorCreated = (article.userType == "Professor")
+
+        // If the student is viewing, and professor did not create, and studentID!=article-userID
+        if (studentViewing && !professorCreated && (article.userID != this.props.getUser().studentID)){
+            return (
+                <div className="hidden"></div>
+            )
+        }
 
 
         // If it is a file show different UI
@@ -185,25 +210,50 @@ class BuildArticle extends Component {
 
             return (
                 <article class="m-4">
-                <div className={`pt-1 pb-1 border-b-2 ${this.state.expanded ? "border-gray-500" : ""}`}>
-                    <header class="flex h-16 justify-between items-center p-2 pl-6 pr-6 cursor-pointer select-none">
-                        <span className={`text-grey-600 text-xl font-normal`}>
-                            <FontAwesomeIcon className={color} size="2x" icon={icon}/>
-                            <span className="pl-6 hover:text-gray-800 hover:underline">
-                                {article.name}
+                    <div className={`pt-1 pb-1 border-b-2 ${this.state.expanded ? "border-gray-500" : ""}`}>
+                        <header class="flex h-16 justify-between items-center p-2 pl-6 pr-6 cursor-pointer select-none">
+                            <a download={article.name} target="_blank" href={'data:application/octet-stream;base64,' + this.props.bytes}>
+                                <span className={`text-grey-600 text-xl font-normal`}>
+                                    <FontAwesomeIcon className={color} size="2x" icon={icon}/>
+                                    <span className="pl-6 hover:text-gray-800 hover:underline">
+                                        {article.name}
+                                    </span>
+                                </span>
+                            </a>
+                            <span className={`pl-4 ${(!professorCreated) ? "" : "hidden"}`}>
+                                <a href="#" class="my-0.5 relative inline-flex items-center bg-white rounded-full border border-gray-300 px-3 py-0.5 text-sm">
+                                    <div class="absolute flex-shrink-0 flex items-center justify-center">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-green-500" aria-hidden="true"></span>
+                                    </div>
+                                    <div class="ml-3.5 font-medium text-gray-900">submission</div>
+                                </a>
                             </span>
-                        </span>
-                        <span className={`pl-4 ${((professorCreated && !studentViewing) || (!professorCreated && studentViewing)) ? "" : "hidden"}`}>
-                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold hover:border-red-500 hover:shadow-md"
-                            onClick={() => this.props.deleteContent(article.path + article.name + "/")}>
-                                Del
+                            <span className={`pl-4 ${(((professorCreated && !studentViewing) || (!professorCreated && studentViewing)) && !hasGrade) ? "" : "hidden"}`}>
+                                <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold hover:border-red-500 hover:shadow-md"
+                                onClick={() => this.props.deleteContent(article.path + article.name + "/")}>
+                                    Del
+                                    <span className="ml-2">
+                                        <FontAwesomeIcon className="text-red-500" size="lg" icon={faMinus}/>
+                                    </span>
+                                </button>
+                            </span>
+                            <span className={`pl-4 ${hasGrade ? "" : "hidden"}`}>
+                                <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold">
+                                    Grade={this.props.grade}
+                                </button>
+                            </span>
+
+                            <span className={`pl-4 ${(!hasGrade && !studentViewing && !professorCreated) ? "" : "hidden"}`}>
+                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono border-green-500 hover:shadow-md">
+                                Add Grade
                                 <span className="ml-2">
-                                    <FontAwesomeIcon className="text-red-500" size="lg" icon={faMinus}/>
+                                    <FontAwesomeIcon className="text-gray-800 hover:text-green-500" size="lg" icon={faPercent}/>
                                 </span>
                             </button>
-                        </span>
-                    </header>
-                </div>
+                    </span>
+                            
+                        </header>
+                    </div>
                 </article>
             )
         }
@@ -240,7 +290,7 @@ class BuildArticle extends Component {
 
         if (isSection) pillClass = `h-1.5 w-1.5 rounded-full bg-gray-500`
         if (isDefault) pillClass = `h-1.5 w-1.5 rounded-full bg-pink-500`;
-        if (isSubmission) pillClass = `h-1.5 w-1.5 rounded-full bg-green-500`;
+        // if (isSubmission) pillClass = `h-1.5 w-1.5 rounded-full bg-green-500`;
         if (isDeliverable) pillClass = `h-1.5 w-1.5 rounded-full bg-blue-500`;
 
         console.log(article.name + ": " + this.props.editable)
@@ -275,18 +325,11 @@ class BuildArticle extends Component {
                             </button>
                     </span>
                     <span className={`pl-4 ${(isDeliverable && studentViewing) ? "" : "hidden"}`}>
-                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono border-green-500 hover:shadow-md">
+                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono border-green-500 hover:shadow-md"
+                            onClick={() => this.props.openAddContent((article.path + article.name + "/"), true)}>
                                 Add Submission
                                 <span className="ml-2">
                                     <FontAwesomeIcon className="text-gray-800 hover:text-green-500" size="lg" icon={faPlus}/>
-                                </span>
-                            </button>
-                    </span>
-                    <span className={`pl-4 ${(isSubmission && !hasGrade && !studentViewing) ? "" : "hidden"}`}>
-                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono border-yellow-500 hover:shadow-md">
-                                Add Grade
-                                <span className="ml-2">
-                                    <FontAwesomeIcon className="text-gray-800 hover:text-yellow-500" size="lg" icon={faPercent}/>
                                 </span>
                             </button>
                     </span>

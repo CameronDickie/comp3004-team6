@@ -6,9 +6,10 @@ import React, { Component } from "react";
 class AddCourseContentModal extends Component{
     constructor(props) {
         super(props);
+
         this.state = {
             name: "",
-            type: "default",
+            type: "section",
             year: "2020",
             month: "05",
             day: "25",
@@ -21,13 +22,10 @@ class AddCourseContentModal extends Component{
     }
 
     handleChange = (event) => {
-        if (this.state.type == "deliverable"){
-            this.setState({[event.target.id]: String(event.target.value), })
-        } else this.setState({[event.target.id]: String(event.target.value)})        
+        this.setState({[event.target.id]: String(event.target.value)})          
     }
 
     doSubmit = async () => {
-        
         let concat_date = this.state.year + "-" + this.state.month + "-" + this.state.day + "-" + this.state.hour + "-" + this.state.minutes
 
         console.log(concat_date)
@@ -37,6 +35,7 @@ class AddCourseContentModal extends Component{
 
         let api_path = ((this.state.type != "deliverable") ? "/api/add-content" : "/api/add-deliverable")
         if (this.state.type == "file") api_path = "/api/add-document"
+        if (this.props.isSubmission) api_path = "/api/submit-deliverable"
 
         let type = this.state.type
         if (type == "file"){
@@ -113,7 +112,13 @@ class AddCourseContentModal extends Component{
     buildItemTypeOptions = () => {
         let pdl = [];
 
-        let types = ["default", "section", "lecture", "deliverable", "submission", "file"]
+        console.log(this.props.isSubmission)
+
+        let types = ["section", "lecture", "deliverable", "file"]
+
+        if (this.props.isSubmission == true) {
+            types = ["file"]
+        }
 
         for (let t in types){
             pdl.push(<option>{types[t]}</option>)
@@ -185,6 +190,10 @@ class AddCourseContentModal extends Component{
 
 
     render(){
+
+        if (this.props.isSubmission && this.state.type != "file"){
+            this.setState({type: "file"})
+        }
         
         return (
             <div className={`flex items-center justify-center fixed left-0 bottom-0 w-full h-full bg-gray-300 bg-opacity-60 z-50 ${(this.props.show == true) ? "" : "hidden"}`}>

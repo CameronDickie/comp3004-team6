@@ -684,11 +684,10 @@ public class Routes {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         course.setStrategy(new SubmitDeliverableStrategy());
-
         String path = (String) contentMap.get("path");
-        String pathToDeliverable = path.substring(0, path.lastIndexOf("/"));
-        pathToDeliverable = pathToDeliverable.substring(0, path.lastIndexOf("/"));
-        Component deliverable = (Component) course.getContent().executeCommand("findByPath", pathToDeliverable);
+//        String pathToDeliverable = path.substring(0, path.lastIndexOf("/"));
+//        pathToDeliverable = pathToDeliverable.substring(0, path.lastIndexOf("/"));
+        Component deliverable = (Component) course.getContent().executeCommand("findByPath", path);
         if((boolean) deliverable.executeCommand("isBeforeDeadline", s.date)) {
             String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
             Component comp = (Component) course.getContent().executeCommand("findByPath", info);
@@ -705,6 +704,7 @@ public class Routes {
                         false);
             }
 
+            course.updateAll("get-course-content", null);
             return (String) course.getContent().executeCommand("stringify", null);
         } else {
             HashMap<String, String> err = new HashMap<>();

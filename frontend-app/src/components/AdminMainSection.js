@@ -96,9 +96,9 @@ class AdminMainSection extends Component{
                      
                      <div>
                          <div class="text-center leading-none flex justify-between w-full">
-                             <span class="mr-2 inline-flex items-center leading-none text-sm  py-1 ">
+                             {/* <span class="mr-2 inline-flex items-center leading-none text-sm  py-1 ">
                                  <button className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Edit<FontAwesomeIcon className="ml-2 text-yellow-500" size="lg" icon={faPen}/></button>
-                             </span>
+                             </span> */}
                              <span class="mr-2 inline-flex items-center leading-none text-sm  py-1">
                                 <button onClick={() => {this.props.deleteCourse(course.code)}} className="bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md">Delete<FontAwesomeIcon className="ml-2 text-red-500" size="lg" icon={faTrash}/></button>
                              </span>

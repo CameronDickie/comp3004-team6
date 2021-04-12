@@ -33,56 +33,66 @@ class CreateCourseModal extends Component{
     }
 
     doSubmit = async () => {
-        if(this.state.professor_name == "") {
-            this.setState({professor_name: this.props.professors[0].name, professor_id: this.props.professors[0].id}, () => {
-                this.doSubmit();
-            })
-        } else {
-            //checking if a course code has been provided
-            if(this.state.course_code == "") {
-                alert("You must provide a course code for this course");
-                return;
-            }
-            //checking if a course name has been provided
-            if(this.state.course_name == "") {
-                alert("You must provide a name for this course")
-                return;
-            }
-            let _choose_days = []
+        let pname = this.state.professor_name;
+        let pid = "";
 
-            for (let d in this.state.daysChoosen){
-                if (this.state.daysChoosen[d]){
-                    _choose_days.push(d);
-                }
-            }
-            //checking if there are days assigned to the course
-            if(_choose_days.length == 0) {
-                alert("You must provide days this course takes place on.");
-                return;
-            }
-
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/html' },
-                body: JSON.stringify({
-                    courseCode: this.state.course_code,
-                    courseName: this.state.course_name,
-                    maxStudents: this.state.num_of_students,
-                    professorID: this.state.professor_id,
-                    prerequisites: this.state.prerequisites_choosen,
-                    professorName: this.state.professor_name,
-                    days: _choose_days,
-                    startTime: this.state.start_time,
-                    classDuration: this.state.class_duration,
-                })
-            };
-            await fetch('/api/create-course', requestOptions)
-                .then(response => response.text())
-                .then(res => {
-                    console.log(res)
-                    this.props.hide()
-                });
+        if(pname == "") {
+            pname = this.props.professors[0].name;
+            pid = this.props.professors[0].id;
         }
+
+        for(let prof in this.props.professors) {
+            if(this.props.professors[prof].name == pname) {
+                pid = this.props.professors[prof].id;
+                break;
+            }
+        }
+        
+        // this.setState({professor_name: this.props.professors[0].name, professor_id: this.props.professors[0].id})
+        //checking if a course code has been provided
+        if(this.state.course_code == "") {
+            alert("You must provide a course code for this course");
+            return;
+        }
+        //checking if a course name has been provided
+        if(this.state.course_name == "") {
+            alert("You must provide a name for this course")
+            return;
+        }
+        let _choose_days = []
+
+        for (let d in this.state.daysChoosen){
+            if (this.state.daysChoosen[d]){
+                _choose_days.push(d);                }
+            }
+        //checking if there are days assigned to the course
+        if(_choose_days.length == 0) {
+            alert("You must provide days this course takes place on.");
+            return;
+        }
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/html' },
+            body: JSON.stringify({
+                courseCode: this.state.course_code,
+                courseName: this.state.course_name,
+                maxStudents: this.state.num_of_students,
+                professorID: pid,
+                prerequisites: this.state.prerequisites_choosen,
+                professorName: pname,
+                days: _choose_days,
+                startTime: this.state.start_time,
+                classDuration: this.state.class_duration,
+            })
+        };
+        console.log("professor id:" + pid);
+        await fetch('/api/create-course', requestOptions)
+            .then(response => response.text())
+            .then(res => {
+                alert(res)
+                this.props.hide()
+            });
         
     };
 

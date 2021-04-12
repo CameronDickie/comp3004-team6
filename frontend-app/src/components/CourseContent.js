@@ -407,7 +407,7 @@ class BuildArticle extends Component {
                             onClick={() => this.props.openAddContent(article.path, null, article, this.props.deadline)}>
                                 Edit
                                 <span className="ml-2">
-                                    <FontAwesomeIcon className="text-gray-800 hover:text-blue-500" size="lg" icon={faPlus}/>
+                                    <FontAwesomeIcon className="text-gray-800 hover:text-blue-500" size="lg" icon={faPencilAlt}/>
                                 </span>
                             </button>
                     </span>

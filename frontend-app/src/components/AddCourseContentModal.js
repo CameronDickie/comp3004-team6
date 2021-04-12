@@ -63,7 +63,7 @@ class AddCourseContentModal extends Component{
         await fetch(api_path, requestOptions)
             .then(response => response.text())
             .then(res => {
-                alert(res)
+                console.log(res)
                 this.props.clearCurrentContent()
                 this.props.hide()
             });

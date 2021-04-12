@@ -28,7 +28,7 @@ class Dashboard extends React.Component {
             courses: [{code:"COMP3004", name:"OOSE"}],
             globalCourses : [],
 
-            currentCourseData: cData.wrappee,
+            currentCourseData: null,
             currentCourseName: ""
         }
     }

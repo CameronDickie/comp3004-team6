@@ -861,29 +861,33 @@ public class Routes {
     /*
     Route for submitting the final grade for a student(s)
     @param
-        - studentID (long): the student to add the grade to
+        - studentIDs (List<String>): the student to add the grade to
         - courseCode (String): the course that the grade relates to
-        - grade (int): the final grade that the student received
+        - grades (List<int>): the final grade that the student received
     @return failure/success message
     TODO: implement socket updates? (already using update method so just add socket stuff to the finalGrade command)
      */
     @PostMapping(value = "/api/submit-final-grade", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String submitFinalGrade(@RequestBody String contentInfo) {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
-        Student student = (Student) SystemData.users.get((String) contentMap.get("studentID"));
-        if(student != null) {
-            HashMap<String, Integer> gradeMap = new HashMap<>();
-            gradeMap.put((String) contentMap.get("courseCode"), Integer.parseInt((String) contentMap.get("grade")));
-            student.update("finalGrade", gradeMap);
+        List<String> studentIDs = (List) contentMap.get("studentIDs");
+        List<Integer> grades = (List) contentMap.get("grades");
+        String courseCode = (String) contentMap.get("courseCode");
+        HashMap<String, String> response = new HashMap<>();
 
-            HashMap<String, String> suc = new HashMap<>();
-            suc.put("success", "Grade added properly");
-            return Helper.objectToJSONString(suc);
-        } else {
-            HashMap<String, String> err = new HashMap<>();
-            err.put("error", "Can't find user");
-            return Helper.objectToJSONString(err);
+        for(int i = 0; i < studentIDs.size(); ++i) {
+            Student student = (Student) SystemData.users.get(studentIDs.get(i));
+            if(student != null) {
+                HashMap<String, Integer> gradeMap = new HashMap<>();
+                gradeMap.put(courseCode, grades.get(i));
+                student.update("finalGrade", gradeMap);
+            } else {
+                response.put("error", "Can't find student " + studentIDs.get(i));
+            }
         }
+
+        response.put("finished", "Final grades have been submitted");
+        return Helper.objectToJSONString(response);
     }
 
     /*

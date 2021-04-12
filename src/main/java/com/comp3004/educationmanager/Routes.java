@@ -61,6 +61,41 @@ public class Routes {
         s.print();
     }
 
+    /*
+    FOR TESTING
+     */
+
+    @PostMapping(value ="/api/get-user", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String getUser(@RequestBody String info) {
+        System.out.println("From '/api/get-user': " + info);
+        HashMap<String, Object> map = Helper.stringToMap(info);
+        return Helper.objectToJSONString(s.getUser((String) map.get("username")));
+    }
+
+    @PostMapping(value ="/api/get-course-info", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String getCourseInfo(@RequestBody String info) {
+        System.out.println("From '/api/get-course-info': " + info);
+        HashMap<String, Object> map = Helper.stringToMap(info);
+
+        CourseData data = s.getCourseData((String) map.get("courseCode"));
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("courseCode", data.getCourseCode());
+        response.put("courseName", data.getCourseName());
+        response.put("maxStudents", data.getMaxStudents());
+        response.put("prerequisites", data.getPrerequisites());
+        response.put("days", data.getDays());
+        response.put("startTime", data.getStartTime());
+        response.put("classDuration", data.getClassDuration());
+        response.put("professorID", data.getProfessor().getProfessorID());
+
+        return Helper.objectToJSONString(response);
+    }
+
+    /*
+    END OF FOR TESTING
+     */
+
+
     @GetMapping("/api/members")
     public String members() {
         return "Cameron, Cameron, Ben, Jaxson";
@@ -380,7 +415,7 @@ public class Routes {
         find a use for this lol
     */
     @PostMapping(value = "/api/get-course", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
-    public String getUserCourses(@RequestBody String courseInfo) {
+    public String getCourseContent(@RequestBody String courseInfo) {
         System.out.println("From '/api/get-course: " + courseInfo);
         HashMap<String, Object> courseMap = Helper.stringToMap(courseInfo);
         CourseData course = s.getCourseData((String) courseMap.get("courseCode"));
@@ -676,6 +711,7 @@ public class Routes {
         - userID (Long): id of the user creating the content
         - userType (String): is the user a student or professor
         - visible (boolean): don't need to pass this in, defaults to false
+        - bytes (String): byte array (encoded as string)
     @return the stringified version of the course or an error message
     TODO:
      */
@@ -702,6 +738,7 @@ public class Routes {
                         Long.parseLong((String) contentMap.get("userID")),
                         (String) contentMap.get("userType"),
                         false);
+                comp.setProperty("file", (String) contentMap.get("bytes"));
             }
 
             course.updateAll("get-course-content", null);

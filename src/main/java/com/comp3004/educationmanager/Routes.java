@@ -160,40 +160,60 @@ public class Routes {
         (String) lastname: The last name of the new user,
         (String) password: The password to be used by this new user,
         (ArrayList<String>): A list of the courseCodes that will be the past courses of this user
+        (String) type: The type of user to be created
      */
     @PostMapping(value="/api/register-user-prerequisites", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String registerWithPrerequisites(@RequestBody String userInfo) {
 
         HashMap<String, Object> userMap = Helper.stringToMap(userInfo);
-        if(userMap.get("firstname") == null || userMap.get("lastname") == null || userMap.get("password") == null) {
+        if(userMap.get("firstname") == null || userMap.get("lastname") == null || userMap.get("password") == null || userMap.get("type") == null) {
             HashMap<String, String> response = new HashMap<>();
             response.put("error", "user is missing required fields");
             return Helper.objectToJSONString(response);
         }
-        Student st = (Student) studentCreator.createUser(((String) userMap.get("firstname")).toLowerCase() + ((String) userMap.get("lastname")).toLowerCase(), (String) userMap.get("password"));
-        ArrayList<String> thisUserPastCourses = (ArrayList<String>) userMap.get("prerequisites");
+        if(userMap.get("type").equals("student")) {
+            Student st = (Student) studentCreator.createUser(((String) userMap.get("firstname")).toLowerCase() + ((String) userMap.get("lastname")).toLowerCase(), (String) userMap.get("password"));
+            ArrayList<String> thisUserPastCourses = (ArrayList<String>) userMap.get("prerequisites");
 
-        if(thisUserPastCourses.size() > 0) {
-            //add all of the past courses courseCode to this student
-            for(String cid : thisUserPastCourses) {
-                //ensure that the course indeed exists
-                if(!SystemData.courses.containsKey(cid)) {
-                    System.out.println("Unable to add the course " + cid + " as we could not find it in the system");
-                } else {
-                    st.addPastCourse(cid);
+            if(thisUserPastCourses.size() > 0) {
+                //add all of the past courses courseCode to this student
+                for(String cid : thisUserPastCourses) {
+                    //ensure that the course indeed exists
+                    if(!SystemData.courses.containsKey(cid)) {
+                        System.out.println("Unable to add the course " + cid + " as we could not find it in the system");
+                    } else {
+                        st.addPastCourse(cid);
+                    }
                 }
             }
-        }
-        //attach this new user to the placeholder course
-        CourseData placeholder = SystemData.courses.get("COUR1234A");
-        placeholder.attach(st);
+            //attach this new user to the placeholder course
+            CourseData placeholder = SystemData.courses.get("COUR1234A");
+            placeholder.attach(st);
 
-        //add this user to the system
-        s.createUser(st);
-        HashMap<String, String> response = new HashMap<>();
-        response.put("success", "user has been added");
-        System.out.println(SystemData.users);
-        return Helper.objectToJSONString(response);
+            //add this user to the system
+            s.createUser(st);
+            HashMap<String, String> response = new HashMap<>();
+            response.put("success", "user has been added");
+            return Helper.objectToJSONString(response);
+        } else if(userMap.get("type").equals("professor")) {
+            //create a professor with this information
+            Professor p = (Professor) professorCreator.createUser(((String) userMap.get("firstname")).toLowerCase() + ((String) userMap.get("lastname")).toLowerCase(), (String) userMap.get("password"));
+
+            //attach this new user to the placeholder course
+            CourseData placeholder = SystemData.courses.get("COUR1234A");
+            placeholder.attach(p);
+
+            s.createUser(p);
+
+            HashMap<String, String> response = new HashMap<>();
+            response.put("success", "user has been added");
+            return Helper.objectToJSONString(response);
+        } else {
+            HashMap<String, String> response = new HashMap<>();
+            response.put("error", "user is not of type student or professor!");
+            return Helper.objectToJSONString(response);
+        }
+
     }
 
     @PostMapping(value = "/api/login", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
@@ -861,29 +881,33 @@ public class Routes {
     /*
     Route for submitting the final grade for a student(s)
     @param
-        - studentID (long): the student to add the grade to
+        - studentIDs (List<String>): the student to add the grade to
         - courseCode (String): the course that the grade relates to
-        - grade (int): the final grade that the student received
+        - grades (List<int>): the final grade that the student received
     @return failure/success message
     TODO: implement socket updates? (already using update method so just add socket stuff to the finalGrade command)
      */
     @PostMapping(value = "/api/submit-final-grade", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String submitFinalGrade(@RequestBody String contentInfo) {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
-        Student student = (Student) SystemData.users.get((String) contentMap.get("studentID"));
-        if(student != null) {
-            HashMap<String, Integer> gradeMap = new HashMap<>();
-            gradeMap.put((String) contentMap.get("courseCode"), Integer.parseInt((String) contentMap.get("grade")));
-            student.update("finalGrade", gradeMap);
+        List<String> studentIDs = (List) contentMap.get("studentIDs");
+        List<Integer> grades = (List) contentMap.get("grades");
+        String courseCode = (String) contentMap.get("courseCode");
+        HashMap<String, String> response = new HashMap<>();
 
-            HashMap<String, String> suc = new HashMap<>();
-            suc.put("success", "Grade added properly");
-            return Helper.objectToJSONString(suc);
-        } else {
-            HashMap<String, String> err = new HashMap<>();
-            err.put("error", "Can't find user");
-            return Helper.objectToJSONString(err);
+        for(int i = 0; i < studentIDs.size(); ++i) {
+            Student student = (Student) SystemData.users.get(studentIDs.get(i));
+            if(student != null) {
+                HashMap<String, Integer> gradeMap = new HashMap<>();
+                gradeMap.put(courseCode, grades.get(i));
+                student.update("finalGrade", gradeMap);
+            } else {
+                response.put("error", "Can't find student " + studentIDs.get(i));
+            }
         }
+
+        response.put("finished", "Final grades have been submitted");
+        return Helper.objectToJSONString(response);
     }
 
     /*

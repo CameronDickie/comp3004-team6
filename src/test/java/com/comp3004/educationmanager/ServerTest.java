@@ -285,6 +285,7 @@ public class ServerTest {
         map.put("lastname", "rolfe");
         map.put("password", "secondyear");
         map.put("prerequisites", new ArrayList<>(Arrays.asList("COMP1405A")));
+        map.put("type", "student");
 
         HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "register-user-prerequisites", Helper.objectToJSONString(map)));
         assertNotNull(response.get("success"));

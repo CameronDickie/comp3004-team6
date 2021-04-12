@@ -113,7 +113,6 @@ class Dashboard extends React.Component {
             return;
         }
         let uString = JSON.stringify({attachUser:this.props.getUser()});
-        console.log('Client sends: ' + uString);
         ws.send(uString);
     }
     setPage = (pageName) => {
@@ -130,11 +129,6 @@ class Dashboard extends React.Component {
             if (document.getElementById('myModal') != null){
                 document.getElementById('myModal').showModal()
             }
-
-        // this.setState({modalOpen: true, currentCourse: code, whichModal: 0, currentCourseName: name})
-        // if (document.getElementById('myModal') != null){
-        //     document.getElementById('myModal').showModal()
-        // }
     }
 
     showModalRegister = () => {

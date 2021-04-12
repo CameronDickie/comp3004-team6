@@ -11,6 +11,7 @@ class CreateCourseModal extends Component{
             lastname: "",
             password: "",
             prerequisites_choosen:[],
+            toggle: false
         }
     }
 
@@ -20,6 +21,11 @@ class CreateCourseModal extends Component{
     }
 
     doSubmit = async () => {
+        let thisType = "student"
+
+        if (this.state.toggle){
+            thisType = "professor"
+        }
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/html' },
@@ -27,7 +33,8 @@ class CreateCourseModal extends Component{
                     firstname: this.state.firstname,
                     lastname: this.state.lastname,
                     password: this.state.password,
-                    prerequisites: this.state.prerequisites_choosen
+                    prerequisites: this.state.prerequisites_choosen,
+                    type: thisType
                 })
             };
             await fetch('/api/register-user-prerequisites', requestOptions)
@@ -119,19 +126,33 @@ class CreateCourseModal extends Component{
                                 <label for="course_name" class="block mb-2 text-sm text-gray-600 dark:text-gray-400">PASSWORD</label>
                                 <input onChange={this.handleChange.bind(this)} type="password" name="password" id="password"  class="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-yellow-100 focus:border-yellow-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500" />
                             </div>
+                            
 
-
-                            <div class="mb-6">
+                            {(!this.state.toggle) ? <div class="mb-6">
                                 <label for="course_name" class="block mb-2 text-sm text-gray-600 dark:text-gray-400">CHOOSE PREREQUISITES</label>
                                 <div class="container">
                                     <div class="row space-x-1">
                                         {this.buildCourseOptions()}
                                     </div>
                                 </div>
-                                {/* <div className="grid grid-cols-5 gap-2 items-center">
-                                    {this.buildCourseOptions()}
-                                </div> */}
-                            </div>
+                            </div> : <div />}
+
+                            <div className="-mx-3 -mt-4 mb-6">
+                                    <div class="w-full h-full flex flex-col justify-center items-center">
+                                        <div class="flex justify-center items-center">
+                                            <span class="">
+                                                Student
+                                            </span>
+                                        
+                                            <div class="w-14 h-7 flex items-center bg-gray-300 rounded-full mx-3 px-1" onClick={()=>{this.setState({toggle: !this.state.toggle})}}>
+                                                <div className={`bg-white w-5 h-5 rounded-full shadow-md transform ${this.state.toggle ? "translate-x-7" : ""}`}></div>
+                                            </div>
+                                            <span class="">
+                                                Professor
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
 
 
                         </div>

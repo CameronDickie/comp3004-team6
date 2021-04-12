@@ -246,7 +246,12 @@ public class Student extends User {
         return currDate.compareTo(widthdrawDeadline) < 0;
     }
 
-
-
-
+    public int getFinalGrade(String courseCode) {
+        for(String course : finalGrades.keySet()) {
+            if(course.equals(courseCode)) {
+                return finalGrades.get(course);
+            }
+        }
+        return -1;
+    }
 }

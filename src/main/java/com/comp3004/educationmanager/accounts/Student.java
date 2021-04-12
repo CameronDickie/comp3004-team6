@@ -254,4 +254,8 @@ public class Student extends User {
         }
         return -1;
     }
+
+    public HashMap<String, Integer> getFinalGrades() {
+        return finalGrades;
+    }
 }

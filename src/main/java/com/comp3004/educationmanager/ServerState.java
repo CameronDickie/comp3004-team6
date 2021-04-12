@@ -32,8 +32,6 @@ public class ServerState {
     Calendar date = Calendar.getInstance();
     Calendar deadline = Calendar.getInstance();
 
-
-
     public ServerState () {
         System.out.println("Server state is being made...");
 

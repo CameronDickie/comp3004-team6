@@ -91,7 +91,7 @@ public class ServerTest {
     @Test
     @Order(3)
     public void testAdminLogin() {
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put("username", "admin");
         map.put("password", "pass");
 
@@ -102,7 +102,7 @@ public class ServerTest {
     @Test
     @Order(4)
     public void testErrorLogin() {
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put("username", "bad");
         map.put("password", "login");
 
@@ -113,7 +113,7 @@ public class ServerTest {
     @Test
     @Order(5)
     public void testProfessorRegistration() {
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put("firstname", "robert");
         map.put("lastname", "collier");
         map.put("password", "password");
@@ -145,7 +145,7 @@ public class ServerTest {
     @Test
     @Order(7)
     public void testProfessorLogin() {
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put("username", "robertcollier");
         map.put("password", "password");
 
@@ -159,7 +159,7 @@ public class ServerTest {
         HashMap<String, Object> map = new HashMap<>();
         map.put("courseCode", "COMP1405A");
         map.put("courseName", "Introduction to Computer Science");
-        map.put("maxStudents", "150");
+        map.put("maxStudents", "200");
         map.put("prerequisites", new ArrayList<String>() {});
         map.put("professorID", "2000000");
         map.put("days", new ArrayList<>(Arrays.asList("monday", "wednesday")));
@@ -178,7 +178,7 @@ public class ServerTest {
     @Test
     @Order(9)
     public void testStudentRegistration() {
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put("firstname", "ben");
         map.put("lastname", "williams");
         map.put("password", "compscirocks");
@@ -210,7 +210,7 @@ public class ServerTest {
     @Test
     @Order(11)
     public void testStudentLogin() {
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put("username", "benwilliams");
         map.put("password", "compscirocks");
 
@@ -231,7 +231,164 @@ public class ServerTest {
         map.clear();
         map.put("userID", "1000000");
         response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
-        System.out.println(response);
+        assertEquals(1, ((ArrayList) response.get("courses")).size());
+        assertEquals(0, ((ArrayList) response.get("pastCourses")).size());
+    }
+
+    @Test
+    @Order(13)
+    public void testCourseCreationWithPrereqs() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP2402A");
+        map.put("courseName", "Abstract Data Types");
+        map.put("maxStudents", "125");
+        map.put("prerequisites", new ArrayList<String>(Arrays.asList("COMP1405A")));
+        map.put("professorID", "2000000");
+        map.put("days", new ArrayList<>(Arrays.asList("tuesday", "thursday")));
+        map.put("startTime", "11:35");
+        map.put("classDuration", "1.5");
+
+        sendRequest("POST", "create-course", Helper.objectToJSONString(map));
+
+        map.clear();
+        map.put("courseCode", "COMP2402A");
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "get-course-info", Helper.objectToJSONString(map)));
+        assertEquals("COMP2402A", response.get("courseCode"));
+        assertEquals("Abstract Data Types", response.get("courseName"));
+    }
+
+    @Test
+    @Order(14)
+    public void testErrorCourseRegistrationWithPrereqs() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP2402A");
+        map.put("studentID", 1000000);
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "course-registration", Helper.objectToJSONString(map)));
+        assertNotNull(response.get("error"));
+
+        map.clear();
+        map.put("userID", "1000000");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        assertEquals(1, ((ArrayList) response.get("courses")).size());
+        assertEquals(0, ((ArrayList) response.get("pastCourses")).size());
+    }
+
+    @Test
+    @Order(15)
+    public void testCreateStudentWithPrereqs() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("firstname", "cameron");
+        map.put("lastname", "rolfe");
+        map.put("password", "secondyear");
+        map.put("prerequisites", new ArrayList<>(Arrays.asList("COMP1405A")));
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "register-user-prerequisites", Helper.objectToJSONString(map)));
+        assertNotNull(response.get("success"));
+
+        map.clear();
+        map.put("userID", "1000001");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        assertEquals("cameronrolfe", response.get("name"));
+        assertEquals(1, ((ArrayList) response.get("pastCourses")).size()); // NOTE: user starts with a placeholder course, this is removed once they register in their first course
+        assertEquals(1, ((ArrayList) response.get("pastCourses")).size());
+    }
+
+    @Test
+    @Order(16)
+    public void testCourseRegistrationWithPrereqs() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP2402A");
+        map.put("studentID", 1000001);
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "course-registration", Helper.objectToJSONString(map)));
+        assertNotNull(response.get("success"));
+
+        map.clear();
+        map.put("userID", "1000001");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        assertEquals(1, ((ArrayList) response.get("courses")).size());
+        assertEquals(1, ((ArrayList) response.get("pastCourses")).size());
+    }
+
+    @Test
+    @Order(17)
+    public void testErrorTimeslotCourseCreation() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP1805A");
+        map.put("courseName", "Discrete Structures");
+        map.put("maxStudents", "150");
+        map.put("prerequisites", new ArrayList<String>());
+        map.put("professorID", "2000000");
+        map.put("days", new ArrayList<>(Arrays.asList("monday", "tuesday")));
+        map.put("startTime", "11:35");
+        map.put("classDuration", "1.5");
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "create-course", Helper.objectToJSONString(map)));
+        assertNotNull(response.get("error"));
+    }
+
+    @Test
+    @Order(18)
+    public void testSecondProfessorCreation() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("firstname", "jean-pierre");
+        map.put("lastname", "corriveau");
+        map.put("password", "designdesigndesign");
+        map.put("type", "professor");
+
+        sendRequest("POST", "register", Helper.objectToJSONString(map));
+
+        map.clear();
+        map.put("name", "jean-pierre corriveau");
+        map.put("type", "professor");
+        sendRequest("POST", "process-application", Helper.objectToJSONString(map));
+
+        map.clear();
+        map.put("userID", "2000001");
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        assertEquals("jean-pierrecorriveau", response.get("name"));
+        assertNotNull(response.get("professorID"));
+    }
+
+    @Test
+    @Order(19)
+    public void testThirdCourseCreation() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("courseName", "Design Patterns");
+        map.put("maxStudents", "100");
+        map.put("prerequisites", new ArrayList<String>());
+        map.put("professorID", "2000001");
+        map.put("days", new ArrayList<>(Arrays.asList("monday", "wednesday")));
+        map.put("startTime", "11:35");
+        map.put("classDuration", "1.5");
+
+        sendRequest("POST", "create-course", Helper.objectToJSONString(map));
+
+        map.clear();
+        map.put("courseCode", "COMP3004B");
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "get-course-info", Helper.objectToJSONString(map)));
+        assertEquals("COMP3004B", response.get("courseCode"));
+        assertEquals("Design Patterns", response.get("courseName"));
+    }
+
+    @Test
+    @Order(20)
+    public void testErrorTimeslotCourseRegistration() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("studentID", 1000000);
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "course-registration", Helper.objectToJSONString(map)));
+        assertNotNull(response.get("error"));
+    }
+
+    @Test
+    @Order(21)
+    public void testPastDeadlineCourseRegistration() {
+
     }
 
     /*
@@ -239,52 +396,6 @@ public class ServerTest {
         - Add @Order tags once order is finalized (I put them in a general order, can be switched around though)
         - Implement the following tests
      */
-
-    @Test
-    public void testCourseWithdrawal() {
-
-    }
-
-    @Test
-    public void testPastDeadlineCourseWithdrawal() {
-        // re-add student to course and withdraw after date
-    }
-
-    @Test
-    public void testCourseCreationWithPrereqs() {
-
-    }
-
-    @Test
-    public void testErrorTimeslotCourseCreation() {
-        // professor time conflict
-    }
-
-    @Test
-    public void testCourseRegistrationWithPrereqs() {
-        // add past course to student
-    }
-
-    @Test
-    public void testCreateStudentWithPrereqs() {
-        // register and process student application here (two requests?)
-        // needed for the next prereq error test
-    }
-
-    @Test
-    public void testErrorCourseRegistrationWithPrereqs() {
-
-    }
-
-    @Test
-    public void testThirdCourseCreation() {
-        // needed for the next timeslot conflict test
-    }
-
-    @Test
-    public void testErrorTimeslotCourseRegistration() {
-
-    }
 
     @Test
     public void testAddContentToCourse() {
@@ -347,7 +458,17 @@ public class ServerTest {
     }
 
     @Test
+    public void testCourseWithdrawal() {
+
+    }
+
+    @Test
     public void testLastCourseWithdrawal() {
-        // verify student was deleted from course
+        // verify student was deleted from system
+    }
+
+    @Test
+    public void testPastDeadlineCourseWithdrawal() {
+
     }
 }

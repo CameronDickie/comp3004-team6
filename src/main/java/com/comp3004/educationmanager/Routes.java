@@ -681,7 +681,14 @@ public class Routes {
         Component comp = (Component) course.getContent().executeCommand("findByPath", info);
         if(comp != null) {
             for(Map.Entry<String, Object> entry : contentMap.entrySet()) {
-                comp.setProperty(entry.getKey(), entry.getValue());
+                if(entry.getKey().equals("userID")) {
+                    comp.setProperty(entry.getKey(), Long.parseLong((String) entry.getValue()));
+                } else if(entry.getKey().equals("visible")) {
+                    comp.setProperty(entry.getKey(), Boolean.parseBoolean((String) entry.getValue()));
+                } else {
+                    comp.setProperty(entry.getKey(), entry.getValue());
+                }
+
             }
         } else {
             comp = course.addContent((String) contentMap.get("name"),

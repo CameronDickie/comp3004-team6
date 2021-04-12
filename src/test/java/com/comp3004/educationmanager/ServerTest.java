@@ -173,6 +173,13 @@ public class ServerTest {
         HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "get-course-info", Helper.objectToJSONString(map)));
         assertEquals("COMP1405A", response.get("courseCode"));
         assertEquals("Introduction to Computer Science", response.get("courseName"));
+
+        map.clear();
+        response.clear();
+        map.put("userID", "2000000");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        ArrayList<String> courses = (ArrayList) response.get("courses");
+        System.out.println(courses);
     }
 
     @Test
@@ -386,30 +393,56 @@ public class ServerTest {
     }
 
     @Test
-    @Order(21)
+    @Order(22)
     public void testPastDeadlineCourseRegistration() {
 
     }
 
-    /*
-    TODO:
-        - Add @Order tags once order is finalized (I put them in a general order, can be switched around though)
-        - Implement the following tests
-     */
-
     @Test
+    @Order(23)
     public void testAddContentToCourse() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("name", "Section 1");
+        map.put("path", "/COMP3004B/");
+        map.put("type", "section");
+        map.put("userID", "2000001");
+        map.put("userType", "professor");
+        map.put("visible", "true");
 
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "add-content", Helper.objectToJSONString(map)));
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+        assertEquals("Section 1", response.get("name"));
     }
 
     @Test
-    public void testModifyContent() {
-
-    }
-
-    @Test
+    @Order(24)
     public void testAddDocumentToCourse() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("name", "Document 1");
+        map.put("path", "/COMP3004B/Section 1/");
+        map.put("type", "PDF");
+        map.put("userID", "2000001");
+        map.put("userType", "professor");
+        map.put("visible", "true");
+        map.put("bytes", "SGVsbG8gV29ybGQ=");
 
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "add-document", Helper.objectToJSONString(map)));
+        System.out.println(response);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+
+        HashMap<String, Object> file = (HashMap) response.get("file");
+        //assertEquals("Hello World", new String((byte[]) file.get("bytes")));
+
+        response = (HashMap) response.get("wrappee");
+        assertEquals("Document 1", response.get("name"));
     }
 
     @Test
@@ -420,6 +453,34 @@ public class ServerTest {
     @Test
     public void testSubmitDeliverable() {
 
+    }
+
+    @Test
+    public void testModifyDeliverable() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("name", "Section 1");
+        map.put("path", "/COMP3004B/");
+        map.put("type", "section");
+        map.put("userID", "2000001");
+        map.put("userType", "professor");
+        map.put("visible", "true");
+        map.put("bytes", "R29vZGJ5ZSBXb3JsZA==");
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "add-document", Helper.objectToJSONString(map)));
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+
+
+
+        HashMap<String, Object> file = (HashMap) response.get("file");
+        //assertEquals("Goodbye World", Base64.getDecoder().decode((String) file.get("byteString")).toString());
+
+        response = (HashMap) response.get("wrappee");
+        assertEquals("Document 1", response.get("name"));
     }
 
     @Test

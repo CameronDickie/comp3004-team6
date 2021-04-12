@@ -69,7 +69,29 @@ public class Routes {
     public String getUser(@RequestBody String info) {
         System.out.println("From '/api/get-user': " + info);
         HashMap<String, Object> map = Helper.stringToMap(info);
-        return Helper.objectToJSONString(s.getUser((String) map.get("username")));
+
+        User user = data.users.get(Long.parseLong((String) map.get("userID")));
+
+        if (user == null) {
+            user = data.admin;
+        }
+
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("userID", user.getUserId());
+        response.put("name", user.getName());
+        response.put("password", user.getPassword());
+        if(user instanceof Student) {
+            Student s = (Student) user;
+            response.put("studentID", s.getStudentID());
+            response.put("courses", s.getCourses().keySet());
+            response.put("pastCourses", s.getPastCourses());
+        } else if(user instanceof Professor) {
+            Professor p = (Professor) user;
+            response.put("professorID", p.getProfessorID());
+            response.put("courses", p.getCourses().keySet());
+        }
+
+        return Helper.objectToJSONString(response);
     }
 
     @PostMapping(value ="/api/get-course-info", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
@@ -336,20 +358,20 @@ public class Routes {
                 //remove this course
                 student.getCourses().remove("COUR1234A");
             }
-            jsonReturn = "{success:'";
-            jsonReturn+= "Student has successfully registered in course " + courseData.getCourseCode() + "'}";
+            jsonReturn = "{\"success\":\"";
+            jsonReturn+= "Student has successfully registered in course " + courseData.getCourseCode() + "\"}";
         }
         else if (studentRegistrationStatus == 1) {
-            jsonReturn+= "Student could not be registered in course as course registration has closed'}";
+            jsonReturn+= "Student could not be registered in course as course registration has closed\"}";
         }
         else if (studentRegistrationStatus == 2) {
-            jsonReturn+= "Student could not be registered in course as it is full'}";
+            jsonReturn+= "Student could not be registered in course as it is full\"}";
         }
         else if (studentRegistrationStatus == 3) {
-            jsonReturn+= "Student could not be registered in course as they do not meet prerequisites'}";
+            jsonReturn+= "Student could not be registered in course as they do not meet prerequisites\"}";
         }
         else if (studentRegistrationStatus == 4) {
-            jsonReturn+= "Student could not be registered in course as there are timetable conflicts'}";
+            jsonReturn+= "Student could not be registered in course as there are timetable conflicts\"}";
         }
 
 

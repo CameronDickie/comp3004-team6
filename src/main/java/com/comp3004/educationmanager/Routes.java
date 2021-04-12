@@ -205,6 +205,7 @@ public class Routes {
 
             s.createUser(p);
 
+            data.updateAll("get-professor", null);
             HashMap<String, String> response = new HashMap<>();
             response.put("success", "user has been added");
             return Helper.objectToJSONString(response);

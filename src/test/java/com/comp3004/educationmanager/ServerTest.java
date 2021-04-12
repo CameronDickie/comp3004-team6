@@ -245,7 +245,7 @@ public class ServerTest {
         map.put("courseCode", "COMP2402A");
         map.put("courseName", "Abstract Data Types");
         map.put("maxStudents", "125");
-        map.put("prerequisites", new ArrayList<String>(Arrays.asList("COMP1405A")));
+        map.put("prerequisites", new ArrayList<String>(Arrays.asList("COMP1405")));
         map.put("professorID", "2000000");
         map.put("days", new ArrayList<>(Arrays.asList("tuesday", "thursday")));
         map.put("startTime", "11:35");
@@ -284,7 +284,7 @@ public class ServerTest {
         map.put("firstname", "cameron");
         map.put("lastname", "rolfe");
         map.put("password", "secondyear");
-        map.put("prerequisites", new ArrayList<>(Arrays.asList("COMP1405A")));
+        map.put("prerequisites", new ArrayList<>(Arrays.asList("COMP1405")));
         map.put("type", "student");
 
         HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "register-user-prerequisites", Helper.objectToJSONString(map)));
@@ -306,6 +306,7 @@ public class ServerTest {
         map.put("studentID", 1000001);
 
         HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "course-registration", Helper.objectToJSONString(map)));
+        System.out.println(response);
         assertNotNull(response.get("success"));
 
         map.clear();

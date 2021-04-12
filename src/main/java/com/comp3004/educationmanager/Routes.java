@@ -174,17 +174,16 @@ public class Routes {
         if(userMap.get("type").equals("student")) {
             Student st = (Student) studentCreator.createUser(((String) userMap.get("firstname")).toLowerCase() + ((String) userMap.get("lastname")).toLowerCase(), (String) userMap.get("password"));
             ArrayList<String> thisUserPastCourses = (ArrayList<String>) userMap.get("prerequisites");
-
             if(thisUserPastCourses.size() > 0) {
                 //add all of the past courses courseCode to this student
                 for(String cid : thisUserPastCourses) {
                     //ensure that the course indeed exists
-                    if(!SystemData.courses.containsKey(cid)) {
-                        System.out.println("Unable to add the course " + cid + " as we could not find it in the system");
-                    } else {
-                        st.addPastCourse(cid);
-                    }
+                    st.addPastCourse(cid);
                 }
+            }
+            System.out.println("printing students previous courses");
+            for(String s : st.getPastCourses()) {
+                System.out.println(s);
             }
             //attach this new user to the placeholder course
             CourseData placeholder = SystemData.courses.get("COUR1234A");
@@ -601,7 +600,7 @@ public class Routes {
                 }
                 boolean alreadyRegistered = false;
                 for(CourseData sc: curStudent.getCourses().values()) {
-                    if(c.getCourseID().equals(sc.getCourseID())) {
+                    if(c.getCourseCode().substring(0, c.getCourseCode().length()-1).equals(sc.getCourseCode().substring(0, sc.getCourseCode().length() -1))) {
                         alreadyRegistered = true;
                     }
                 }

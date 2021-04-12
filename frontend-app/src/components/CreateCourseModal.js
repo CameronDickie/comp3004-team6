@@ -71,6 +71,21 @@ class CreateCourseModal extends Component{
             return;
         }
 
+        let reqs = this.state.prerequisites_choosen;
+        for(let i in reqs) {
+            reqs[i] = reqs[i].substring(0, reqs[i].length-1);
+        }
+        //ensuring that no duplicate courses are provided
+        for(let i = 0; i < reqs.length; i++) {
+            for(let j = i+1; j < reqs.length; j++) {
+                if(reqs[i] == reqs[j]) {
+                    //remove all duplicates of reqs[i]
+                    reqs = reqs.splice(j);
+                    j--;
+                }
+            }
+        }
+
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'text/html' },
@@ -79,7 +94,7 @@ class CreateCourseModal extends Component{
                 courseName: this.state.course_name,
                 maxStudents: this.state.num_of_students,
                 professorID: pid,
-                prerequisites: this.state.prerequisites_choosen,
+                prerequisites: reqs,
                 professorName: pname,
                 days: _choose_days,
                 startTime: this.state.start_time,

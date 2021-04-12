@@ -26,6 +26,26 @@ class CreateCourseModal extends Component{
         if (this.state.toggle){
             thisType = "professor"
         }
+
+        //ensuring that all sections for the prerequisites are removed
+        let reqs = this.state.prerequisites_choosen;
+        for(let i in reqs) {
+            reqs[i] = reqs[i].substring(0, reqs[i].length-1);
+        }
+        // console.log("prereqs before: " + reqs)
+        //ensuring that no duplicate courses are provided
+        for(let i = 0; i < reqs.length; i++) {
+            for(let j = i+1; j < reqs.length; j++) {
+                if(reqs[i] == reqs[j]) {
+                    //remove all duplicates of reqs[i]
+                    reqs = reqs.splice(j);
+                    j--;
+                }
+            }
+        }
+        // console.log("prereqs after: " + reqs)
+
+
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/html' },
@@ -33,7 +53,7 @@ class CreateCourseModal extends Component{
                     firstname: this.state.firstname,
                     lastname: this.state.lastname,
                     password: this.state.password,
-                    prerequisites: this.state.prerequisites_choosen,
+                    prerequisites: reqs,
                     type: thisType
                 })
             };

@@ -270,7 +270,10 @@ public class Routes {
 
         if (professor.canProfessorBeAssignedToCourse(courseData)) {
             courseData.attach(professor); //Attaching Professor to CourseData
-
+            CourseData placeholder = professor.getCourses().get("COUR1234A");
+            if(placeholder != null) {
+                professor.getCourses().remove("COUR1234A");
+            }
             SystemData.courses.put(courseCode, courseData); //Storing CourseData in courses hashmap
 
             professor.addCourse(courseData); //giving this professor the course in their list of courses

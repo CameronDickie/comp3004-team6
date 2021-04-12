@@ -40,6 +40,10 @@ public class CourseItem implements Component, java.io.Serializable {
             visible = (boolean) value;
         } else if(property.equals("type")) {
             type = (String) value;
+        } else if(property.equals("userID")) {
+            userID = (long) value;
+        } else if(property.equals("userType")) {
+            userType = (String) value;
         } else {
             System.out.println("Property " + property + " not found.");
             return false;

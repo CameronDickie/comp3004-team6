@@ -51,9 +51,17 @@ public class CourseContent implements Component, java.io.Serializable {
             }
         } else if(property.equals("type")) {
             type = (String) value;
+        } else if(property.equals("userID")) {
+            userID = (long) value;
+        } else if(property.equals("userType")) {
+            userType = (String) value;
         } else {
-                System.out.println("Property " + property + " not found.");
-                return false;
+            boolean shouldReturn = false;
+            for(int i = 0; i < children.size(); ++i) {
+                shouldReturn = children.get(i).setProperty(property, value);
+                if(shouldReturn) break;
+            }
+            return shouldReturn;
         }
 
         return true;

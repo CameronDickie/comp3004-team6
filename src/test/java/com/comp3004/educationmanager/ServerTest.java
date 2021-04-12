@@ -15,6 +15,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -434,6 +435,7 @@ public class ServerTest {
         HashMap<String, Object> map = new HashMap<>();
         map.put("courseCode", "COMP3004B");
         map.put("name", "Section 1");
+        map.put("oldName", "");
         map.put("path", "/COMP3004B/");
         map.put("type", "section");
         map.put("userID", "2000001");
@@ -453,6 +455,7 @@ public class ServerTest {
         HashMap<String, Object> map = new HashMap<>();
         map.put("courseCode", "COMP3004B");
         map.put("name", "Document 1");
+        map.put("oldName", "");
         map.put("path", "/COMP3004B/Section 1/");
         map.put("type", "PDF");
         map.put("userID", "2000001");
@@ -469,10 +472,66 @@ public class ServerTest {
         response = (HashMap) response.get("wrappee");
 
         HashMap<String, Object> file = (HashMap) response.get("file");
-        //assertEquals("Hello World", new String((byte[]) file.get("bytes")));
+        byte[] str = Base64.getDecoder().decode((String) file.get("byteString"));
+        assertEquals("Hello World", new String(str));
 
         response = (HashMap) response.get("wrappee");
         assertEquals("Document 1", response.get("name"));
+    }
+
+    @Test
+    @Order(25)
+    public void testModifyDocument() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("name", "Document 1 Modified");
+        map.put("oldName", "Document 1");
+        map.put("path", "/COMP3004B/Section 1/");
+        map.put("type", "PDF");
+        map.put("userID", "2000001");
+        map.put("userType", "professor");
+        map.put("visible", "true");
+        map.put("bytes", "R29vZGJ5ZSBXb3JsZA==");
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "add-document", Helper.objectToJSONString(map)));
+        System.out.println(response);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+
+        HashMap<String, Object> file = (HashMap) response.get("file");
+        byte[] str = Base64.getDecoder().decode((String) file.get("byteString"));
+        assertEquals("Goodbye World", new String(str));
+
+        response = (HashMap) response.get("wrappee");
+        assertEquals("Document 1 Modified", response.get("name"));
+    }
+
+    @Test
+    @Order(26)
+    public void testModifyContent() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("name", "Section 2");
+        map.put("oldName", "Section 1");
+        map.put("path", "/COMP3004B/");
+        map.put("type", "section");
+        map.put("userID", "2000001");
+        map.put("userType", "professor");
+        map.put("visible", "true");
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "add-content", Helper.objectToJSONString(map)));
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+        assertEquals("Section 2", response.get("name"));
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) response.get("wrappee");
+        assertEquals("Document 1 Modified", response.get("name"));
+        assertEquals("/COMP3004B/Section 2/", response.get("path"));
     }
 
     @Test
@@ -487,30 +546,7 @@ public class ServerTest {
 
     @Test
     public void testModifyDeliverable() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("courseCode", "COMP3004B");
-        map.put("name", "Section 1");
-        map.put("path", "/COMP3004B/");
-        map.put("type", "section");
-        map.put("userID", "2000001");
-        map.put("userType", "professor");
-        map.put("visible", "true");
-        map.put("bytes", "R29vZGJ5ZSBXb3JsZA==");
 
-        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "add-document", Helper.objectToJSONString(map)));
-        response = (HashMap) response.get("wrappee");
-        response = (HashMap) ((ArrayList) response.get("children")).get(0);
-        response = (HashMap) response.get("wrappee");
-        response = (HashMap) ((ArrayList) response.get("children")).get(0);
-        response = (HashMap) response.get("wrappee");
-
-
-
-        HashMap<String, Object> file = (HashMap) response.get("file");
-        //assertEquals("Goodbye World", Base64.getDecoder().decode((String) file.get("byteString")).toString());
-
-        response = (HashMap) response.get("wrappee");
-        assertEquals("Document 1", response.get("name"));
     }
 
     @Test

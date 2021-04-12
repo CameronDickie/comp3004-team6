@@ -625,6 +625,7 @@ public class Routes {
     @param (contentInfo JSON)
         - courseCode (String): the course to add the content to
         - name (String): the name for the CourseContent object
+        - oldName (String): old-name if editing an item ("" otherwise)
         - path (String): the path for the CourseContent object (i.e. /COMP3004B/)
         - type (String): the type of composite object being added (one of: lecture, section)
         - userID (Long): id of the user creating the content
@@ -637,11 +638,17 @@ public class Routes {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         course.setStrategy(new CourseContentStrategy());
-        String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
+        String info = (String) contentMap.get("path") + (String) contentMap.get("oldName") + "/";
         Component comp = (Component) course.getContent().executeCommand("findByPath", info);
         if(comp != null) {
             for(Map.Entry<String, Object> entry : contentMap.entrySet()) {
-                comp.setProperty(entry.getKey(), entry.getValue());
+                if(entry.getKey().equals("userID")) {
+                    comp.setProperty(entry.getKey(), Long.parseLong((String) entry.getValue()));
+                } else if(entry.getKey().equals("visible")) {
+                    comp.setProperty(entry.getKey(), Boolean.parseBoolean((String) entry.getValue()));
+                } else {
+                    comp.setProperty(entry.getKey(), entry.getValue());
+                }
             }
         } else {
             comp = course.addContent((String) contentMap.get("name"),
@@ -663,6 +670,7 @@ public class Routes {
     @params (contentInfo JSON)
         - courseCode (String): course to add document to
         - name (String): name of document to add
+        - oldName (String): old-name if editing an item ("" otherwise)
         - path (String): path of where to add document
         - type (String): one of PDF, DOCX, PPTX
         - userID (long): id of the user adding the document
@@ -677,7 +685,7 @@ public class Routes {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         course.setStrategy(new AddDocumentStrategy());
-        String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
+        String info = (String) contentMap.get("path") + (String) contentMap.get("oldName") + "/";
         Component comp = (Component) course.getContent().executeCommand("findByPath", info);
         if(comp != null) {
             for(Map.Entry<String, Object> entry : contentMap.entrySet()) {
@@ -688,7 +696,6 @@ public class Routes {
                 } else {
                     comp.setProperty(entry.getKey(), entry.getValue());
                 }
-
             }
         } else {
             comp = course.addContent((String) contentMap.get("name"),
@@ -711,6 +718,7 @@ public class Routes {
     @params
         - courseCode (String): the course to add the deliverable to
         - name (String): the name for the CourseContent object
+        - oldName (String): old-name if editing an item ("" otherwise)
         - path (String): the path for the CourseContent object (i.e. /COMP3004B/)
         - type (String): the type of deliverable object being added (one of: quiz, assignment)
         - userID (Long): id of the user creating the content
@@ -725,11 +733,17 @@ public class Routes {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         course.setStrategy(new AddDeliverableStrategy());
-        String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
+        String info = (String) contentMap.get("path") + (String) contentMap.get("oldName") + "/";
         Component comp = (Component) course.getContent().executeCommand("findByPath", info);
         if(comp != null) {
             for(Map.Entry<String, Object> entry : contentMap.entrySet()) {
-                comp.setProperty(entry.getKey(), entry.getValue());
+                if(entry.getKey().equals("userID")) {
+                    comp.setProperty(entry.getKey(), Long.parseLong((String) entry.getValue()));
+                } else if(entry.getKey().equals("visible")) {
+                    comp.setProperty(entry.getKey(), Boolean.parseBoolean((String) entry.getValue()));
+                } else {
+                    comp.setProperty(entry.getKey(), entry.getValue());
+                }
             }
         } else {
             comp = course.addContent((String) contentMap.get("name"),
@@ -751,6 +765,7 @@ public class Routes {
     @params
         - courseCode (String): the course to add the deliverable to
         - name (String): the name for the CourseContent object
+        - oldName (String): old-name if editing an item ("" otherwise)
         - path (String): the path for the CourseContent object (i.e. /COMP3004B/)
         - type (String): the type of deliverable object being added (one of: quiz, assignment)
         - userID (Long): id of the user creating the content
@@ -766,15 +781,19 @@ public class Routes {
         CourseData course = s.getCourseData((String) contentMap.get("courseCode"));
         course.setStrategy(new SubmitDeliverableStrategy());
         String path = (String) contentMap.get("path");
-//        String pathToDeliverable = path.substring(0, path.lastIndexOf("/"));
-//        pathToDeliverable = pathToDeliverable.substring(0, path.lastIndexOf("/"));
         Component deliverable = (Component) course.getContent().executeCommand("findByPath", path);
         if((boolean) deliverable.executeCommand("isBeforeDeadline", s.date)) {
-            String info = (String) contentMap.get("path") + (String) contentMap.get("name") + "/";
+            String info = (String) contentMap.get("path") + (String) contentMap.get("oldName") + "/";
             Component comp = (Component) course.getContent().executeCommand("findByPath", info);
             if(comp != null) {
                 for(Map.Entry<String, Object> entry : contentMap.entrySet()) {
-                    comp.setProperty(entry.getKey(), entry.getValue());
+                    if(entry.getKey().equals("userID")) {
+                        comp.setProperty(entry.getKey(), Long.parseLong((String) entry.getValue()));
+                    } else if(entry.getKey().equals("visible")) {
+                        comp.setProperty(entry.getKey(), Boolean.parseBoolean((String) entry.getValue()));
+                    } else {
+                        comp.setProperty(entry.getKey(), entry.getValue());
+                    }
                 }
             } else {
                 comp = course.addContent( (String) contentMap.get("name"),

@@ -1,25 +1,20 @@
 package com.comp3004.educationmanager;
 
-import com.comp3004.educationmanager.misc.Serialization;
-import com.comp3004.educationmanager.observer.SystemData;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -385,10 +380,45 @@ public class ServerTest {
         assertNotNull(response.get("error"));
     }
 
+
     @Test
     @Order(21)
-    public void testPastDeadlineCourseRegistration() {
+    public void testSecondCourseRegistration() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("studentID", 1000001);
 
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "course-registration", Helper.objectToJSONString(map)));
+        assertNotNull(response.get("success"));
+
+        map.clear();
+        map.put("userID", "1000001");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        assertEquals(2, ((ArrayList) response.get("courses")).size());
+    }
+
+    @Test
+    @Order(22)
+    public void testPastDeadlineCourseRegistration() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP1405A");
+        map.put("studentID", 1000000);
+
+        String date = "2021-02-01-00-00";
+
+
+        HashMap<String, Object> dateMap = new HashMap<>();
+        dateMap.put("date", date);
+        sendRequest("POST", "set-system-date", Helper.objectToJSONString(dateMap));
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "course-registration", Helper.objectToJSONString(map)));
+        assertNotNull(response.get("error"));
+
+
+        map.clear();
+        map.put("userID", "1000000");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        assertEquals(1, ((ArrayList) response.get("courses")).size());
     }
 
     /*
@@ -454,21 +484,79 @@ public class ServerTest {
 
     @Test
     public void testDeleteCourse() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP1405A");
 
+        //1000001
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "delete-course", Helper.objectToJSONString(map)));
+
+        assertNotNull(response.get("success"));
+
+        map.clear();
+        map.put("userID", "1000000");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        assertEquals(0, ((ArrayList) response.get("courses")).size());
     }
+
 
     @Test
     public void testCourseWithdrawal() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("studentID", 1000001);
 
+        String date = "2021-01-15-00-00";
+        HashMap<String, Object> dateMap = new HashMap<>();
+        dateMap.put("date", date);
+        sendRequest("POST", "set-system-date", Helper.objectToJSONString(dateMap));
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "course-withdrawal", Helper.objectToJSONString(map)));
+
+        assertNotNull(response.get("success"));
+
+        map.clear();
+        map.put("userID", "1000001");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        assertEquals(1, ((ArrayList) response.get("courses")).size());
     }
 
     @Test
     public void testLastCourseWithdrawal() {
-        // verify student was deleted from system
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP2402A");
+        map.put("studentID", 1000001);
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "course-withdrawal", Helper.objectToJSONString(map)));
+
+        assertNotNull(response.get("success"));
+
+        map.clear();
+        map.put("userID", "1000001");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        System.out.println("RESPONSE: " + response);
+        assertEquals("admin", response.get("name"));
     }
 
     @Test
     public void testPastDeadlineCourseWithdrawal() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP1405A");
+        map.put("studentID", 1000000);
 
+        String date = "2021-01-31-00-00";
+        HashMap<String, Object> dateMap = new HashMap<>();
+        dateMap.put("date", date);
+        sendRequest("POST", "set-system-date", Helper.objectToJSONString(dateMap));
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "course-withdrawal", Helper.objectToJSONString(map)));
+
+        assertNotNull(response.get("error"));
+
+        map.clear();
+        map.put("userID", "1000000");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        assertEquals(1, ((ArrayList) response.get("courses")).size());
     }
+
+
 }

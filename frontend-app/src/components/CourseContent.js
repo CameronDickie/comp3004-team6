@@ -37,7 +37,7 @@ class CourseContent extends Component {
         await fetch('/api/delete-content', requestOptions)
             .then(response => response.text())
             .then(res => {
-                console.log(res)
+                alert(res)
             });
     }
 
@@ -54,8 +54,18 @@ class CourseContent extends Component {
                 byteStream = file.byteString
             }
 
-
-            if (data[i].wrappee.wrappee){
+            if (data[i].wrappee.wrappee && data[i].wrappee.wrappee.wrappee){
+                trees.push(<BuildArticle 
+                    getUser={this.props.getUser} 
+                    data={data[i].wrappee.wrappee.wrappee} 
+                    editable={data[i].editable} 
+                    bytes={data[i].wrappee.file.byteString} 
+                    openAddContent={this.toggleCourseContentModal}
+                    openGradeItem={this.toggleGradeModal}
+                    deadline={data[i].wrappee.dateString} 
+                    grade={data[i].wrappee.wrappee.grade}
+                    deleteContent={this.deleteCourseContent} />)
+            } else if (data[i].wrappee.wrappee){
                 trees.push(<BuildArticle 
                     getUser={this.props.getUser} 
                     data={data[i].wrappee.wrappee} 
@@ -154,7 +164,19 @@ class BuildArticle extends Component {
                 byteStream = file.byteString
             }
 
-            if (this.props.data.children[i].wrappee.wrappee){
+            if (this.props.data.children[i].wrappee.wrappee && this.props.data.children[i].wrappee.wrappee.wrappee){
+                list.push(
+                    <BuildArticle 
+                        getUser={this.props.getUser} 
+                        data={this.props.data.children[i].wrappee.wrappee.wrappee} 
+                        editable={this.props.data.children[i].editable} 
+                        bytes={this.props.data.children[i].wrappee.file.byteString} 
+                        deadline={this.props.data.children[i].wrappee.dateString} 
+                        grade={this.props.data.children[i].wrappee.wrappee.grade} 
+                        openAddContent={this.props.openAddContent}
+                        openGradeItem={this.props.openGradeItem}
+                        deleteContent={this.props.deleteContent} />)
+            } else if (this.props.data.children[i].wrappee.wrappee){
                 list.push(
                     <BuildArticle 
                         getUser={this.props.getUser} 

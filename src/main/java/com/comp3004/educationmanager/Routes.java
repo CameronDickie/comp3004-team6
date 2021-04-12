@@ -351,7 +351,6 @@ public class Routes {
         if (student.canStudentWithdraw(s.date, s.deadline)) {
             courseData.detach(student);//Detach student from course
 //            courseData.updateAll("get-courses", student.getStudentID()); //inform all other users that they need to
-            student.update("deleteCourse", courseData.getCourseCode());
             student.update("get-courses", student.getStudentID());
             System.out.println(student.getCourses());
             //if student.getCourses() is null, remove the user

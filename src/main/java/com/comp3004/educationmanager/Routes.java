@@ -113,6 +113,20 @@ public class Routes {
         return Helper.objectToJSONString(response);
     }
 
+    @PostMapping(value ="/api/set-system-date", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String setSystemDate(@RequestBody String info) {
+        HashMap<String, Object> map = Helper.stringToMap(info);
+        String[] date = ((String) map.get("date")).split("-");
+        s.date.set(Calendar.YEAR, Integer.parseInt(date[0]));
+        s.date.set(Calendar.MONTH, Integer.parseInt(date[1]) -1);
+        s.date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[2]));
+        s.date.set(Calendar.HOUR_OF_DAY, Integer.parseInt(date[3]));
+        s.date.set(Calendar.MINUTE, Integer.parseInt(date[4]));
+
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("success", "set time to " + map.get("date"));
+        return Helper.objectToJSONString(response);
+    }
     /*
     END OF FOR TESTING
      */
@@ -270,12 +284,12 @@ public class Routes {
                 u.update("get-global-courses", courseData);
             }
 
-            String jsonReturn = "{success:'";
-            jsonReturn += courseCode + " has been created'}";
+            String jsonReturn = "{\"success\":\"";
+            jsonReturn += courseCode + " has been created\"}";
             return jsonReturn;
         } else {
-            String jsonReturn = "{error:'";
-            jsonReturn += courseCode + " could not be created as Professor has timetable conflict'}";
+            String jsonReturn = "{\"error\":\"";
+            jsonReturn += courseCode + " could not be created as Professor has timetable conflict\"}";
             return jsonReturn;
         }
 
@@ -342,7 +356,7 @@ public class Routes {
 
         int studentRegistrationStatus = student.canStudentRegisterInCourse(courseData, s.date, s.deadline);
 
-        String jsonReturn = "{error:'";
+        String jsonReturn = "{\"error\":\"";
         //0 = Student can register successfully
         //1 = Course Registration Closed
         //2 = Course is Full

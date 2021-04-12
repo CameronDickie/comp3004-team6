@@ -41,6 +41,11 @@ class AddCourseContentModal extends Component{
         if (type == "file"){
             let extension = String(this.state.file.name).split('.')[1].toUpperCase()
             type = extension
+
+            if (extension != "PDF" && extension != "DOCX" && extension != "PPTX"){
+                alert("The file you choose is not supported. Files supported are (pdf, pptx, docx).")
+                return;
+            }
         }
 
         const requestOptions = {

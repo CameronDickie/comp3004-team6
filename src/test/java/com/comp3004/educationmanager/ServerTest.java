@@ -13,10 +13,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -537,51 +534,181 @@ public class ServerTest {
     }
 
     @Test
+    @Order(27)
     public void testAddDeliverableToCourse() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("name", "Deliverable 1");
+        map.put("oldName", "");
+        map.put("path", "/COMP3004B/Section 2/");
+        map.put("type", "deliverable");
+        map.put("userID", "2000001");
+        map.put("userType", "professor");
+        map.put("visible", "true");
+        map.put("deadline", "2020-01-01-23-59");
 
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "add-deliverable", Helper.objectToJSONString(map)));
+        System.out.println(response);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(1);
+        response = (HashMap) response.get("wrappee");
+        assertEquals("2020-01-01-23-59", response.get("dateString"));
+        response = (HashMap) response.get("wrappee");
+        assertEquals("Deliverable 1", response.get("name"));
     }
 
     @Test
-    public void testSubmitDeliverable() {
-
-    }
-
-    @Test
-    public void testModifyDeliverable() {
-
-    }
-
-    @Test
+    @Order(28)
     public void testPastDeadlineSubmitDeliverable() {
-        // have two separate students submit deliverables?
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("name", "Student Submission 1");
+        map.put("oldName", "");
+        map.put("path", "/COMP3004B/Section 2/Deliverable 1/");
+        map.put("type", "PDF");
+        map.put("userID", "1000001");
+        map.put("userType", "student");
+        map.put("visible", "true");
+        map.put("bytes", "SGVsbG8gV29ybGQ=");
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "submit-deliverable", Helper.objectToJSONString(map)));
+        assertNotNull(response.get("error"));
     }
 
     @Test
-    public void testDeleteContentFromCourse() {
+    @Order(29)
+    public void testModifyDeliverable() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("name", "Deliverable 1");
+        map.put("oldName", "Deliverable 1");
+        map.put("path", "/COMP3004B/Section 2/");
+        map.put("type", "deliverable");
+        map.put("userID", "2000001");
+        map.put("userType", "professor");
+        map.put("visible", "true");
+        map.put("deadline", "2022-01-01-23-59");
 
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "add-deliverable", Helper.objectToJSONString(map)));
+        System.out.println(response);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(1);
+        response = (HashMap) response.get("wrappee");
+        assertEquals("2022-01-01-23-59", response.get("dateString"));
+        response = (HashMap) response.get("wrappee");
+        assertEquals("Deliverable 1", response.get("name"));
     }
 
     @Test
+    @Order(30)
+    public void testSubmitDeliverable() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("name", "Student Submission 1");
+        map.put("oldName", "");
+        map.put("path", "/COMP3004B/Section 2/Deliverable 1/");
+        map.put("type", "PDF");
+        map.put("userID", "1000001");
+        map.put("userType", "student");
+        map.put("visible", "true");
+        map.put("bytes", "SGVsbG8gV29ybGQ=");
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "submit-deliverable", Helper.objectToJSONString(map)));
+        assertNull(response.get("error"));
+
+        System.out.println(response);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(1);
+        System.out.println(response);
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) response.get("wrappee");
+        response = (HashMap) ((ArrayList) response.get("children")).get(0);
+        response = (HashMap) response.get("wrappee");
+
+        HashMap<String, Object> file = (HashMap) response.get("file");
+        byte[] str = Base64.getDecoder().decode((String) file.get("byteString"));
+        assertEquals("Hello World", new String(str));
+
+        response = (HashMap) response.get("wrappee");
+        assertEquals(-1.0, response.get("grade"));
+        response = (HashMap) response.get("wrappee");
+        assertEquals("Student Submission 1", response.get("name"));
+    }
+
+    @Test
+    @Order(31)
     public void testAddDeliverableGrade() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("path", "/COMP3004B/Section 2/Deliverable 1/Student Submission 1/");
+        map.put("grade", "90.4");
 
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "add-grade", Helper.objectToJSONString(map)));
+        assertNotNull(response.get("success"));
     }
 
     @Test
+    @Order(32)
+    public void testDeleteContentFromCourse() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP3004B");
+        map.put("path", "/COMP3004B/Section 2/");
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "delete-content", Helper.objectToJSONString(map)));
+        System.out.println(response);
+        response = (HashMap) response.get("wrappee");
+        assertEquals(0, ((ArrayList) response.get("children")).size());
+    }
+
+    @Test
+    @Order(33)
     public void testSubmitFinalGrade() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("studentIDs", new ArrayList<>(Arrays.asList("1000001")));
+        map.put("courseCode", "COMP3004B");
+        map.put("grades", new ArrayList<>(Arrays.asList("92")));
 
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "submit-final-grade", Helper.objectToJSONString(map)));
+        assertNull(response.get("error"));
+        assertNotNull(response.get("finished"));
+
+        map.clear();
+        map.put("userID", "1000001");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        response = (HashMap) response.get("finalGrades");
+        assertEquals(92, response.get("COMP3004B"));
     }
 
     @Test
-    public void testDownloadDocument() {
+    @Order(34)
+    public void testPastDeadlineCourseWithdrawal() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("courseCode", "COMP1405A");
+        map.put("studentID", 1000000);
 
+        String date = "2021-01-31-00-00";
+        HashMap<String, Object> dateMap = new HashMap<>();
+        dateMap.put("date", date);
+        sendRequest("POST", "set-system-date", Helper.objectToJSONString(dateMap));
+
+        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "course-withdrawal", Helper.objectToJSONString(map)));
+
+        assertNotNull(response.get("error"));
+
+        map.clear();
+        map.put("userID", "1000000");
+        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
+        assertEquals(1, ((ArrayList) response.get("courses")).size());
     }
 
     @Test
-    public void testViewDocumentAsPDF() {
-        // currently not working for PPTX
-    }
-
-    @Test
+    @Order(35)
     public void testDeleteCourse() {
         HashMap<String, Object> map = new HashMap<>();
         map.put("courseCode", "COMP1405A");
@@ -599,6 +726,7 @@ public class ServerTest {
 
 
     @Test
+    @Order(36)
     public void testCourseWithdrawal() {
         HashMap<String, Object> map = new HashMap<>();
         map.put("courseCode", "COMP3004B");
@@ -620,6 +748,7 @@ public class ServerTest {
     }
 
     @Test
+    @Order(37)
     public void testLastCourseWithdrawal() {
         HashMap<String, Object> map = new HashMap<>();
         map.put("courseCode", "COMP2402A");
@@ -635,27 +764,4 @@ public class ServerTest {
         System.out.println("RESPONSE: " + response);
         assertEquals("admin", response.get("name"));
     }
-
-    @Test
-    public void testPastDeadlineCourseWithdrawal() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("courseCode", "COMP1405A");
-        map.put("studentID", 1000000);
-
-        String date = "2021-01-31-00-00";
-        HashMap<String, Object> dateMap = new HashMap<>();
-        dateMap.put("date", date);
-        sendRequest("POST", "set-system-date", Helper.objectToJSONString(dateMap));
-
-        HashMap<String, Object> response = Helper.stringToMap(sendRequest("POST", "course-withdrawal", Helper.objectToJSONString(map)));
-
-        assertNotNull(response.get("error"));
-
-        map.clear();
-        map.put("userID", "1000000");
-        response = Helper.stringToMap(sendRequest("POST", "get-user", Helper.objectToJSONString(map)));
-        assertEquals(1, ((ArrayList) response.get("courses")).size());
-    }
-
-
 }

@@ -85,6 +85,7 @@ public class Routes {
             response.put("studentID", s.getStudentID());
             response.put("courses", s.getCourses().keySet());
             response.put("pastCourses", s.getPastCourses());
+            response.put("finalGrades", s.getFinalGrades());
         } else if(user instanceof Professor) {
             Professor p = (Professor) user;
             response.put("professorID", p.getProfessorID());
@@ -787,7 +788,7 @@ public class Routes {
         - name (String): the name for the CourseContent object
         - oldName (String): old-name if editing an item ("" otherwise)
         - path (String): the path for the CourseContent object (i.e. /COMP3004B/)
-        - type (String): the type of deliverable object being added (one of: quiz, assignment)
+        - type (String): the type of deliverable object being added
         - userID (Long): id of the user creating the content
         - userType (String): is the user a student or professor
         - visible (boolean): don't need to pass this in, defaults to false
@@ -833,6 +834,7 @@ public class Routes {
             return Helper.objectToJSONString(err);
         }
     }
+
 
     /*
     Route for deleting course content
@@ -883,23 +885,23 @@ public class Routes {
     @param
         - studentIDs (List<String>): the student to add the grade to
         - courseCode (String): the course that the grade relates to
-        - grades (List<int>): the final grade that the student received
+        - grades (List<String>): the final grade that the student received
     @return failure/success message
     TODO: implement socket updates? (already using update method so just add socket stuff to the finalGrade command)
      */
     @PostMapping(value = "/api/submit-final-grade", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public String submitFinalGrade(@RequestBody String contentInfo) {
         HashMap<String, Object> contentMap = Helper.stringToMap(contentInfo);
-        List<String> studentIDs = (List) contentMap.get("studentIDs");
-        List<Integer> grades = (List) contentMap.get("grades");
+        ArrayList<String> studentIDs = (ArrayList) contentMap.get("studentIDs");
+        ArrayList<String> grades = (ArrayList) contentMap.get("grades");
         String courseCode = (String) contentMap.get("courseCode");
         HashMap<String, String> response = new HashMap<>();
 
         for(int i = 0; i < studentIDs.size(); ++i) {
-            Student student = (Student) SystemData.users.get(studentIDs.get(i));
+            Student student = (Student) data.users.get(Long.parseLong(studentIDs.get(i)));
             if(student != null) {
                 HashMap<String, Integer> gradeMap = new HashMap<>();
-                gradeMap.put(courseCode, grades.get(i));
+                gradeMap.put(courseCode, Integer.parseInt(grades.get(i)));
                 student.update("finalGrade", gradeMap);
             } else {
                 response.put("error", "Can't find student " + studentIDs.get(i));

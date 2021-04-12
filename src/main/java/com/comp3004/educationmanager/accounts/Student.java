@@ -169,13 +169,15 @@ public class Student extends User {
 
     //Function used to return status on course registration.
     //Returns different int depending on status of course registration:
-    //0 = Success
+    //0 = Student Can Register In Course
     //1 = Course Registration Deadline has Passed
     //2 = Course is Full
     //3 = Student does not meet prerequisites
     //4 = Course does not fit student timetable
     //Rather than returning boolean, it is more useful to return status so
     //front-end can display to user reason for not being able to register
+    //Registration Status is used to make a decision for student registration
+    // is routes, if it is 0 then student register otherwise they cannot and a reason is given
     public int canStudentRegisterInCourse(CourseData courseData, Calendar currDate, Calendar registrationDeadline) {
 
         ArrayList<String> days = courseData.getDays();
@@ -233,7 +235,7 @@ public class Student extends User {
         else if (timeConflicts > 0) {
             return 4;
         }
-        //Success: There are no conflicts.
+        //Student Can Register in Course
         else {
             return 0;
         }

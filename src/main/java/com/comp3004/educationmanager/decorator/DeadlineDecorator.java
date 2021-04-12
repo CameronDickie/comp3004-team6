@@ -17,7 +17,7 @@ public class DeadlineDecorator extends Decorator {
         if(property.equals("deadline")) {
             String[] date = ((String) value).split("-");
             deadline.set(Calendar.YEAR, Integer.parseInt(date[0]));
-            deadline.set(Calendar.MONTH, Integer.parseInt(date[1]));
+            deadline.set(Calendar.MONTH, Integer.parseInt(date[1]) -1);
             deadline.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[2]));
             deadline.set(Calendar.HOUR_OF_DAY, Integer.parseInt(date[3]));
             deadline.set(Calendar.MINUTE, Integer.parseInt(date[4]));

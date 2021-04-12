@@ -80,6 +80,7 @@ public class CourseData extends Subject implements java.io.Serializable {
 
     @Override
     public boolean detach(Observer o) {
+        o.update("deleteCourse", this.getCourseCode());
         currStudents--;
         return observers.remove(o);
     }

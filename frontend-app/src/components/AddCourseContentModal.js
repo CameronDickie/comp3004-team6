@@ -17,7 +17,8 @@ class AddCourseContentModal extends Component{
             minutes: "00",
 
             file: null,
-            base64URL: ""
+            base64URL: "",
+            oldName: ""
         }
     }
 
@@ -28,8 +29,6 @@ class AddCourseContentModal extends Component{
     doSubmit = async () => {
         let concat_date = this.state.year + "-" + this.state.month + "-" + this.state.day + "-" + this.state.hour + "-" + this.state.minutes
 
-        console.log(concat_date)
-
         let na = this.state.name
         if (this.state.type == "file") na = this.state.file.name
 
@@ -38,9 +37,9 @@ class AddCourseContentModal extends Component{
         if (this.props.isSubmission) api_path = "/api/submit-deliverable"
 
         let type = this.state.type
+
         if (type == "file"){
             let extension = String(this.state.file.name).split('.')[1].toUpperCase()
-            console.log(extension)
             type = extension
         }
 
@@ -56,14 +55,16 @@ class AddCourseContentModal extends Component{
                 courseCode: this.props.courseCode,
                 visible: "true",
                 deadline: concat_date,
-                bytes: this.state.base64URL
+                bytes: this.state.base64URL,
+                oldName: this.state.oldName
             })
         };
         
         await fetch(api_path, requestOptions)
             .then(response => response.text())
             .then(res => {
-                console.log(res)
+                alert(res)
+                this.props.clearCurrentContent()
                 this.props.hide()
             });
     };
@@ -111,8 +112,6 @@ class AddCourseContentModal extends Component{
 
     buildItemTypeOptions = () => {
         let pdl = [];
-
-        console.log(this.props.isSubmission)
 
         let types = ["section", "lecture", "deliverable", "file"]
 
@@ -191,8 +190,35 @@ class AddCourseContentModal extends Component{
 
     render(){
 
-        if (this.props.isSubmission && this.state.type != "file"){
+        if (this.props.isSubmission && this.state.type != "file" && (this.props.currentContent.data == null)){
             this.setState({type: "file"})
+        }
+
+        if (this.props.currentContent.data != null && this.props.currentContent.isUpdate){
+
+            if (this.props.currentContent.deadline){
+                let dateList = this.props.currentContent.deadline.split("-");
+
+                this.setState({
+                    name: this.props.currentContent.data.name,
+                    type: this.props.currentContent.data.type,
+                    year: dateList[0],
+                    month: dateList[1],
+                    day: dateList[2],
+                    hour: dateList[3],
+                    minutes: dateList[4],
+                    oldName: this.props.currentContent.data.name
+                })
+
+            } else {
+                this.setState({
+                    name: this.props.currentContent.data.name,
+                    type: this.props.currentContent.data.type,
+                    oldName: this.props.currentContent.data.name
+                })
+            }
+
+            this.props.setIsUpdate(false)
         }
         
         return (
@@ -213,7 +239,7 @@ class AddCourseContentModal extends Component{
                                     
                             <div className={`mb-6 ${(this.state.type == "file" ? "hidden" : "")}`}>
                                 <label for="name" class="block mb-2 text-sm text-gray-600 dark:text-gray-400">NAME</label>
-                                <input onChange={this.handleChange.bind(this)} type="name" name="name" id="name" placeholder="ex. Lecture 1" class="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-200 focus:border-green-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500" />
+                                <input onChange={this.handleChange.bind(this)} type="name" name="name" id="name" value={this.state.name} placeholder="ex. Lecture 1" class="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-200 focus:border-green-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500" />
                             </div>
 
                             <div className="grid grid-cols-4">
@@ -222,7 +248,7 @@ class AddCourseContentModal extends Component{
                                     <label class="block pt-2 pb-2 text-sm text-gray-600 dark:text-gray-400 uppercase">Type</label>
                                     <div class="relative inline-flex">
                                         <svg class="w-2 h-2 absolute top-0 right-0 m-4 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 412 232"><path d="M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z" fill="#648299" fill-rule="nonzero"/></svg>
-                                        <select id="type" onChange={this.handleChange.bind(this)} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
+                                        <select id="type" onChange={this.handleChange.bind(this)} value={this.state.type} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
                                             {this.buildItemTypeOptions()}
                                         </select>
                                     </div>
@@ -241,7 +267,7 @@ class AddCourseContentModal extends Component{
                                     <label class="block pt-2 pb-2 text-sm text-gray-600 dark:text-gray-400 uppercase">YEAR</label>
                                     <div class="relative inline-flex">
                                         <svg class="w-2 h-2 absolute top-0 right-0 m-4 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 412 232"><path d="M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z" fill="#648299" fill-rule="nonzero"/></svg>
-                                        <select id="year" onChange={this.handleChange.bind(this)} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
+                                        <select id="year" onChange={this.handleChange.bind(this)} value={this.state.year} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
                                             {this.buildYearDropDown()}
                                         </select>
                                     </div>
@@ -251,7 +277,7 @@ class AddCourseContentModal extends Component{
                                     <label class="block pt-2 pb-2 text-sm text-gray-600 dark:text-gray-400 uppercase">MONTH</label>
                                     <div class="relative inline-flex">
                                         <svg class="w-2 h-2 absolute top-0 right-0 m-4 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 412 232"><path d="M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z" fill="#648299" fill-rule="nonzero"/></svg>
-                                        <select id="month" name="month" onChange={this.handleChange.bind(this)} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
+                                        <select id="month" name="month" onChange={this.handleChange.bind(this)} value={this.state.month} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
                                             {this.buildMonthDropDown()}
                                         </select>
                                     </div>
@@ -261,7 +287,7 @@ class AddCourseContentModal extends Component{
                                     <label class="block pt-2 pb-2 text-sm text-gray-600 dark:text-gray-400 uppercase">DAY</label>
                                     <div class="relative inline-flex">
                                         <svg class="w-2 h-2 absolute top-0 right-0 m-4 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 412 232"><path d="M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z" fill="#648299" fill-rule="nonzero"/></svg>
-                                        <select id="day" name="day" onChange={this.handleChange.bind(this)} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
+                                        <select id="day" name="day" onChange={this.handleChange.bind(this)} value={this.state.day} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
                                             {this.buildDayDropDown()}
                                         </select>
                                     </div>
@@ -272,7 +298,7 @@ class AddCourseContentModal extends Component{
                                     <label class="block pt-2 pb-2 text-sm text-gray-600 dark:text-gray-400 uppercase">HOUR</label>
                                     <div class="relative inline-flex">
                                         <svg class="w-2 h-2 absolute top-0 right-0 m-4 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 412 232"><path d="M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z" fill="#648299" fill-rule="nonzero"/></svg>
-                                        <select id="hour" name="hour" onChange={this.handleChange.bind(this)} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
+                                        <select id="hour" name="hour" onChange={this.handleChange.bind(this)} value={this.state.hour} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
                                             {this.buildHourDropDown()}
                                         </select>
                                     </div>
@@ -282,7 +308,7 @@ class AddCourseContentModal extends Component{
                                     <label class="block pt-2 pb-2 text-sm text-gray-600 dark:text-gray-400 uppercase">MINUTES</label>
                                     <div class="relative inline-flex">
                                         <svg class="w-2 h-2 absolute top-0 right-0 m-4 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 412 232"><path d="M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z" fill="#648299" fill-rule="nonzero"/></svg>
-                                        <select id="minutes" name="minutes" onChange={this.handleChange.bind(this)} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
+                                        <select id="minutes" name="minutes" onChange={this.handleChange.bind(this)} value={this.state.minutes} class="text-center border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
                                             {this.buildMinutesDropDown()}
                                         </select>
                                     </div>

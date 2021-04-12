@@ -21,6 +21,12 @@ class CourseContent extends Component {
             addGradeModal: false,
             isSubmission: false,
             cur_path: "/COMP3004/",
+
+            cur_article: {
+                data:null,
+                deadline: "",
+                isUpdate: false
+            }
         }
     }
 
@@ -94,11 +100,18 @@ class CourseContent extends Component {
         return trees;
     }
 
-    toggleCourseContentModal = (new_path, isSub) => {
+    toggleCourseContentModal = (new_path, isSub, article, dl) => {
         if (new_path != null){
             if (isSub != null){
                 this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: new_path, isSubmission: isSub})
+            } else if (article != null){
+                this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: new_path, cur_article: {
+                    data: article,
+                    deadline: dl,
+                    isUpdate: true
+                }})
             } else this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: new_path})
+
         } else this.setState({addContentModalOpen: !this.state.addContentModalOpen, cur_path: this.state.path})
     }
 
@@ -106,6 +119,18 @@ class CourseContent extends Component {
         if (new_path != null){
             this.setState({addGradeModal: !this.state.addGradeModal, cur_path: new_path})
         } else this.setState({addGradeModal: !this.state.addGradeModal, cur_path: this.state.path})
+    }
+
+    clearCurrentContent = () => {
+        this.setState({cur_article: {data:null, deadline:"", isUpdate:false}})
+    }
+
+    setIsUpdate = (tf) => {
+        this.setState({cur_article: {
+            data: this.state.cur_article.data,
+            deadline: this.state.cur_article.deadline,
+            isUpdate: tf
+        }})
     }
 
     render(){
@@ -131,7 +156,10 @@ class CourseContent extends Component {
                 {this.buildArticleTrees()}
 
                 <AddCourseContentModal getUser={this.props.getUser} show={this.state.addContentModalOpen} hide={this.toggleCourseContentModal} 
-                cPath={this.state.cur_path} courseCode={this.props.courseCode} isSubmission={this.state.isSubmission}/>
+                cPath={this.state.cur_path} courseCode={this.props.courseCode} isSubmission={this.state.isSubmission} 
+                currentContent={this.state.cur_article} 
+                clearCurrentContent={this.clearCurrentContent}
+                setIsUpdate={this.setIsUpdate}/>
 
                 <AddGradeModal getUser={this.props.getUser} show={this.state.addGradeModal} hide={this.toggleGradeModal} 
                 cPath={this.state.cur_path} courseCode={this.props.courseCode}/>
@@ -370,6 +398,16 @@ class BuildArticle extends Component {
                                 Add Submission
                                 <span className="ml-2">
                                     <FontAwesomeIcon className="text-gray-800 hover:text-green-500" size="lg" icon={faPlus}/>
+                                </span>
+                            </button>
+                    </span>
+
+                    <span className={`pl-4 ${(!studentViewing) ? "" : "hidden"}`}>
+                            <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono border-blue-500 hover:shadow-md"
+                            onClick={() => this.props.openAddContent(article.path, null, article, this.props.deadline)}>
+                                Edit
+                                <span className="ml-2">
+                                    <FontAwesomeIcon className="text-gray-800 hover:text-blue-500" size="lg" icon={faPlus}/>
                                 </span>
                             </button>
                     </span>

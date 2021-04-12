@@ -438,7 +438,7 @@ public class SystemFunctionsTest {
 
     //Test to make sure student can register in a course when there are zero conflicts
     @Test
-    public void testCourseRegistration() {
+    public void testCourseRegistrationNoConflicts() {
         ArrayList<String> days = new ArrayList<>();
         days.add("Tuesday");
         days.add("Thursday");

@@ -16,8 +16,6 @@ import {
 import FullScreenCourseModal from "../components/FullScreenCourseModal";
 import FullScreenRegisterModal from "../components/FullScreenRegisterModal";
 
-import cData from "../course-example.json"
-
 class Dashboard extends React.Component {
     constructor(props) {
         super(props);

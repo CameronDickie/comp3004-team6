@@ -84,7 +84,6 @@ public class Professor extends User {
     }
 
     public void addCourse(CourseData data) {
-        //TODO: Check to make sure student meets pre-req, course is not full and students timetable has no conflicts and it is not past deadline
         courses.put(data.getCourseCode(), data);
     }
     public void setProfessorID(long professorID) {

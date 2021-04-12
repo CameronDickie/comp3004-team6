@@ -84,7 +84,6 @@ public class Professor extends User {
     }
 
     public void addCourse(CourseData data) {
-        //TODO: Check to make sure student meets pre-req, course is not full and students timetable has no conflicts and it is not past deadline
         courses.put(data.getCourseCode(), data);
     }
     public void setProfessorID(long professorID) {
@@ -103,19 +102,19 @@ public class Professor extends User {
 
         ArrayList<String> days = courseData.getDays();
 
-        HashMap<String, CourseData> studentCourses = courses;
+        HashMap<String, CourseData> professorCourses = courses;
 
         int timeConflicts = 0;
 
         //Loop to determine timetable conflicts
         for (String day : days) {
-            for (CourseData studentCourseData : studentCourses.values()) {
-                for (String day2: studentCourseData.getDays()) {
+            for (CourseData professorCourseData : professorCourses.values()) {
+                for (String day2: professorCourseData.getDays()) {
                     if (day.equals(day2)) {
                         //Course is on same day as another course, check if there is time conflict
                         String startTime = courseData.getStartTime();
 
-                        String startTimeStudentCourse = studentCourseData.getStartTime();
+                        String startTimeStudentCourse = professorCourseData.getStartTime();
 
                         String[] startTimeArr = startTime.split(":");
 
@@ -128,7 +127,7 @@ public class Professor extends User {
                         //Verifying if new course would be before or after current course.
                         //If the course is neither before or after then there must be a timetable conflict
                         if (!((startTimeMinutes + (courseData.getClassDuration() * 60) < startTimeStudentCourseMinutes) ||
-                                (startTimeMinutes > startTimeStudentCourseMinutes + (studentCourseData.getClassDuration() * 60)))) {
+                                (startTimeMinutes > startTimeStudentCourseMinutes + (professorCourseData.getClassDuration() * 60)))) {
                             timeConflicts++;
                             System.out.println("Conflict for: " + day2 + " " + " at " + startTimeStudentCourse);
                         }

@@ -327,8 +327,8 @@ public class Routes {
         //Removing course from list of courses
         SystemData.courses.remove(courseCode);
 
-        String jsonReturn = "{success:'";
-        jsonReturn+= courseCode + " has been deleted'}";
+        String jsonReturn = "{\"success\":\"";
+        jsonReturn+= courseCode + " has been deleted\"}";
         return jsonReturn;
     }
 
@@ -434,12 +434,12 @@ public class Routes {
                 student.update("removal-from-system", student);
             }
 
-            String jsonReturn = "{success:'Student has successfully withdrawn from the course " + courseData.getCourseCode() + "'}";
+            String jsonReturn = "{\"success\":\"Student has successfully withdrawn from the course " + courseData.getCourseCode() + "\"}";
             return jsonReturn;
         }
         else {
 //            courseData.attach(student);
-            String jsonReturn = "{error:'Student cannot withdraw as the withdraw deadline has past " + courseData.getCourseCode() + "'}";
+            String jsonReturn = "{\"error\":\"Student cannot withdraw as the withdraw deadline has past " + courseData.getCourseCode() + "\"}";
             return jsonReturn;
         }
     }

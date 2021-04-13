@@ -91,7 +91,7 @@ class Dashboard extends React.Component {
             if(event.data == "get-courses") {
                 this.updateCourses(); //updating this user's list of courses
                 this.getGlobalCourses(); //updating this user's list of total courses
-                this.getFinalGrades();
+                if(this.props.getUser().type == "Student") this.getFinalGrades();
             } else if(event.data == "removal-from-system") {
                 //sign this user out
                 this.disconnect();
@@ -103,7 +103,7 @@ class Dashboard extends React.Component {
                 this.getCourseContentData(this.state.currentCourse);
             } else if(event.data == "get-final-grade") {
                 //do something with this final grade
-                this.getFinalGrades();
+                if(this.props.getUser().type == "Student") this.getFinalGrades();
             }
         }
         ws.onerror = (event) => {

@@ -31,7 +31,7 @@ public class Student extends User {
     @Override
     public void update(String command, Object value) {
         switch (command) {
-            case "deleteCourse":
+            case "deleteCourse": {
                 String courseCode = (String) value;
                 courses.remove(courseCode);
                 try {
@@ -45,13 +45,25 @@ public class Student extends User {
                     e.printStackTrace(System.out);
                 }
                 break;
+            }
             case "addCourse":
                 addCourse((CourseData) value);
                 break;
-            case "finalGrade":
+            case "finalGrade": {
                 HashMap<String, Integer> pair = (HashMap) value;
                 finalGrades.put((String) pair.keySet().toArray()[0], (Integer) pair.values().toArray()[0]);
+                TextMessage message = new TextMessage("get-final-grade");
+                try {
+                    if (this.getSocketConnection() != null && this.getSocketConnection().isOpen()) {
+                        this.getSocketConnection().sendMessage(message);
+                    } else {
+                        System.out.println("Unable to connect to student");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace(System.out);
+                }
                 break;
+            }
             case "get-courses": {
                 TextMessage message = new TextMessage("get-courses");
                 try {

@@ -7,6 +7,7 @@ import React, { Component } from "react";
 //TEST DATA
 import AddCourseContentModal from "./AddCourseContentModal";
 import AddGradeModal from "./AddGradeModal";
+import SubmitFinalGradesModal from "./SubmitFinalGradesModal";
 
 class CourseContent extends Component {
 
@@ -21,6 +22,7 @@ class CourseContent extends Component {
             addGradeModal: false,
             isSubmission: false,
             cur_path: "/COMP3004/",
+            finalGradeModal: false,
 
             cur_article: {
                 data:null,
@@ -121,6 +123,10 @@ class CourseContent extends Component {
         } else this.setState({addGradeModal: !this.state.addGradeModal, cur_path: this.state.path})
     }
 
+    toggleFinalGradeModal = () => {
+        this.setState({finalGradeModal: !this.state.finalGradeModal});
+    }
+
     clearCurrentContent = () => {
         this.setState({cur_article: {data:null, deadline:"", isUpdate:false}})
     }
@@ -143,6 +149,13 @@ class CourseContent extends Component {
                             <div className="text-5xl font-semibold italic text-gray-200">Course Content:</div>
                         </div>
                         <div className="">
+                        {(this.props.getUser().type == "Professor") ? <button className={`px-3 mr-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold border-indigo-500 hover:shadow-md ${(this.props.getUser().type == "Student") ? "hidden" : ""}`}
+                            onClick={()=>this.toggleFinalGradeModal()}>
+                                Submit Final Grades
+                                <span className="ml-2">
+                                    <FontAwesomeIcon className="text-gray-800 hover:text-indigo-500" size="lg" icon={faPlusCircle}/>
+                                </span>
+                        </button> : <div/>}
                             <button className={`px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold border-yellow-500 hover:shadow-md ${(this.props.getUser().type == "Student") ? "hidden" : ""}`}
                             onClick={()=>this.toggleCourseContentModal("/" + this.props.courseCode + "/")}>
                                     Add Content
@@ -163,6 +176,8 @@ class CourseContent extends Component {
 
                 <AddGradeModal getUser={this.props.getUser} show={this.state.addGradeModal} hide={this.toggleGradeModal} 
                 cPath={this.state.cur_path} courseCode={this.props.courseCode}/>
+
+                <SubmitFinalGradesModal show={this.state.finalGradeModal} courseCode={this.props.courseCode} students={this.props.students} hide={this.toggleFinalGradeModal}/>
 
             </section>
         )

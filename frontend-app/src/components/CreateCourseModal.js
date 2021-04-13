@@ -70,7 +70,10 @@ class CreateCourseModal extends Component{
             alert("You must provide days this course takes place on.");
             return;
         }
-
+        if(this.state.course_code.length != 9) {
+            alert("Format must be 9 characters long (e.g. COMP3008A)")
+            return;
+        }
         let reqs = this.state.prerequisites_choosen;
         for(let i in reqs) {
             reqs[i] = reqs[i].substring(0, reqs[i].length-1);

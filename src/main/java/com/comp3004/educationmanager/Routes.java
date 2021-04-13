@@ -11,6 +11,7 @@ import com.comp3004.educationmanager.factory.StudentCreator;
 
 import com.comp3004.educationmanager.misc.Application;
 import com.comp3004.educationmanager.observer.CourseData;
+import com.comp3004.educationmanager.observer.Observer;
 import com.comp3004.educationmanager.observer.SystemData;
 import com.comp3004.educationmanager.strategy.AddDeliverableStrategy;
 import com.comp3004.educationmanager.strategy.AddDocumentStrategy;
@@ -539,6 +540,8 @@ public class Routes {
                 thisCourseInfo.put("code", c.getCourseCode());
                 thisCourseInfo.put("name", c.getCourseName());
                 thisCourseInfo.put("id", String.valueOf(c.getCourseID()));
+                //find if this user has a final grade provided with this course
+
                 courseInfo.add(thisCourseInfo);
             }
             return Helper.objectToJSONString(courseInfo);
@@ -907,7 +910,7 @@ public class Routes {
                 response.put("error", "Can't find student " + studentIDs.get(i));
             }
         }
-
+        System.out.println("reads: " + contentInfo);
         response.put("finished", "Final grades have been submitted");
         return Helper.objectToJSONString(response);
     }
@@ -1064,6 +1067,52 @@ public class Routes {
             }
         }
         return Helper.objectToJSONString(profs);
+    }
+
+    /*
+    (String) cid: The code of the course we want to query the students for
+
+    returns: a map of all of the studentID and username pairs in the course
+     */
+    @PostMapping(value="/api/get-all-students-course", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String getAllStudentsInCourse(@RequestBody String courseInfo) {
+        HashMap<String, Object> courseMap = Helper.stringToMap(courseInfo);
+        String courseID = (String) courseMap.get("cid");
+        CourseData course = SystemData.courses.get(courseID);
+        if(course == null) {
+            HashMap<String, String> error = new HashMap<>();
+            error.put("error", "unable to find the course with that cid");
+            return Helper.objectToJSONString(error);
+        }
+        //make a collection of all of the studentIDs in the course
+        HashMap<Long, String> students = new HashMap<>();
+        ArrayList<Observer> participants = course.getObservers();
+        for(Observer o : participants) {
+            if(o instanceof Professor) {
+                continue;
+            } else {
+                Student s = (Student) o;
+                students.put(s.getStudentID(), s.getName());
+            }
+        }
+        return Helper.objectToJSONString(students);
+    }
+
+    /*
+    (String) studentID
+    returns a map of this students final grades
+     */
+    @PostMapping(value="/api/get-student-final-grades", consumes = MediaType.TEXT_HTML_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public String getAllGradesForStudent(@RequestBody String stuInfo) {
+        HashMap<String, Object> stuMap = Helper.stringToMap(stuInfo);
+        Student s = (Student) SystemData.users.get(Long.valueOf((Integer) stuMap.get("studentID")));
+        if(s == null) {
+            HashMap<String, String> err = new HashMap<>();
+            err.put("error", "unable to find student with this id");
+            return Helper.objectToJSONString(err);
+        }
+        return Helper.objectToJSONString(s.getFinalGrades());
+
     }
     /*
     TODO:

@@ -27,9 +27,10 @@ class Dashboard extends React.Component {
             webSocket: null,
             courses: [{code:"COMP3004", name:"OOSE"}],
             globalCourses : [],
-
+            mapOfStudents : [],
+            finalGrades: {},
             currentCourseData: null,
-            currentCourseName: ""
+            currentCourseName: "",
         }
     }
 
@@ -37,6 +38,7 @@ class Dashboard extends React.Component {
         //get this user's courses from the system
         this.updateCourses();
         this.getGlobalCourses();
+        if (this.props.getUser().type=="Student") this.getFinalGrades();
         this.connect(); //connecting to the web socket for this user
     }
 
@@ -53,6 +55,25 @@ class Dashboard extends React.Component {
             .then(res => {
                 this.setState({currentCourseData: res.wrappee})
             });
+        //get the list of students associated with this course and set them to the list of students
+
+        const requestOptions2 = {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/html' },
+            body: JSON.stringify({
+                cid: code
+            })
+        }
+        await fetch('/api/get-all-students-course', requestOptions2)
+            .then(response => response.json())
+            .then(res => {
+                if(res.error) {
+                    alert(res.error);
+                    return;
+                }
+                console.log(res)
+                this.setState({mapOfStudents: res})
+            })
     };
 
     connect = () => {
@@ -70,6 +91,7 @@ class Dashboard extends React.Component {
             if(event.data == "get-courses") {
                 this.updateCourses(); //updating this user's list of courses
                 this.getGlobalCourses(); //updating this user's list of total courses
+                this.getFinalGrades();
             } else if(event.data == "removal-from-system") {
                 //sign this user out
                 this.disconnect();
@@ -79,6 +101,9 @@ class Dashboard extends React.Component {
                 this.getGlobalCourses();
             } else if(event.data == "get-course-content") {
                 this.getCourseContentData(this.state.currentCourse);
+            } else if(event.data == "get-final-grade") {
+                //do something with this final grade
+                this.getFinalGrades();
             }
         }
         ws.onerror = (event) => {
@@ -118,8 +143,6 @@ class Dashboard extends React.Component {
     }
 
     showModalCourse = (code, name) => {
-        // -- UNCOMMENT ONCE HOOKED UP
-
         this.getCourseContentData(code)
             .then(() => {
                 this.setState({modalOpen: true, currentCourse: code, whichModal: 0, currentCourseName: name})
@@ -139,6 +162,27 @@ class Dashboard extends React.Component {
     closeModal = () => {
         this.setState({modalOpen: false})
         document.getElementById('myModal').hidden = true
+    }
+
+    getFinalGrades = async () => {
+        const requestOptions = { 
+            method: 'POST',
+            headers: {'Content-Type':'text/html'},
+            body: JSON.stringify({
+                studentID: this.props.getUser().studentID
+            })
+        }
+
+        await fetch('/api/get-student-final-grades', requestOptions)
+            .then(response => response.json())
+            .then(res => {
+                if(res.error) {
+                    alert(res.error);
+                    return;
+                }
+                console.log(res);
+                this.setState({finalGrades: res});
+            });
     }
     updateCourses = async () => {
         //make a request to /api/get-user-courses-minimal
@@ -237,7 +281,7 @@ class Dashboard extends React.Component {
         if (this.state.modalOpen){
             if (this.state.whichModal == 0){
                 return (
-                    <FullScreenCourseModal getUser={this.props.getUser} course={this.state.currentCourseData} dashboard={this} name={this.state.currentCourseName} />
+                    <FullScreenCourseModal getUser={this.props.getUser} students={this.state.mapOfStudents} course={this.state.currentCourseData} dashboard={this} name={this.state.currentCourseName} />
                 )
             } else if (this.state.whichModal == 1){
                 return (
@@ -311,6 +355,11 @@ function makeCourseCard(i, course, app){
                     <span class=" mr-3 inline-flex items-center leading-none text-sm  py-1 ">
                     <button onClick={() => {app.dropCourse(course.code)}} className={(app.props.getUser().type == "Student") ? "bg-white border-gray-800 ml-1 px-2 py-2 border rounded-md  font-bold shadow-sm text-sm hover:shadow-md" : "hidden"}>Drop<FontAwesomeIcon className="ml-2 text-red-500" size="lg" icon={faTrash}/></button>
                     </span>
+                    <span className={`pl-4 ${app.state.finalGrades[course.code] ? "" : "hidden"}`}>
+                                <button className="px-3 rounded-lg py-2 border-2 text-sm font-mono font-semibold">
+                                    Grade={app.state.finalGrades[course.code]}
+                                </button>
+                            </span>
                     <span class=" inline-flex items-center leading-none text-sm">
                         <button onClick={() => app.showModalCourse(course.code, course.name)} className="text-lg font-semibold hover:underline">View</button>
                     </span>

@@ -14,3 +14,7 @@
 - mvn install -Dskiptests
 
 - These tests do infact work, if you run the Tests main function individually they all succeed. Additionally, if you are on Windows or Ubuntu, this is not an issue and mvn install can be run as normal.
+
+# Logging into the System
+- username: admin   |   password: pass
+- otherwise register to be created in the system
